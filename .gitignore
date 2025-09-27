@@ -66,4 +66,32 @@ lib/generated_plugin_registrant.dart
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 
+*.lock
+*.iml
+
+# Build artifacts that should not be committed
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+*.config.dart
+
+# Pre-commit
+.pre-commit-config.yaml.bak
+
+# IDE and editor files
+*.swp
+*.swo
+*~
+.vscode/
+
+# macOS
+.DS_Store
+
+# Secrets and environment files
+.env
+.env.local
+.env.production
+*.pem
+*.key
+*.p12
 # End of https://www.toptal.com/developers/gitignore/api/flutter

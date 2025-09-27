@@ -1,0 +1,141 @@
+# Copyright (c) 2025 Monikode. All rights reserved.
+# Unauthorized copying of this file, via any medium, is strictly prohibited.
+# Created by MoniK.
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  # Standard pre-commit hooks for general file handling
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: '\.md$'
+      - id: end-of-file-fixer
+      - id: check-yaml
+        exclude: '\.github/workflows/.*\.ya?ml$'
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+      - id: no-commit-to-branch
+        args: [--branch, main, --branch, master]
+
+  # Flutter and Dart hooks using local commands
+  - repo: local
+    hooks:
+      - id: dart-format
+        name: Format Dart code
+        description: Formats Dart code using dart format
+        entry: dart format --set-exit-if-changed --line-length=80
+        language: system
+        files: '\.dart$'
+        pass_filenames: true
+
+      - id: flutter-analyze
+        name: Analyze Dart code
+        description: Analyzes Dart code using flutter analyze
+        entry: flutter analyze --fatal-infos
+        language: system
+        files: '\.dart$'
+        pass_filenames: false
+
+      - id: flutter-test-quick
+        name: Run Flutter unit tests (quick)
+        description: Run Flutter unit tests for changed files only
+        entry: flutter test test/unit/
+        language: system
+        files: '\.dart$'
+        pass_filenames: false
+
+      - id: check-forbidden-patterns
+        name: Check for forbidden patterns
+        description: Prevent committing debug code and TODOs
+        entry: bash
+        language: system
+        args:
+          - -c
+          - |
+            if grep -rn --include="*.dart" -E "(TODO:|FIXME:|XXX:|HACK:|debugPrint\(|print\()" lib/ test/ 2>/dev/null; then
+              echo "❌ Found forbidden patterns (TODO, FIXME, debug prints, etc.)"
+              echo "Please remove or replace them before committing."
+              exit 1
+            fi
+
+      - id: validate-pubspec
+        name: Validate pubspec.yaml
+        description: Check pubspec.yaml is valid
+        entry: flutter pub get --dry-run
+        language: system
+        files: 'pubspec\.ya?ml$'
+        pass_filenames: false
+
+      - id: validate-asset-references
+        name: Validate asset references
+        description: Check that all referenced assets exist
+        entry: bash
+        language: system
+        args:
+          - -c
+          - |
+            if grep -rn --include="*.dart" "assets/" lib/ test/ 2>/dev/null | while read line; do
+              file=$(echo "$line" | cut -d: -f1)
+              asset_path=$(echo "$line" | grep -o 'assets/[^"]*' | head -1)
+              if [ ! -f "$asset_path" ]; then
+                echo "❌ Missing asset: $asset_path referenced in $file"
+                exit 1
+              fi
+            done; then
+              exit 1
+            fi
+
+      - id: check-image-size
+        name: Check image file sizes
+        description: Ensure image assets are optimized for mobile
+        entry: bash
+        language: system
+        files: '\.(png|jpg|jpeg|gif|webp)$'
+        args:
+          - -c
+          - |
+            for file in "$@"; do
+              if [ -f "$file" ]; then
+                size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null)
+                if [ "$size" -gt 500000 ]; then
+                  echo "❌ Image $file is too large (${size} bytes > 500KB)"
+                  echo "   Consider optimizing images for mobile apps"
+                  exit 1
+                fi
+              fi
+            done
+        pass_filenames: true
+
+      - id: check-build-artifacts
+        name: Prevent committing build artifacts
+        description: Ensure build artifacts are not committed
+        entry: bash
+        language: system
+        args:
+          - -c
+          - |
+            if find lib/ test/ -name "*.g.dart" -o -name "*.freezed.dart" -o -name "*.mocks.dart" 2>/dev/null | head -1 | grep -q .; then
+              echo "❌ Build artifacts found. These should not be committed:"
+              find lib/ test/ -name "*.g.dart" -o -name "*.freezed.dart" -o -name "*.mocks.dart" 2>/dev/null
+              echo "Run 'flutter packages pub run build_runner clean' and add to .gitignore"
+              exit 1
+            fi
+
+  # Security and secrets scanning
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: '\.git/|\.lock$|\.md$'
+
+# Global configuration
+default_stages: [pre-commit]
+fail_fast: true
+minimum_pre_commit_version: '3.0.0'

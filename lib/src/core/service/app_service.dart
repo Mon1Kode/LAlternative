@@ -16,6 +16,6 @@ class ThemeService {
     if (modeStr == ThemeMode.dark.name) return ThemeMode.dark;
     if (modeStr == ThemeMode.light.name) return ThemeMode.light;
     if (modeStr == ThemeMode.system.name) return ThemeMode.system;
-    return ThemeMode.light;
+    return ThemeMode.system;
   }
 }

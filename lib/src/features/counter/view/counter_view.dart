@@ -16,8 +16,8 @@ class CounterView extends ConsumerWidget {
     final counterService = CounterService();
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(title),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: Text(title, style: const TextStyle(color: Colors.black)),
         actions: [
           IconButton(
             onPressed: () async {
@@ -29,6 +29,7 @@ class CounterView extends ConsumerWidget {
               Theme.of(context).brightness == Brightness.dark
                   ? Icons.sunny
                   : Icons.nightlight,
+              color: Colors.black,
             ),
           ),
         ],

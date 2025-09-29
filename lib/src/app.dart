@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:l_alternative/src/features/history/view/history_view.dart';
 import 'package:l_alternative/src/features/home/view/home_view.dart';
 import 'package:l_alternative/src/features/profile/view/profile_view.dart';
 
@@ -31,7 +32,7 @@ class MyApp extends ConsumerWidget {
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFFF8B29C),
-          foregroundColor: Colors.white,
+          foregroundColor: Colors.black,
         ),
         floatingActionButtonTheme: const FloatingActionButtonThemeData(
           backgroundColor: Color(0xFF636C70),
@@ -70,6 +71,7 @@ class MyApp extends ConsumerWidget {
       routes: {
         '/': (context) => const HomeView(),
         '/profile': (context) => const ProfileView(),
+        '/moodHistory': (context) => const HistoryView(),
       },
       //home: const HomeView(),
     );

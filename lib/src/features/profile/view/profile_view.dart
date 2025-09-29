@@ -35,11 +35,7 @@ class _ProfileViewState extends ConsumerState<ProfileView>
         centerTitle: false,
         title: Text(
           "Profile",
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'Chillax',
-          ),
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
         ),
         actions: [
           ImageButton(

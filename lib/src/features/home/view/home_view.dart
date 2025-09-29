@@ -5,7 +5,6 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:l_alternative/src/core/components/image_button.dart';
@@ -423,7 +422,13 @@ class _HomeViewState extends ConsumerState<HomeView>
                           ),
                           Row(
                             children: [
-                              ImageButton(imagePath: "chart.png", size: 24),
+                              ImageButton(
+                                imagePath: "chart.png",
+                                size: 24,
+                                onPressed: () {
+                                  Navigator.pushNamed(context, '/moodHistory');
+                                },
+                              ),
                             ],
                           ),
                         ],
@@ -644,7 +649,7 @@ class CircleMoods extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(2.0),
           child: ImageButton(
-            imagePath: mood,
+            imagePath: "moods/$mood",
             onPressed: onPressed,
             size: size.width * 0.1,
             isColored: false,

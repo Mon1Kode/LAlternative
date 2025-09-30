@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:l_alternative/src/core/components/image_button.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
+import 'package:l_alternative/src/features/profile/provider/user_provider.dart';
 import 'package:monikode_event_store/monikode_event_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -184,6 +185,7 @@ class _HomeViewState extends ConsumerState<HomeView>
 
   @override
   Widget build(BuildContext context) {
+    var user = ref.watch(userProvider);
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,
@@ -209,7 +211,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                         children: [
                           Text("Bon retour,", style: TextStyle(fontSize: 24)),
                           Text(
-                            "MoniK",
+                            user.name,
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,

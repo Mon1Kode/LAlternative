@@ -24,7 +24,7 @@ void main() {
 
       // Verify basic UI elements are present
       expect(find.text('Bon retour,'), findsOneWidget);
-      expect(find.text('MoniK'), findsOneWidget);
+      expect(find.text('NAME'), findsOneWidget);
       expect(find.text('Outils'), findsOneWidget);
       expect(find.text('Humeur actuelle'), findsOneWidget);
 

@@ -167,6 +167,7 @@ class _HistoryViewState extends State<HistoryView> {
               ),
               RoundedContainer(
                 padding: const EdgeInsets.all(16.0),
+                width: double.infinity,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: 8,
@@ -178,33 +179,41 @@ class _HistoryViewState extends State<HistoryView> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    for (var entry
-                        in _moodHistory.entries.toList()
-                          ..sort((a, b) => b.key.compareTo(a.key)))
-                      Column(
-                        spacing: 4,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    if (_moodHistory.entries.isNotEmpty) ...[
+                      Builder(
+                        builder: (context) {
+                          final sortedEntries = _moodHistory.entries.toList()
+                            ..sort((a, b) => b.key.compareTo(a.key));
+                          return Column(
+                            spacing: 4,
                             children: [
-                              Text(Utils.formatDate(entry.key)),
-                              Image.asset(
-                                "assets/images/moods/${entry.value}",
-                                width: 24,
-                                height: 24,
-                              ),
+                              for (
+                                int i = 0;
+                                i < sortedEntries.length;
+                                i++
+                              ) ...[
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      Utils.formatDate(sortedEntries[i].key),
+                                    ),
+                                    Image.asset(
+                                      "assets/images/moods/${sortedEntries[i].value}",
+                                      width: 24,
+                                      height: 24,
+                                    ),
+                                  ],
+                                ),
+                                if (i < sortedEntries.length - 1) Divider(),
+                              ],
                             ],
-                          ),
-                          if (entry.key !=
-                              _moodHistory.entries
-                                  .toList()
-                                  .reduce(
-                                    (a, b) => a.key.isBefore(b.key) ? a : b,
-                                  )
-                                  .key)
-                            Divider(),
-                        ],
+                          );
+                        },
                       ),
+                    ] else
+                      Text("Aucun historique n'est disponible."),
                   ],
                 ),
               ),

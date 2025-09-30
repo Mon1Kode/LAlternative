@@ -26,7 +26,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Bon retour,'), findsOneWidget);
-        expect(find.text('MoniK'), findsOneWidget);
+        expect(find.text('NAME'), findsOneWidget);
       });
 
       testWidgets('renders avatar with correct properties', (

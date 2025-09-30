@@ -20,7 +20,7 @@ void main() {
         // Step 1: Verify app opens and shows HomeView
         expect(find.byType(HomeView), findsOneWidget);
         expect(find.text('Bon retour,'), findsOneWidget);
-        expect(find.text('MoniK'), findsOneWidget);
+        expect(find.text('NAME'), findsOneWidget);
         expect(find.text('Outils'), findsOneWidget);
         expect(find.text('Humeur actuelle'), findsOneWidget);
 
@@ -230,7 +230,7 @@ void main() {
 
       // Test HomeView elements
       expect(find.text('Bon retour,'), findsOneWidget);
-      expect(find.text('MoniK'), findsOneWidget);
+      expect(find.text('NAME'), findsOneWidget);
       expect(find.text('Outils'), findsOneWidget);
       expect(find.text('Humeur actuelle'), findsOneWidget);
 

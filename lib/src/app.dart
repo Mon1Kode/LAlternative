@@ -46,7 +46,7 @@ class MyApp extends ConsumerWidget {
         colorScheme: ColorScheme(
           brightness: Brightness.dark,
           primary: const Color(0xFF636C70),
-          onPrimary: Colors.white,
+          onPrimary: const Color(0xFF434B4B),
           secondary: Colors.white,
           onSecondary: Colors.black,
           tertiary: const Color(0xFFF8B29C),

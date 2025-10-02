@@ -249,11 +249,48 @@ class _ProfileViewState extends ConsumerState<ProfileView>
                         imagePath: "trash.png",
                         color: Colors.red,
                         size: 32,
-                        onPressed: () async {
-                          await ref
-                              .read(userProvider.notifier)
-                              .deleteUserData();
-                          setState(() {});
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: Text(
+                                  "Confirmer la suppression",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                content: Text(
+                                  "Êtes-vous sûr de vouloir supprimer toutes vos données ? Cette action est irréversible.",
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text(
+                                      "Annuler",
+                                      style: TextStyle(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.tertiary,
+                                      ),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () async {
+                                      ref
+                                          .read(userProvider.notifier)
+                                          .deleteUserData();
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text(
+                                      "Supprimer",
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
                         },
                       ),
                     ],

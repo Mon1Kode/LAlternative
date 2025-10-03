@@ -7,10 +7,12 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:l_alternative/src/core/components/activity_card.dart';
 import 'package:l_alternative/src/core/components/image_button.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
 import 'package:l_alternative/src/core/provider/app_providers.dart';
 import 'package:l_alternative/src/features/profile/provider/user_provider.dart';
+import 'package:l_alternative/src/features/relaxation/view/relaxation_view.dart';
 import 'package:monikode_event_store/monikode_event_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -210,7 +212,7 @@ class _HomeViewState extends ConsumerState<HomeView>
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: SingleChildScrollView(
               child: Column(
-                spacing: 24,
+                spacing: 16,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -498,6 +500,63 @@ class _HomeViewState extends ConsumerState<HomeView>
                             },
                           ),
                         ],
+                      ),
+                    ],
+                  ),
+                  Column(
+                    spacing: 8,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Activités",
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          ImageButton(
+                            imagePath: "arrow-right-circle.png",
+                            size: 24,
+                            onPressed: () {},
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 350, // Provide explicit height for the stack
+                        width: double.infinity,
+                        child: Stack(
+                          children: [
+                            Positioned(
+                              top: 0,
+                              child: ActivityCard(
+                                title: "Pratiquer la relaxation",
+                                description: "Prend un moment pour te détendre",
+                                imagePath: "assets/images/relaxation.png",
+                                actionView: RelaxationView(),
+                              ),
+                            ),
+                            Positioned(
+                              top: 90,
+                              child: ActivityCard(
+                                title: "Pratiquer la relaxation",
+                                description: "Prend un moment pour te détendre",
+                                imagePath: "assets/images/relaxation.png",
+                                actionView: RelaxationView(),
+                              ),
+                            ),
+                            Positioned(
+                              top: 180,
+                              child: ActivityCard(
+                                title: "Pratiquer la relaxation",
+                                description: "Prend un moment pour te détendre",
+                                imagePath: "assets/images/relaxation.png",
+                                actionView: RelaxationView(),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),

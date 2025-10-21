@@ -23,13 +23,12 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify basic UI elements are present
-      expect(find.text('Bon retour,'), findsOneWidget);
       expect(find.text('NAME'), findsOneWidget);
       expect(find.text('Outils'), findsOneWidget);
       expect(find.text('Humeur actuelle'), findsOneWidget);
 
-      // Verify avatar image is present
-      expect(find.byType(Image), findsWidgets);
+      // Verify ImageButtons are present
+      expect(find.byType(ImageButton), findsWidgets);
     });
 
     testWidgets('Mood selection section renders all mood options', (
@@ -97,17 +96,13 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Find and tap the avatar image
-      final avatarImage = find.byWidgetPredicate(
-        (widget) =>
-            widget is Image &&
-            widget.image is AssetImage &&
-            (widget.image as AssetImage).assetName ==
-                "assets/images/avatar.png",
+      // Find the user profile button (ImageButton with user.png)
+      final userButton = find.byWidgetPredicate(
+        (widget) => widget is ImageButton && widget.imagePath == "user.png",
       );
 
-      expect(avatarImage, findsOneWidget);
-      await tester.tap(avatarImage);
+      expect(userButton, findsOneWidget);
+      await tester.tap(userButton);
       await tester.pumpAndSettle();
 
       // Verify navigation to profile page

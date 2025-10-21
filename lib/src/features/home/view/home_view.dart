@@ -11,6 +11,7 @@ import 'package:l_alternative/src/core/components/activity_card.dart';
 import 'package:l_alternative/src/core/components/image_button.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
 import 'package:l_alternative/src/core/provider/app_providers.dart';
+import 'package:l_alternative/src/core/utils/app_utils.dart';
 import 'package:l_alternative/src/features/profile/provider/user_provider.dart';
 import 'package:l_alternative/src/features/relaxation/view/relaxation_view.dart';
 import 'package:monikode_event_store/monikode_event_store.dart';
@@ -24,11 +25,16 @@ class HomeView extends ConsumerStatefulWidget {
 }
 
 class _HomeViewState extends ConsumerState<HomeView>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _controller;
+  late PageController _pageController;
+  late AnimationController _textAnimationController;
+  late Animation<Offset> _slideAnimation;
   bool _isEditMode = false;
 
   String _selectedMood = "love.png";
+  String _selectedFatigue = "cool.png";
+  int _currentMoodPage = 0;
 
   final Widget _streak = Stack(
     children: [
@@ -82,43 +88,26 @@ class _HomeViewState extends ConsumerState<HomeView>
     ],
   );
 
-  final Widget _nextActivity = Stack(
-    children: [
-      ClipRRect(
-        borderRadius: BorderRadius.circular(24.0),
-        child: Image.asset(
-          "assets/images/calendar.png",
-          width: 300,
-          height: 150,
-        ),
-      ),
-      RoundedContainer(
-        width: 300,
-        height: 150,
-        borderWidth: 1,
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Text(
-              "Activité",
-              style: TextStyle(fontSize: 16, color: Colors.black),
-            ),
-          ],
-        ),
-      ),
-    ],
+  // loader
+  Widget _nextActivity = RoundedContainer(
+    width: 300,
+    height: 150,
+    borderWidth: 1,
+    padding: const EdgeInsets.all(8.0),
+    child: Center(child: CircularProgressIndicator()),
   );
 
   // Map to define tool widths (in grid units)
   final Map<Widget, int> _toolWidths = {};
   var _toolsChildren = <Widget>[];
   late SharedPreferences prefs;
+  final bool _hasNotification = false;
 
   Future<void> getUserConfig() async {
     prefs = await SharedPreferences.getInstance();
     setState(() {
       _selectedMood = prefs.getString("mood") ?? "love.png";
+      _selectedFatigue = prefs.getString("fatigue") ?? "cool.png";
       _toolsChildren =
           prefs
               .getStringList("tools")
@@ -142,10 +131,10 @@ class _HomeViewState extends ConsumerState<HomeView>
             return "";
           }).toList(),
         });
+    getNextActivity();
   }
 
   Future<void> updateMoodHistoryList(String mood) async {
-    // Add the new mood to the history list by date
     List<String> moodHistory =
         prefs.getStringList("mood_history") ?? <String>[];
     final today = DateTime.now();
@@ -160,6 +149,21 @@ class _HomeViewState extends ConsumerState<HomeView>
     );
   }
 
+  Future<void> updateFatigueHistoryList(String fatigue) async {
+    List<String> fatigueHistory =
+        prefs.getStringList("fatigue_history") ?? <String>[];
+    final today = DateTime.now();
+    final todayString = "${today.year}-${today.month}-${today.day}";
+    fatigueHistory.removeWhere((entry) => entry.startsWith(todayString));
+    fatigueHistory.add("$todayString:$fatigue");
+    await prefs.setStringList("fatigue_history", fatigueHistory);
+    EventStore.getInstance().localEventStore.log(
+      "fatigue_history_updated",
+      EventLevel.debug,
+      {"fatigue_history": fatigueHistory},
+    );
+  }
+
   Future<void> selectMood() async {
     await prefs.setString("mood", _selectedMood);
     EventStore.getInstance().localEventStore.log(
@@ -170,10 +174,121 @@ class _HomeViewState extends ConsumerState<HomeView>
     updateMoodHistoryList(_selectedMood);
   }
 
+  Future<void> selectFatigue() async {
+    await prefs.setString("fatigue", _selectedFatigue);
+    EventStore.getInstance().localEventStore.log(
+      "fatigue_selected",
+      EventLevel.debug,
+      {"fatigue": _selectedFatigue},
+    );
+    updateFatigueHistoryList(_selectedFatigue);
+  }
+
+  Future<void> getNextActivity() async {
+    var storedActivity = prefs.getStringList("next_activity");
+    String title = storedActivity != null && storedActivity.isNotEmpty
+        ? storedActivity[0]
+        : "Pratiquer la relaxation";
+    String description = storedActivity != null && storedActivity.length > 1
+        ? storedActivity[1]
+        : "Prend un moment pour te détendre";
+    String imagePath = storedActivity != null && storedActivity.length > 2
+        ? storedActivity[2]
+        : "assets/images/relaxation.png";
+    Color color = storedActivity != null && storedActivity.length > 3
+        ? Color(int.parse(storedActivity[3]))
+        : Color(0xFFF7E879);
+    Widget actionView = RelaxationView();
+    List<String> storedTools = prefs.getStringList("tools") ?? [];
+    setState(() {
+      _nextActivity = Stack(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(24.0),
+            child: ActivityCard(
+              title: title,
+              description: description,
+              imagePath: imagePath,
+              actionView: actionView,
+              color: color,
+              hasImage: false,
+              padding: EdgeInsets.all(4),
+            ),
+          ),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(24.0),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => actionView),
+                );
+              },
+              child: RoundedContainer(
+                width: 300,
+                height: 150,
+                borderWidth: 1,
+                padding: const EdgeInsets.all(8.0),
+                color: Colors.black.withValues(alpha: 0.7),
+                child: Center(
+                  child: Text(
+                    Utils.formatShortDate(DateTime.now()),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+      _toolWidths[_nextActivity] = 2;
+      if (!storedTools.contains("nextActivity")) {
+        _toolsChildren.add(_nextActivity);
+      } else {
+        int index = storedTools.indexWhere((tool) => tool == "nextActivity");
+        if (index != -1) {
+          _toolsChildren[index] = _nextActivity;
+        }
+      }
+    });
+    await prefs.setStringList("next_activity", [title, description, imagePath]);
+    await prefs.setStringList(
+      "tools",
+      _toolsChildren.map((e) {
+        if (e == _streak) return "streak";
+        if (e == _calendar) return "calendar";
+        if (e == _nextActivity) return "nextActivity";
+        return "";
+      }).toList(),
+    );
+    EventStore.getInstance().localEventStore.log(
+      "next_activity_loaded",
+      EventLevel.debug,
+      {"activity": "Prochaine activité"},
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this);
+    _pageController = PageController();
+    _textAnimationController = AnimationController(
+      duration: Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _slideAnimation = Tween<Offset>(begin: Offset.zero, end: Offset.zero)
+        .animate(
+          CurvedAnimation(
+            parent: _textAnimationController,
+            curve: Curves.easeInOut,
+          ),
+        );
     _toolWidths[_streak] = 1;
     _toolWidths[_calendar] = 1;
     _toolWidths[_nextActivity] = 2;
@@ -183,7 +298,33 @@ class _HomeViewState extends ConsumerState<HomeView>
   @override
   void dispose() {
     _controller.dispose();
+    _pageController.dispose();
+    _textAnimationController.dispose();
     super.dispose();
+  }
+
+  void _animateTextTransition(int newPage) {
+    if (newPage != _currentMoodPage) {
+      _slideAnimation =
+          Tween<Offset>(
+            begin: Offset.zero,
+            end: newPage > _currentMoodPage
+                ? Offset(-1.0, 0.0)
+                : Offset(1.0, 0.0),
+          ).animate(
+            CurvedAnimation(
+              parent: _textAnimationController,
+              curve: Curves.easeInOut,
+            ),
+          );
+
+      _textAnimationController.forward().then((_) {
+        setState(() {
+          _currentMoodPage = newPage;
+        });
+        _textAnimationController.reset();
+      });
+    }
   }
 
   @override
@@ -217,35 +358,28 @@ class _HomeViewState extends ConsumerState<HomeView>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Bon retour,", style: TextStyle(fontSize: 24)),
-                          Text(
-                            user.name,
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                      ImageButton(
+                        imagePath: _hasNotification
+                            ? "bell-circle.png"
+                            : "bell.png",
+                        size: 32,
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/notifications');
+                        },
                       ),
-                      Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(99.0),
-                          onTap: () {
-                            Navigator.pushNamed(context, '/profile');
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(2.0),
-                            child: Image.asset(
-                              "assets/images/avatar.png",
-                              width: 100,
-                              height: 100,
-                            ),
-                          ),
+                      Text(
+                        user.name,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
                         ),
+                      ),
+                      ImageButton(
+                        imagePath: "user.png",
+                        size: 32,
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/profile');
+                        },
                       ),
                     ],
                   ),
@@ -420,86 +554,283 @@ class _HomeViewState extends ConsumerState<HomeView>
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: 16,
+                    spacing: 0,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Humeur actuelle",
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Row(
-                            children: [
-                              ImageButton(
-                                imagePath: "chart.png",
-                                size: 24,
-                                onPressed: () {
-                                  Navigator.pushNamed(context, '/moodHistory');
-                                },
+                      SizedBox(
+                        height: 30,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: ClipRect(
+                                child: AnimatedBuilder(
+                                  animation: _textAnimationController,
+                                  builder: (context, child) {
+                                    return Stack(
+                                      children: [
+                                        SlideTransition(
+                                          position: _slideAnimation,
+                                          child: Text(
+                                            _currentMoodPage == 0
+                                                ? "Humeur actuelle"
+                                                : "Fatigue actuelle",
+                                            style: TextStyle(
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        if (_textAnimationController
+                                            .isAnimating)
+                                          SlideTransition(
+                                            position: Tween<Offset>(
+                                              begin:
+                                                  _slideAnimation.value.dx < 0
+                                                  ? Offset(1.0, 0.0)
+                                                  : Offset(-1.0, 0.0),
+                                              end: Offset.zero,
+                                            ).animate(_textAnimationController),
+                                            child: Text(
+                                              _currentMoodPage == 0
+                                                  ? "Fatigue actuelle"
+                                                  : "Humeur actuelle",
+                                              style: TextStyle(
+                                                fontSize: 24,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    );
+                                  },
+                                ),
                               ),
-                            ],
-                          ),
-                        ],
+                            ),
+                            Row(
+                              children: [
+                                ImageButton(
+                                  imagePath: "arrow-left.png",
+                                  size: 24,
+                                  onPressed: () {
+                                    if (_currentMoodPage > 0) {
+                                      _pageController.animateToPage(
+                                        _currentMoodPage - 1,
+                                        duration: Duration(milliseconds: 300),
+                                        curve: Curves.easeInOut,
+                                      );
+                                    }
+                                  },
+                                  color: _currentMoodPage == 0
+                                      ? Colors.grey
+                                      : null,
+                                ),
+                                ImageButton(
+                                  imagePath: "arrow-right.png",
+                                  size: 24,
+                                  onPressed: () {
+                                    if (_currentMoodPage < 1) {
+                                      _pageController.animateToPage(
+                                        _currentMoodPage + 1,
+                                        duration: Duration(milliseconds: 300),
+                                        curve: Curves.easeInOut,
+                                      );
+                                    }
+                                  },
+                                  color: _currentMoodPage == 1
+                                      ? Colors.grey
+                                      : null,
+                                ),
+                              ],
+                            ),
+                            ImageButton(
+                              imagePath: "chart.png",
+                              size: 24,
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/moodHistory',
+                                  arguments: {
+                                    "category": _currentMoodPage == 0
+                                        ? "mood_history"
+                                        : "fatigue_history",
+                                  },
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          CircleMoods(
-                            mood: "love.png",
-                            selectedMood: _selectedMood,
-                            onPressed: () {
-                              setState(() {
-                                _selectedMood = "love.png";
-                              });
-                              selectMood();
-                            },
-                          ),
-                          CircleMoods(
-                            mood: "happy.png",
-                            selectedMood: _selectedMood,
-                            onPressed: () {
-                              setState(() {
-                                _selectedMood = "happy.png";
-                              });
-                              selectMood();
-                            },
-                          ),
-                          CircleMoods(
-                            mood: "neutral.png",
-                            selectedMood: _selectedMood,
-                            onPressed: () {
-                              setState(() {
-                                _selectedMood = "neutral.png";
-                              });
-                              selectMood();
-                            },
-                          ),
-                          CircleMoods(
-                            mood: "frowning.png",
-                            selectedMood: _selectedMood,
-                            onPressed: () {
-                              setState(() {
-                                _selectedMood = "frowning.png";
-                              });
-                              selectMood();
-                            },
-                          ),
-                          CircleMoods(
-                            mood: "sad.png",
-                            selectedMood: _selectedMood,
-                            onPressed: () {
-                              setState(() {
-                                _selectedMood = "sad.png";
-                              });
-                              selectMood();
-                            },
-                          ),
-                        ],
+                      SizedBox(
+                        height: 70,
+                        child: PageView(
+                          controller: _pageController,
+                          onPageChanged: (index) {
+                            _animateTextTransition(index);
+                          },
+                          children: [
+                            GestureDetector(
+                              onPanUpdate: (details) {
+                                // Swipe detection on mood row
+                                if (details.delta.dx > 10) {
+                                  // Swipe right - go to previous page
+                                  if (_currentMoodPage > 0) {
+                                    _pageController.animateToPage(
+                                      _currentMoodPage - 1,
+                                      duration: Duration(milliseconds: 300),
+                                      curve: Curves.easeInOut,
+                                    );
+                                  }
+                                } else if (details.delta.dx < -10) {
+                                  // Swipe left - go to next page
+                                  if (_currentMoodPage < 1) {
+                                    _pageController.animateToPage(
+                                      _currentMoodPage + 1,
+                                      duration: Duration(milliseconds: 300),
+                                      curve: Curves.easeInOut,
+                                    );
+                                  }
+                                }
+                              },
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  CircleMoods(
+                                    mood: "love.png",
+                                    selectedMood: _selectedMood,
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedMood = "love.png";
+                                      });
+                                      selectMood();
+                                    },
+                                  ),
+                                  CircleMoods(
+                                    mood: "happy.png",
+                                    selectedMood: _selectedMood,
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedMood = "happy.png";
+                                      });
+                                      selectMood();
+                                    },
+                                  ),
+                                  CircleMoods(
+                                    mood: "neutral.png",
+                                    selectedMood: _selectedMood,
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedMood = "neutral.png";
+                                      });
+                                      selectMood();
+                                    },
+                                  ),
+                                  CircleMoods(
+                                    mood: "frowning.png",
+                                    selectedMood: _selectedMood,
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedMood = "frowning.png";
+                                      });
+                                      selectMood();
+                                    },
+                                  ),
+                                  CircleMoods(
+                                    mood: "sad.png",
+                                    selectedMood: _selectedMood,
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedMood = "sad.png";
+                                      });
+                                      selectMood();
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // Second page with additional moods or information
+                            GestureDetector(
+                              onPanUpdate: (details) {
+                                // Swipe detection on mood row
+                                if (details.delta.dx > 10) {
+                                  // Swipe right - go to previous page
+                                  if (_currentMoodPage > 0) {
+                                    _pageController.animateToPage(
+                                      _currentMoodPage - 1,
+                                      duration: Duration(milliseconds: 300),
+                                      curve: Curves.easeInOut,
+                                    );
+                                  }
+                                } else if (details.delta.dx < -10) {
+                                  // Swipe left - go to next page
+                                  if (_currentMoodPage < 1) {
+                                    _pageController.animateToPage(
+                                      _currentMoodPage + 1,
+                                      duration: Duration(milliseconds: 300),
+                                      curve: Curves.easeInOut,
+                                    );
+                                  }
+                                }
+                              },
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  CircleMoods(
+                                    mood: "cool.png",
+                                    selectedMood: _selectedFatigue,
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedFatigue = "cool.png";
+                                      });
+                                      selectFatigue();
+                                    },
+                                  ),
+                                  CircleMoods(
+                                    mood: "okay.png",
+                                    selectedMood: _selectedFatigue,
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedFatigue = "okay.png";
+                                      });
+                                      selectFatigue();
+                                    },
+                                  ),
+                                  CircleMoods(
+                                    mood: "empty.png",
+                                    selectedMood: _selectedFatigue,
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedFatigue = "empty.png";
+                                      });
+                                      selectFatigue();
+                                    },
+                                  ),
+                                  CircleMoods(
+                                    mood: "tired.png",
+                                    selectedMood: _selectedFatigue,
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedFatigue = "tired.png";
+                                      });
+                                      selectFatigue();
+                                    },
+                                  ),
+                                  CircleMoods(
+                                    mood: "sleep.png",
+                                    selectedMood: _selectedFatigue,
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedFatigue = "sleep.png";
+                                      });
+                                      selectFatigue();
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -531,19 +862,23 @@ class _HomeViewState extends ConsumerState<HomeView>
                             Positioned(
                               top: 0,
                               child: ActivityCard(
-                                title: "Pratiquer la relaxation",
-                                description: "Prend un moment pour te détendre",
+                                title: "Continuer à bouger",
+                                description:
+                                    "Faire quelque exercices pour rester actif",
                                 imagePath: "assets/images/relaxation.png",
                                 actionView: RelaxationView(),
+                                color: Color(0xFFBAE6FD),
                               ),
                             ),
                             Positioned(
                               top: 90,
                               child: ActivityCard(
-                                title: "Pratiquer la relaxation",
-                                description: "Prend un moment pour te détendre",
+                                title: "Découvrir vos droits",
+                                description:
+                                    "Connaissez tous les droits que vous avez suivant votre situation",
                                 imagePath: "assets/images/relaxation.png",
                                 actionView: RelaxationView(),
+                                color: Color(0xFFDCA8FA),
                               ),
                             ),
                             Positioned(
@@ -553,6 +888,8 @@ class _HomeViewState extends ConsumerState<HomeView>
                                 description: "Prend un moment pour te détendre",
                                 imagePath: "assets/images/relaxation.png",
                                 actionView: RelaxationView(),
+                                color: Color(0xFFF7E879),
+                                isLast: true,
                               ),
                             ),
                           ],
@@ -695,6 +1032,7 @@ class CircleMoods extends StatelessWidget {
   final String mood;
   final String selectedMood;
   final VoidCallback onPressed;
+
   const CircleMoods({
     super.key,
     required this.mood,

@@ -5,25 +5,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
-import 'package:l_alternative/src/core/provider/app_providers.dart';
-import 'package:l_alternative/src/features/relaxation/view/breathing_details.dart';
 
-class RelaxationView extends ConsumerStatefulWidget {
-  const RelaxationView({super.key});
+class ApaView extends ConsumerStatefulWidget {
+  const ApaView({super.key});
 
   @override
-  ConsumerState<RelaxationView> createState() => _RelaxationViewState();
+  ConsumerState<ApaView> createState() => _ApaViewState();
 }
 
-class _RelaxationViewState extends ConsumerState<RelaxationView> {
+class _ApaViewState extends ConsumerState<ApaView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFFF7E879),
+        backgroundColor: Color(0xFFBAE6FD),
         foregroundColor: Colors.black,
         title: Text(
-          "Pratiquer la relaxation",
+          "Continuer à bouger",
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
@@ -41,33 +39,19 @@ class _RelaxationViewState extends ConsumerState<RelaxationView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "La respiration diaphragmatique",
+                    "Faire quelque exercices pour rester actif",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                  ),
-                  Text(
-                    "Techniques, Bienfaits et Applications",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  Text(
-                    "La respiration diaphragmatique, également connue sous le nom de respiration abdominale ou respiration profonde, est une technique de respiration qui utilise pleinement le diaphragme pour maximiser l'apport d'oxygène et améliorer l'efficacité respiratoire. Lorsque vous inspirez profondément, le diaphragme se contracte et descend, permettant aux poumons de se remplir d'air. À l'expiration, le diaphragme se détend et remonte, expulsant l'air des poumons.",
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: ref.watch(themeModeProvider) == ThemeMode.dark
-                          ? Colors.grey
-                          : Color(0xFF6D6D6D),
-                    ),
-                    maxLines: 20,
                   ),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BreathingDetails(),
-                          ),
-                        );
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => BreathingDetails(),
+                        //   ),
+                        // );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.tertiary,

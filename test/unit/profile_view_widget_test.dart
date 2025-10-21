@@ -30,7 +30,7 @@ void main() {
       // Assert
       expect(find.text('Profile'), findsOneWidget);
       expect(find.text('Informations personnelles'), findsOneWidget);
-      expect(find.text('Eveluations'), findsOneWidget);
+      expect(find.text('Evaluations'), findsOneWidget); // Fixed typo
       expect(find.text('Zone sensible'), findsOneWidget);
       expect(find.text('Supprimer mes données'), findsOneWidget);
     });
@@ -91,7 +91,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text('Eveluations'), findsOneWidget);
+      expect(find.text('Evaluations'), findsOneWidget);
 
       // Should show evaluation dates (the default evaluations from provider)
       // We know from the provider there are default evaluations with specific dates

@@ -169,7 +169,7 @@ class _ProfileViewState extends ConsumerState<ProfileView>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Eveluations",
+                        "Evaluations",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,

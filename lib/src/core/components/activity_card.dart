@@ -10,6 +10,10 @@ class ActivityCard extends StatelessWidget {
   final String description;
   final String imagePath;
   final Widget actionView;
+  final Color color;
+  final bool isLast;
+  final EdgeInsets padding;
+  final bool hasImage;
 
   const ActivityCard({
     super.key,
@@ -17,6 +21,10 @@ class ActivityCard extends StatelessWidget {
     required this.description,
     required this.imagePath,
     required this.actionView,
+    required this.color,
+    this.isLast = false,
+    this.padding = const EdgeInsets.all(16),
+    this.hasImage = true,
   });
 
   @override
@@ -42,14 +50,14 @@ class ActivityCard extends StatelessWidget {
       child: RoundedContainer(
         width: MediaQuery.of(context).size.width - 32 - 8,
         hasBorder: false,
-        color: Color(0xFFF7E879),
-        padding: const EdgeInsets.all(16),
+        color: color,
+        padding: padding,
         borderRadius: 20,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             SizedBox(
-              width: 220,
+              width: MediaQuery.of(context).size.width * 0.55,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -65,27 +73,28 @@ class ActivityCard extends StatelessWidget {
                     description,
                     style: const TextStyle(fontSize: 16, color: Colors.black),
                   ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.tertiary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  if (isLast)
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.tertiary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => actionView),
+                        );
+                      },
+                      child: Text(
+                        "Voir l'activité",
+                        style: TextStyle(fontSize: 16, color: Colors.white),
                       ),
                     ),
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => actionView),
-                      );
-                    },
-                    child: Text(
-                      "Voir l'activité",
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
-                  ),
                 ],
               ),
             ),
-            Image.asset(imagePath, height: 100),
+            if (hasImage) Image.asset(imagePath, height: 100),
           ],
         ),
       ),

@@ -21,7 +21,9 @@ void main() {
         SharedPreferences.setMockInitialValues({'mood_history': <String>[]});
 
         await tester.pumpWidget(
-          ProviderScope(child: MaterialApp(home: HistoryView())),
+          ProviderScope(
+            child: MaterialApp(home: HistoryView(category: 'mood_history')),
+          ),
         );
         await tester.pumpAndSettle();
 
@@ -53,7 +55,9 @@ void main() {
         });
 
         await tester.pumpWidget(
-          ProviderScope(child: MaterialApp(home: HistoryView())),
+          ProviderScope(
+            child: MaterialApp(home: HistoryView(category: 'mood_history')),
+          ),
         );
         await tester.pumpAndSettle();
 
@@ -91,7 +95,9 @@ void main() {
         });
 
         await tester.pumpWidget(
-          ProviderScope(child: MaterialApp(home: HistoryView())),
+          ProviderScope(
+            child: MaterialApp(home: HistoryView(category: 'mood_history')),
+          ),
         );
         await tester.pumpAndSettle();
 
@@ -128,7 +134,9 @@ void main() {
           });
 
           await tester.pumpWidget(
-            ProviderScope(child: MaterialApp(home: HistoryView())),
+            ProviderScope(
+              child: MaterialApp(home: HistoryView(category: 'mood_history')),
+            ),
           );
           await tester.pumpAndSettle();
 
@@ -183,7 +191,9 @@ void main() {
         });
 
         await tester.pumpWidget(
-          ProviderScope(child: MaterialApp(home: HistoryView())),
+          ProviderScope(
+            child: MaterialApp(home: HistoryView(category: 'mood_history')),
+          ),
         );
         await tester.pumpAndSettle();
 
@@ -221,7 +231,9 @@ void main() {
         });
 
         await tester.pumpWidget(
-          ProviderScope(child: MaterialApp(home: HistoryView())),
+          ProviderScope(
+            child: MaterialApp(home: HistoryView(category: 'mood_history')),
+          ),
         );
         await tester.pumpAndSettle();
 
@@ -259,7 +271,9 @@ void main() {
         });
 
         await tester.pumpWidget(
-          ProviderScope(child: MaterialApp(home: HistoryView())),
+          ProviderScope(
+            child: MaterialApp(home: HistoryView(category: 'mood_history')),
+          ),
         );
         await tester.pumpAndSettle();
 
@@ -281,7 +295,9 @@ void main() {
         });
 
         await tester.pumpWidget(
-          ProviderScope(child: MaterialApp(home: HistoryView())),
+          ProviderScope(
+            child: MaterialApp(home: HistoryView(category: 'mood_history')),
+          ),
         );
         await tester.pumpAndSettle();
 
@@ -299,7 +315,9 @@ void main() {
         });
 
         await tester.pumpWidget(
-          ProviderScope(child: MaterialApp(home: HistoryView())),
+          ProviderScope(
+            child: MaterialApp(home: HistoryView(category: 'mood_history')),
+          ),
         );
         await tester.pumpAndSettle();
 
@@ -351,7 +369,9 @@ void main() {
         });
 
         await tester.pumpWidget(
-          ProviderScope(child: MaterialApp(home: HistoryView())),
+          ProviderScope(
+            child: MaterialApp(home: HistoryView(category: 'mood_history')),
+          ),
         );
         await tester.pumpAndSettle();
 
@@ -379,7 +399,9 @@ void main() {
         });
 
         await tester.pumpWidget(
-          ProviderScope(child: MaterialApp(home: HistoryView())),
+          ProviderScope(
+            child: MaterialApp(home: HistoryView(category: 'mood_history')),
+          ),
         );
         await tester.pumpAndSettle();
 
@@ -400,7 +422,9 @@ void main() {
         SharedPreferences.setMockInitialValues({});
 
         await tester.pumpWidget(
-          ProviderScope(child: MaterialApp(home: HistoryView())),
+          ProviderScope(
+            child: MaterialApp(home: HistoryView(category: 'mood_history')),
+          ),
         );
         await tester.pumpAndSettle();
 
@@ -422,7 +446,9 @@ void main() {
         });
 
         await tester.pumpWidget(
-          ProviderScope(child: MaterialApp(home: HistoryView())),
+          ProviderScope(
+            child: MaterialApp(home: HistoryView(category: 'mood_history')),
+          ),
         );
         await tester.pumpAndSettle();
 

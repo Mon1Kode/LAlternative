@@ -20,7 +20,7 @@ class MyApp extends ConsumerWidget {
         colorScheme: ColorScheme(
           brightness: Brightness.light,
           primary: Colors.white,
-          onPrimary: Colors.white,
+          onPrimary: Colors.black,
           secondary: const Color(0xFF636C70),
           onSecondary: Colors.white,
           tertiary: const Color(0xFFF8B29C),
@@ -68,12 +68,36 @@ class MyApp extends ConsumerWidget {
       ),
       themeMode: themeMode,
       initialRoute: '/',
-      routes: {
-        '/': (context) => const HomeView(),
-        '/profile': (context) => const ProfileView(),
-        '/moodHistory': (context) => const HistoryView(),
+      onGenerateRoute: (settings) {
+        switch (settings.name) {
+          case '/':
+            return MaterialPageRoute(builder: (context) => const HomeView());
+          case '/profile':
+            return MaterialPageRoute(builder: (context) => const ProfileView());
+          case '/moodHistory':
+            final args = settings.arguments;
+            if (args is String) {
+              return MaterialPageRoute(
+                builder: (context) => HistoryView(category: args),
+              );
+            } else if (args is Map<String, dynamic>) {
+              return MaterialPageRoute(
+                builder: (context) =>
+                    HistoryView(category: args['category'] ?? 'mood_history'),
+              );
+            } else {
+              return MaterialPageRoute(
+                builder: (context) =>
+                    const HistoryView(category: 'mood_history'),
+              );
+            }
+          default:
+            return MaterialPageRoute(
+              builder: (context) =>
+                  const Scaffold(body: Center(child: Text('Page not found'))),
+            );
+        }
       },
-      //home: const HomeView(),
     );
   }
 }

@@ -25,7 +25,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Bon retour,'), findsOneWidget);
+        // Only check for the user name, not "Bon retour," which doesn't exist
         expect(find.text('NAME'), findsOneWidget);
       });
 
@@ -44,18 +44,15 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        final avatarImage = find.byWidgetPredicate(
-          (widget) =>
-              widget is Image &&
-              widget.image is AssetImage &&
-              (widget.image as AssetImage).assetName ==
-                  "assets/images/avatar.png",
+        // Find the user profile button (ImageButton with user.png)
+        final userButton = find.byWidgetPredicate(
+          (widget) => widget is ImageButton && widget.imagePath == "user.png",
         );
 
-        expect(avatarImage, findsOneWidget);
+        expect(userButton, findsOneWidget);
 
-        // Test avatar tap functionality
-        await tester.tap(avatarImage);
+        // Test button tap functionality
+        await tester.tap(userButton);
         await tester.pumpAndSettle();
         expect(find.text('Profile'), findsOneWidget);
       });
@@ -311,7 +308,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Should still render without crashing
-        expect(find.text('Bon retour,'), findsOneWidget);
+        expect(find.text('NAME'), findsOneWidget);
         expect(find.text('Outils'), findsOneWidget);
         expect(find.text('Humeur actuelle'), findsOneWidget);
       });

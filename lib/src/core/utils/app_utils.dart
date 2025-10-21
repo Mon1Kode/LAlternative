@@ -7,4 +7,9 @@ class Utils {
     DateFormat formatter = DateFormat('EEEE, d MMMM, y');
     return formatter.format(date);
   }
+
+  static String formatShortDate(DateTime date) {
+    DateFormat formatter = DateFormat('d MMMM, y');
+    return formatter.format(date);
+  }
 }

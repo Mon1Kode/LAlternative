@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:l_alternative/src/core/components/resource_row.dart';
 import 'package:l_alternative/src/features/relaxation/view/breathing_details.dart';
@@ -12,7 +13,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1400);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: BreathingDetails()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: BreathingDetails())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -37,7 +40,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1400);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: BreathingDetails()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: BreathingDetails())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -53,7 +58,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1400);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: BreathingDetails()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: BreathingDetails())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -75,7 +82,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1400);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: BreathingDetails()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: BreathingDetails())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -98,7 +107,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1400);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: BreathingDetails()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: BreathingDetails())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -121,7 +132,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1400);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: BreathingDetails()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: BreathingDetails())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -146,7 +159,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1400);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: BreathingDetails()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: BreathingDetails())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -168,7 +183,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1400);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: BreathingDetails()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: BreathingDetails())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -183,7 +200,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1400);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: BreathingDetails()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: BreathingDetails())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -201,7 +220,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1400);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: BreathingDetails()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: BreathingDetails())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -216,7 +237,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1400);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: BreathingDetails()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: BreathingDetails())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -231,7 +254,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1400);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: BreathingDetails()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: BreathingDetails())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -254,7 +279,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1400);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: BreathingDetails()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: BreathingDetails())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -268,7 +295,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1400);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: BreathingDetails()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: BreathingDetails())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -282,7 +311,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1400);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: BreathingDetails()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: BreathingDetails())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -305,7 +336,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1400);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: BreathingDetails()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: BreathingDetails())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -322,7 +355,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1400);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: BreathingDetails()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: BreathingDetails())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -346,7 +381,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1400);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: BreathingDetails()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: BreathingDetails())),
+      );
 
       await tester.pumpAndSettle();
 

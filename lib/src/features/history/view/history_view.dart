@@ -10,7 +10,8 @@ import 'package:l_alternative/src/core/utils/app_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HistoryView extends StatefulWidget {
-  const HistoryView({super.key});
+  final String category;
+  const HistoryView({super.key, required this.category});
 
   @override
   State<HistoryView> createState() => _HistoryViewState();
@@ -25,6 +26,14 @@ class _HistoryViewState extends State<HistoryView> {
     "sad.png",
   ];
 
+  final List<String> _fatigueImages = [
+    "cool.png",
+    "okay.png",
+    "empty.png",
+    "tired.png",
+    "sleep.png",
+  ];
+
   final Map<String, int> _moodCounts = {
     "love": 0,
     "happy": 0,
@@ -33,14 +42,24 @@ class _HistoryViewState extends State<HistoryView> {
     "sad": 0,
   };
 
-  final Map<DateTime, String> _moodHistory = {};
+  final Map<String, int> _fatigueCounts = {
+    "cool": 0,
+    "okay": 0,
+    "empty": 0,
+    "tired": 0,
+    "sleep": 0,
+  };
 
+  final List<String> _usingImages = [];
+  final Map<String, int> _usingMap = {};
+
+  final Map<DateTime, String> _moodHistory = {};
   int totalMoods = 0;
 
   Future<void> getAllMoods() async {
     var prefs = await SharedPreferences.getInstance();
     List<String> moodHistory =
-        prefs.getStringList("mood_history") ?? <String>[];
+        prefs.getStringList(widget.category) ?? <String>[];
 
     for (var moodEntry in moodHistory) {
       var parts = moodEntry.split(':');
@@ -58,11 +77,34 @@ class _HistoryViewState extends State<HistoryView> {
 
     for (var mood in moodHistory) {
       var moodKey = mood.split(':').last.split('.').first;
-      if (_moodCounts.containsKey(moodKey)) {
-        _moodCounts[moodKey] = _moodCounts[moodKey]! + 1;
+      if (widget.category == "fatigue_history") {
+        if (_fatigueCounts.containsKey(moodKey)) {
+          _fatigueCounts[moodKey] = _fatigueCounts[moodKey]! + 1;
+        }
+      } else {
+        if (_moodCounts.containsKey(moodKey)) {
+          _moodCounts[moodKey] = _moodCounts[moodKey]! + 1;
+        }
       }
     }
-    setState(() {});
+    setState(() {
+      switch (widget.category) {
+        case "mood_history":
+          _usingMap.clear();
+          _usingMap.addAll(_moodCounts);
+          _usingImages.clear();
+          _usingImages.addAll(_moodImages);
+          break;
+        case "fatigue_history":
+          _usingMap.clear();
+          _usingMap.addAll(_fatigueCounts);
+          _usingImages.clear();
+          _usingImages.addAll(_fatigueImages);
+          break;
+        default:
+          _usingMap.clear();
+      }
+    });
   }
 
   @override
@@ -112,11 +154,11 @@ class _HistoryViewState extends State<HistoryView> {
                               width: size.width * 0.6,
                               height: 150,
                               child: BarChartSample4(
-                                values: _moodCounts.values
+                                values: _usingMap.values
                                     .map((e) => e.toDouble())
                                     .toList(),
                                 maxY: totalMoods.toDouble() + 5,
-                                xLabels: _moodImages
+                                xLabels: _usingImages
                                     .map(
                                       (e) => Image.asset(
                                         "assets/images/moods/$e",
@@ -142,7 +184,7 @@ class _HistoryViewState extends State<HistoryView> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             spacing: 6,
                             children: [
-                              for (var mood in _moodCounts.entries)
+                              for (var mood in _usingMap.entries)
                                 Row(
                                   children: [
                                     Image.asset(
@@ -151,9 +193,10 @@ class _HistoryViewState extends State<HistoryView> {
                                       height: 24,
                                     ),
                                     Text(
-                                      _moodCounts[mood.key] != null
-                                          ? " ${_moodCounts[mood.key]} (${totalMoods == 0 ? 0 : ((_moodCounts[mood.key]! / totalMoods) * 100).toInt()}%)"
+                                      _usingMap[mood.key] != null
+                                          ? " ${_usingMap[mood.key]} (${totalMoods == 0 ? 0 : ((_usingMap[mood.key]! / totalMoods) * 100).toInt()}%)"
                                           : " 0 (0%)",
+                                      style: TextStyle(fontSize: 12),
                                     ),
                                   ],
                                 ),

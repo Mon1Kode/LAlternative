@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:l_alternative/src/features/relaxation/view/breathing_details.dart';
 import 'package:l_alternative/src/features/relaxation/view/relaxation_view.dart';
@@ -12,7 +13,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1200);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: RelaxationView()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: RelaxationView())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -36,7 +39,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1200);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: RelaxationView()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: RelaxationView())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -52,7 +57,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1200);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: RelaxationView()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: RelaxationView())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -75,7 +82,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1200);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: RelaxationView()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: RelaxationView())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -101,7 +110,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1200);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: RelaxationView()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: RelaxationView())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -118,7 +129,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1200);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: RelaxationView()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: RelaxationView())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -133,9 +146,14 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: RelaxationView(),
-          routes: {'/breathing_details': (context) => BreathingDetails()},
+        ProviderScope(
+          child: MaterialApp(
+            home: RelaxationView(),
+            routes: {
+              '/breathing_details': (context) =>
+                  ProviderScope(child: BreathingDetails()),
+            },
+          ),
         ),
       );
 
@@ -158,7 +176,9 @@ void main() {
       tester.view.physicalSize = const Size(800, 1200);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(MaterialApp(home: RelaxationView()));
+      await tester.pumpWidget(
+        ProviderScope(child: MaterialApp(home: RelaxationView())),
+      );
 
       await tester.pumpAndSettle();
 
@@ -173,12 +193,14 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: SupportRoundedContainer(
-                imagePath: "assets/images/relaxation_video.png",
-                text: "Test Video",
+        ProviderScope(
+          child: MaterialApp(
+            home: Scaffold(
+              body: Center(
+                child: SupportRoundedContainer(
+                  imagePath: "assets/images/relaxation_video.png",
+                  text: "Test Video",
+                ),
               ),
             ),
           ),
@@ -198,12 +220,14 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: SupportRoundedContainer(
-                imagePath: "assets/images/relaxation_video.png",
-                text: "Test Video",
+        ProviderScope(
+          child: MaterialApp(
+            home: Scaffold(
+              body: Center(
+                child: SupportRoundedContainer(
+                  imagePath: "assets/images/relaxation_video.png",
+                  text: "Test Video",
+                ),
               ),
             ),
           ),
@@ -212,21 +236,32 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      final container = tester.widget<Container>(find.byType(Container).first);
-      expect(container.constraints?.maxWidth, equals(100));
-      expect(container.constraints?.maxHeight, equals(100));
+      // Find the Container widget within SupportRoundedContainer
+      final containerFinder = find.descendant(
+        of: find.byType(SupportRoundedContainer),
+        matching: find.byType(Container),
+      );
+
+      expect(containerFinder, findsWidgets);
+
+      // Get the outermost container (the one with width/height constraints)
+      final outerContainer = tester.widget<Container>(containerFinder.first);
+      expect(outerContainer.constraints?.maxWidth, equals(100));
+      expect(outerContainer.constraints?.maxHeight, equals(100));
     });
 
     testWidgets('SupportRoundedContainer handles short text properly', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: SupportRoundedContainer(
-                imagePath: "assets/images/relaxation_video.png",
-                text: "Short",
+        ProviderScope(
+          child: MaterialApp(
+            home: Scaffold(
+              body: Center(
+                child: SupportRoundedContainer(
+                  imagePath: "assets/images/relaxation_video.png",
+                  text: "Short",
+                ),
               ),
             ),
           ),

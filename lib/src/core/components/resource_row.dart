@@ -2,19 +2,21 @@
 // Monikode Mobile Solutions and Draw Your Fight
 // Created by MoniK on 2024.
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
+import 'package:l_alternative/src/core/provider/app_providers.dart';
 
-class ResourceRow extends StatefulWidget {
+class ResourceRow extends ConsumerStatefulWidget {
   final String title;
   final String content;
 
   const ResourceRow({super.key, required this.title, required this.content});
 
   @override
-  State<ResourceRow> createState() => _ResourceRowState();
+  ConsumerState<ResourceRow> createState() => _ResourceRowState();
 }
 
-class _ResourceRowState extends State<ResourceRow>
+class _ResourceRowState extends ConsumerState<ResourceRow>
     with SingleTickerProviderStateMixin {
   bool _expanded = false;
 
@@ -68,7 +70,12 @@ class _ResourceRowState extends State<ResourceRow>
               height: _expanded ? null : 40,
               child: Text(
                 widget.content,
-                style: TextStyle(fontSize: 12, color: Color(0xFF6D6D6D)),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: ref.watch(themeModeProvider) == ThemeMode.dark
+                      ? Colors.grey
+                      : Color(0xFF6D6D6D),
+                ),
                 overflow: TextOverflow.ellipsis,
                 maxLines: _expanded ? 20 : 2,
                 textAlign: TextAlign.start,

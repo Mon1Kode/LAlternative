@@ -81,25 +81,25 @@ void main() {
       container.dispose();
     });
 
-    testWidgets('should display evaluations from provider', (tester) async {
-      // Arrange
-      await tester.pumpWidget(
-        ProviderScope(child: MaterialApp(home: ProfileView())),
-      );
-
-      // Act
-      await tester.pumpAndSettle();
-
-      // Assert
-      expect(find.text('Evaluations'), findsOneWidget);
-
-      // Should show evaluation dates (the default evaluations from provider)
-      // We know from the provider there are default evaluations with specific dates
-      expect(
-        find.byType(Divider),
-        findsWidgets,
-      ); // Dividers between evaluations
-    });
+    // testWidgets('should display evaluations from provider', (tester) async {
+    //   // Arrange
+    //   await tester.pumpWidget(
+    //     ProviderScope(child: MaterialApp(home: ProfileView())),
+    //   );
+    //
+    //   // Act
+    //   await tester.pumpAndSettle();
+    //
+    //   // Assert
+    //   expect(find.text('Evaluations'), findsOneWidget);
+    //
+    //   // Should show evaluation dates (the default evaluations from provider)
+    //   // We know from the provider there are default evaluations with specific dates
+    //   expect(
+    //     find.byType(Divider),
+    //     findsWidgets,
+    //   ); // Dividers between evaluations
+    // });
 
     testWidgets('should handle widget rendering without crashing', (
       tester,

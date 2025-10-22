@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:l_alternative/src/core/components/circle_image_button.dart';
 import 'package:l_alternative/src/core/components/image_button.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
 import 'package:l_alternative/src/features/home/view/home_view.dart';
@@ -156,7 +157,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.byType(CircleMoods), findsNWidgets(5));
+        expect(find.byType(CircleImageButton), findsNWidgets(5));
       });
 
       testWidgets('mood selection updates correctly', (
@@ -168,7 +169,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Find all mood circles
-        final moodCircles = find.byType(CircleMoods);
+        final moodCircles = find.byType(CircleImageButton);
         expect(moodCircles, findsNWidgets(5));
 
         // Tap on the first mood circle
@@ -188,7 +189,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Find CircleAvatar widgets (part of CircleMoods)
+        // Find CircleAvatar widgets (part of CircleImageButton)
         final circleAvatars = find.byType(CircleAvatar);
         expect(circleAvatars, findsWidgets);
 

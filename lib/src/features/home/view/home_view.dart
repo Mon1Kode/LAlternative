@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:l_alternative/src/core/components/activity_card.dart';
+import 'package:l_alternative/src/core/components/circle_image_button.dart';
 import 'package:l_alternative/src/core/components/image_button.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
 import 'package:l_alternative/src/core/provider/app_providers.dart';
@@ -695,9 +696,9 @@ class _HomeViewState extends ConsumerState<HomeView>
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  CircleMoods(
-                                    mood: "love.png",
-                                    selectedMood: _selectedMood,
+                                  CircleImageButton(
+                                    imagePath: "moods/love.png",
+                                    isSelected: _selectedMood == "love.png",
                                     onPressed: () {
                                       setState(() {
                                         _selectedMood = "love.png";
@@ -705,9 +706,9 @@ class _HomeViewState extends ConsumerState<HomeView>
                                       selectMood();
                                     },
                                   ),
-                                  CircleMoods(
-                                    mood: "happy.png",
-                                    selectedMood: _selectedMood,
+                                  CircleImageButton(
+                                    imagePath: "moods/happy.png",
+                                    isSelected: _selectedMood == "happy.png",
                                     onPressed: () {
                                       setState(() {
                                         _selectedMood = "happy.png";
@@ -715,9 +716,9 @@ class _HomeViewState extends ConsumerState<HomeView>
                                       selectMood();
                                     },
                                   ),
-                                  CircleMoods(
-                                    mood: "neutral.png",
-                                    selectedMood: _selectedMood,
+                                  CircleImageButton(
+                                    imagePath: "moods/neutral.png",
+                                    isSelected: _selectedMood == "neutral.png",
                                     onPressed: () {
                                       setState(() {
                                         _selectedMood = "neutral.png";
@@ -725,9 +726,9 @@ class _HomeViewState extends ConsumerState<HomeView>
                                       selectMood();
                                     },
                                   ),
-                                  CircleMoods(
-                                    mood: "frowning.png",
-                                    selectedMood: _selectedMood,
+                                  CircleImageButton(
+                                    imagePath: "moods/frowning.png",
+                                    isSelected: _selectedMood == "frowning.png",
                                     onPressed: () {
                                       setState(() {
                                         _selectedMood = "frowning.png";
@@ -735,9 +736,9 @@ class _HomeViewState extends ConsumerState<HomeView>
                                       selectMood();
                                     },
                                   ),
-                                  CircleMoods(
-                                    mood: "sad.png",
-                                    selectedMood: _selectedMood,
+                                  CircleImageButton(
+                                    imagePath: "moods/sad.png",
+                                    isSelected: _selectedMood == "sad.png",
                                     onPressed: () {
                                       setState(() {
                                         _selectedMood = "sad.png";
@@ -748,12 +749,9 @@ class _HomeViewState extends ConsumerState<HomeView>
                                 ],
                               ),
                             ),
-                            // Second page with additional moods or information
                             GestureDetector(
                               onPanUpdate: (details) {
-                                // Swipe detection on mood row
                                 if (details.delta.dx > 10) {
-                                  // Swipe right - go to previous page
                                   if (_currentMoodPage > 0) {
                                     _pageController.animateToPage(
                                       _currentMoodPage - 1,
@@ -762,7 +760,6 @@ class _HomeViewState extends ConsumerState<HomeView>
                                     );
                                   }
                                 } else if (details.delta.dx < -10) {
-                                  // Swipe left - go to next page
                                   if (_currentMoodPage < 1) {
                                     _pageController.animateToPage(
                                       _currentMoodPage + 1,
@@ -776,9 +773,9 @@ class _HomeViewState extends ConsumerState<HomeView>
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  CircleMoods(
-                                    mood: "cool.png",
-                                    selectedMood: _selectedFatigue,
+                                  CircleImageButton(
+                                    imagePath: "moods/cool.png",
+                                    isSelected: _selectedFatigue == "cool.png",
                                     onPressed: () {
                                       setState(() {
                                         _selectedFatigue = "cool.png";
@@ -786,9 +783,9 @@ class _HomeViewState extends ConsumerState<HomeView>
                                       selectFatigue();
                                     },
                                   ),
-                                  CircleMoods(
-                                    mood: "okay.png",
-                                    selectedMood: _selectedFatigue,
+                                  CircleImageButton(
+                                    imagePath: "moods/okay.png",
+                                    isSelected: _selectedFatigue == "okay.png",
                                     onPressed: () {
                                       setState(() {
                                         _selectedFatigue = "okay.png";
@@ -796,9 +793,9 @@ class _HomeViewState extends ConsumerState<HomeView>
                                       selectFatigue();
                                     },
                                   ),
-                                  CircleMoods(
-                                    mood: "empty.png",
-                                    selectedMood: _selectedFatigue,
+                                  CircleImageButton(
+                                    imagePath: "moods/empty.png",
+                                    isSelected: _selectedFatigue == "empty.png",
                                     onPressed: () {
                                       setState(() {
                                         _selectedFatigue = "empty.png";
@@ -806,9 +803,9 @@ class _HomeViewState extends ConsumerState<HomeView>
                                       selectFatigue();
                                     },
                                   ),
-                                  CircleMoods(
-                                    mood: "tired.png",
-                                    selectedMood: _selectedFatigue,
+                                  CircleImageButton(
+                                    imagePath: "moods/tired.png",
+                                    isSelected: _selectedFatigue == "tired.png",
                                     onPressed: () {
                                       setState(() {
                                         _selectedFatigue = "tired.png";
@@ -816,9 +813,9 @@ class _HomeViewState extends ConsumerState<HomeView>
                                       selectFatigue();
                                     },
                                   ),
-                                  CircleMoods(
-                                    mood: "sleep.png",
-                                    selectedMood: _selectedFatigue,
+                                  CircleImageButton(
+                                    imagePath: "moods/sleep.png",
+                                    isSelected: _selectedFatigue == "sleep.png",
                                     onPressed: () {
                                       setState(() {
                                         _selectedFatigue = "sleep.png";
@@ -1024,47 +1021,6 @@ class _HomeToolsAddCardState extends State<HomeToolsAddCard> {
             child: Icon(Icons.check, color: Colors.green.shade300, size: 48),
           ),
       ],
-    );
-  }
-}
-
-class CircleMoods extends StatelessWidget {
-  final String mood;
-  final String selectedMood;
-  final VoidCallback onPressed;
-
-  const CircleMoods({
-    super.key,
-    required this.mood,
-    required this.selectedMood,
-    required this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
-    return RoundedContainer(
-      borderRadius: 999,
-      borderWidth: 1,
-      borderColor: Theme.of(context).colorScheme.tertiary,
-      width: size.width * 0.15,
-      height: size.width * 0.15,
-      child: CircleAvatar(
-        backgroundColor: selectedMood == mood
-            ? Theme.of(context).colorScheme.tertiary
-            : Colors.transparent,
-        radius: 999,
-        child: Padding(
-          padding: const EdgeInsets.all(2.0),
-          child: ImageButton(
-            imagePath: "moods/$mood",
-            onPressed: onPressed,
-            size: size.width * 0.1,
-            isColored: false,
-            // borderRadius: 999,
-          ),
-        ),
-      ),
     );
   }
 }

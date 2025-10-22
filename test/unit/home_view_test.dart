@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:l_alternative/src/core/components/circle_image_button.dart';
 import 'package:l_alternative/src/core/components/image_button.dart';
 import 'package:l_alternative/src/features/home/view/home_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -40,8 +41,8 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Find all CircleMoods widgets (should be 5)
-      expect(find.byType(CircleMoods), findsNWidgets(5));
+      // Find all CircleImageButton widgets (should be 5)
+      expect(find.byType(CircleImageButton), findsNWidgets(5));
 
       // Verify the mood selection header
       expect(find.text('Humeur actuelle'), findsOneWidget);
@@ -181,16 +182,18 @@ void main() {
       expect(wasPressed, isTrue);
     });
 
-    testWidgets('CircleMoods renders correctly', (WidgetTester tester) async {
+    testWidgets('CircleImageButton renders correctly', (
+      WidgetTester tester,
+    ) async {
       bool wasPressed = false;
 
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
-              body: CircleMoods(
-                mood: "happy.png",
-                selectedMood: "love.png",
+              body: CircleImageButton(
+                imagePath: "moods/happy.png",
+                isSelected: false,
                 onPressed: () {
                   wasPressed = true;
                 },
@@ -203,7 +206,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify the mood circle renders
-      expect(find.byType(CircleMoods), findsOneWidget);
+      expect(find.byType(CircleImageButton), findsOneWidget);
       expect(find.byType(CircleAvatar), findsOneWidget);
 
       // Test pressing the mood
@@ -218,9 +221,9 @@ void main() {
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
-              body: CircleMoods(
-                mood: "happy.png",
-                selectedMood: "happy.png", // Same as mood - should be selected
+              body: CircleImageButton(
+                imagePath: "moods/happy.png",
+                isSelected: true, // Same as mood - should be selected
                 onPressed: () {},
               ),
             ),
@@ -244,10 +247,10 @@ void main() {
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
-              body: CircleMoods(
-                mood: "happy.png",
-                selectedMood:
-                    "love.png", // Different from mood - should not be selected
+              body: CircleImageButton(
+                imagePath: "moods/happy.png",
+                isSelected:
+                    false, // Different from mood - should not be selected
                 onPressed: () {},
               ),
             ),

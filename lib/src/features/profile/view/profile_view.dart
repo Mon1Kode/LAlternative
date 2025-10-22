@@ -179,9 +179,7 @@ class _ProfileViewState extends ConsumerState<ProfileView>
                         imagePath: "plus-circle.png",
                         size: 32,
                         onPressed: () {
-                          ref
-                              .read(evaluationsProvider.notifier)
-                              .addEvaluation();
+                          Navigator.pushNamed(context, "/evaluations");
                         },
                       ),
                     ],
@@ -207,11 +205,18 @@ class _ProfileViewState extends ConsumerState<ProfileView>
                                   style: TextStyle(fontSize: 18),
                                 ),
                                 ImageButton(
-                                  imagePath: "file-symlink.png",
+                                  imagePath: "eye.png",
                                   size: 32,
                                   color: Theme.of(
                                     context,
                                   ).colorScheme.secondary,
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      "/evaluations",
+                                      arguments: sortedEvaluations[i],
+                                    );
+                                  },
                                 ),
                               ],
                             ),

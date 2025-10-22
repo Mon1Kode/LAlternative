@@ -2,6 +2,8 @@
 // Unauthorized copying of this file, via any medium, is strictly prohibited.
 // Created by MoniK.
 
+import 'package:l_alternative/src/features/evaluations/model/evaluation_row_model.dart';
+
 class EvaluationsModel {
   final List<EvaluationModel> evaluations;
 
@@ -13,9 +15,12 @@ class EvaluationsModel {
 
 class EvaluationModel {
   final DateTime date;
+  final List<EvaluationRowModel> rows;
 
-  EvaluationModel({required this.date});
+  EvaluationModel({required this.date, required this.rows});
 
-  EvaluationModel copyWith({DateTime? newDate}) =>
-      EvaluationModel(date: newDate ?? date);
+  EvaluationModel copyWith({
+    DateTime? newDate,
+    List<EvaluationRowModel>? newRows,
+  }) => EvaluationModel(date: newDate ?? date, rows: newRows ?? rows);
 }

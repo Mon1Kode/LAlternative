@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:l_alternative/src/features/evaluations/view/evalutaions_view.dart';
 import 'package:l_alternative/src/features/history/view/history_view.dart';
 import 'package:l_alternative/src/features/home/view/home_view.dart';
+import 'package:l_alternative/src/features/profile/model/evaluation_model.dart';
 import 'package:l_alternative/src/features/profile/view/profile_view.dart';
 
 import 'core/provider/app_providers.dart';
@@ -74,6 +76,17 @@ class MyApp extends ConsumerWidget {
             return MaterialPageRoute(builder: (context) => const HomeView());
           case '/profile':
             return MaterialPageRoute(builder: (context) => const ProfileView());
+          case '/evaluations':
+            final args = settings.arguments;
+            if (args is EvaluationModel) {
+              return MaterialPageRoute(
+                builder: (context) => EvaluationsView(evaluation: args),
+              );
+            } else {
+              return MaterialPageRoute(
+                builder: (context) => EvaluationsView(evaluation: null),
+              );
+            }
           case '/moodHistory':
             final args = settings.arguments;
             if (args is String) {

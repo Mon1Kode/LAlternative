@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:l_alternative/main.dart' as app;
+import 'package:l_alternative/src/core/components/circle_image_button.dart';
 import 'package:l_alternative/src/core/components/image_button.dart';
 import 'package:l_alternative/src/features/home/view/home_view.dart';
 import 'package:l_alternative/src/features/profile/view/profile_view.dart';
@@ -25,15 +26,15 @@ void main() {
         expect(find.text('Humeur actuelle'), findsOneWidget);
 
         // Step 2: Verify mood selection section is visible
-        expect(find.byType(CircleMoods), findsNWidgets(5));
+        expect(find.byType(CircleImageButton), findsNWidgets(5));
 
         // Step 3: Select a mood (tap on the first mood circle)
-        final moodCircles = find.byType(CircleMoods);
+        final moodCircles = find.byType(CircleImageButton);
         await tester.tap(moodCircles.first);
         await tester.pumpAndSettle();
 
         // Verify mood was selected (should still have 5 mood circles)
-        expect(find.byType(CircleMoods), findsNWidgets(5));
+        expect(find.byType(CircleImageButton), findsNWidgets(5));
 
         // Step 4: Navigate to profile by tapping the avatar
         final avatarImage = find.byWidgetPredicate(
@@ -158,7 +159,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Select a specific mood (let's select the second mood circle)
-      final moodCircles = find.byType(CircleMoods);
+      final moodCircles = find.byType(CircleImageButton);
       expect(moodCircles, findsNWidgets(5));
 
       await tester.tap(moodCircles.at(1)); // Select second mood
@@ -182,7 +183,7 @@ void main() {
 
       // Verify mood selection is still intact
       expect(find.byType(HomeView), findsOneWidget);
-      expect(find.byType(CircleMoods), findsNWidgets(5));
+      expect(find.byType(CircleImageButton), findsNWidgets(5));
     });
 
     testWidgets('App navigation flows work correctly', (
@@ -235,7 +236,7 @@ void main() {
       expect(find.text('Humeur actuelle'), findsOneWidget);
 
       // Test mood selection functionality
-      final moodCircles = find.byType(CircleMoods);
+      final moodCircles = find.byType(CircleImageButton);
       expect(moodCircles, findsNWidgets(5));
 
       // Test each mood circle is tappable

@@ -14,34 +14,27 @@ final evaluationsProvider =
 class EvaluationsNotifier extends StateNotifier<EvaluationsModel> {
   final Ref ref;
   final String evaluationsKey = 'evaluations_key';
-  final List<EvaluationModel> defaultEvaluations = [
-    EvaluationModel(date: DateTime(2025, 07, 09)),
-    EvaluationModel(date: DateTime(2025, 08, 04)),
-  ];
 
-  EvaluationsNotifier(this.ref)
-    : super(
-        EvaluationsModel(
-          evaluations: [
-            EvaluationModel(date: DateTime(2025, 07, 09)),
-            EvaluationModel(date: DateTime(2025, 08, 04)),
-          ],
-        ),
-      ) {
+  EvaluationsNotifier(this.ref) : super(EvaluationsModel(evaluations: [])) {
     _getStoredDate();
   }
 
   Future<void> _getStoredDate() async {
-    // Implementation to get stored date
+    // Implementation to load stored evaluations
+    // For now, we initialize with an empty list
+    state = EvaluationsModel(evaluations: []);
   }
 
-  Future<void> addEvaluation() async {
-    // Implementation to add evaluation
-    state = state.copyWith(newEvaluations: defaultEvaluations);
+  Future<void> addEvaluation(EvaluationModel newEval) async {
+    state = state.copyWith(newEvaluations: [...state.evaluations, newEval]);
   }
 
-  Future<void> deleteEvaluations(int index) async {
-    // Implementation to delete evaluations
+  Future<void> deleteEvaluations(EvaluationModel eval) async {
+    state = state.copyWith(
+      newEvaluations: state.evaluations
+          .where((e) => e.date != eval.date)
+          .toList(),
+    );
   }
 
   Future<void> clearEvaluations() async {

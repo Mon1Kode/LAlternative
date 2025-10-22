@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:l_alternative/main.dart' as app;
 import 'package:l_alternative/src/core/components/bar_chart.dart';
+import 'package:l_alternative/src/core/components/circle_image_button.dart';
 import 'package:l_alternative/src/core/components/image_button.dart';
 import 'package:l_alternative/src/features/history/view/history_view.dart';
 import 'package:l_alternative/src/features/home/view/home_view.dart';
@@ -23,7 +24,7 @@ void main() {
         expect(find.text('Humeur actuelle'), findsOneWidget);
 
         // Step 2: Record a mood by selecting the first mood circle (love)
-        final moodCircles = find.byType(CircleMoods);
+        final moodCircles = find.byType(CircleImageButton);
         expect(moodCircles, findsNWidgets(5));
 
         // Tap the first mood circle (love)
@@ -87,7 +88,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Record multiple different moods
-      final moodCircles = find.byType(CircleMoods);
+      final moodCircles = find.byType(CircleImageButton);
 
       // Record love mood (first circle)
       await tester.tap(moodCircles.first);
@@ -141,7 +142,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Record a mood
-        final moodCircles = find.byType(CircleMoods);
+        final moodCircles = find.byType(CircleImageButton);
         await tester.tap(moodCircles.at(2)); // neutral mood
         await tester.pumpAndSettle();
 
@@ -181,7 +182,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Record a specific mood (sad - last circle)
-      final moodCircles = find.byType(CircleMoods);
+      final moodCircles = find.byType(CircleImageButton);
       await tester.tap(moodCircles.last);
       await tester.pumpAndSettle();
 
@@ -204,7 +205,7 @@ void main() {
       expect(find.byType(HomeView), findsOneWidget);
 
       // Verify mood selection is maintained (sad mood should still be selected)
-      final moodCirclesAfterReturn = find.byType(CircleMoods);
+      final moodCirclesAfterReturn = find.byType(CircleImageButton);
       expect(moodCirclesAfterReturn, findsNWidgets(5));
     });
 
@@ -216,7 +217,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Record multiple moods of different types
-      final moodCircles = find.byType(CircleMoods);
+      final moodCircles = find.byType(CircleImageButton);
 
       // Record several moods to test chart scaling
       for (int i = 0; i < 3; i++) {
@@ -260,7 +261,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Record a mood
-        final moodCircles = find.byType(CircleMoods);
+        final moodCircles = find.byType(CircleImageButton);
         await tester.tap(moodCircles.at(1)); // happy mood
         await tester.pumpAndSettle();
 

@@ -4,7 +4,6 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:l_alternative/src/features/profile/model/user_model.dart';
-import 'package:l_alternative/src/features/profile/provider/evaluation_provider.dart';
 import 'package:l_alternative/src/features/profile/services/user_services.dart';
 import 'package:monikode_event_store/monikode_event_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,7 +40,7 @@ class UserNotifier extends StateNotifier<UserModel> {
     var pref = await SharedPreferences.getInstance();
     await pref.clear();
     state = const UserModel("NAME");
-    ref.read(evaluationsProvider.notifier).clearEvaluations();
+    // ref.read(evaluationsProvider.notifier).clearEvaluations();
     EventStore.getInstance().localEventStore.log(
       "user_delete",
       EventLevel.warning,

@@ -75,7 +75,7 @@ flutter:
           weight: 400
         - asset: assets/fonts/InclusiveSans/InclusiveSans-Medium.ttf
           weight: 500
-        - asset: assets/fonts/InclusiveSans/InclusiveSans-Semibold.ttf
+        - asset: assets/fonts/InclusiveSans/InclusiveSans-SemiBold.ttf
           weight: 600
         - asset: assets/fonts/InclusiveSans/InclusiveSans-Bold.ttf
           weight: 700

@@ -113,13 +113,7 @@ class NotificationService {
           canScheduleExactAlarms = true;
           scheduleMode = AndroidScheduleMode.exact;
         } else {
-          // Fall back to inexact scheduling
           scheduleMode = AndroidScheduleMode.inexact;
-          // EventStore.getInstance().localEventStore.log(
-          //   "notif.exact_alarm_denied",
-          //   EventLevel.warning,
-          //   {"id": id, "title": title},
-          // );
         }
       }
     }

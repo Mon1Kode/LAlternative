@@ -6,7 +6,7 @@ version: 1.0.0+1
 
 environment:
   sdk: ^3.9.2
-  flutter: ^3.35.7
+  flutter: 3.35.7
 
 dependencies:
   flutter:
@@ -50,7 +50,6 @@ flutter:
     - assets/
     - assets/images/
     - assets/images/moods/
-    - assets/icons/
     - assets/fonts/
 
   fonts:

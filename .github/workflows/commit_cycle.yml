@@ -44,4 +44,4 @@ jobs:
         run: flutter analyze
 
       - name: Run unit tests
-        run: flutter test test/units
+        run: flutter test test/unit

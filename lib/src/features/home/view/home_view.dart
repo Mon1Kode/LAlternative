@@ -13,6 +13,7 @@ import 'package:l_alternative/src/core/components/image_button.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
 import 'package:l_alternative/src/core/provider/app_providers.dart';
 import 'package:l_alternative/src/core/utils/app_utils.dart';
+import 'package:l_alternative/src/features/notifications/provider/notifications_provider.dart';
 import 'package:l_alternative/src/features/profile/provider/user_provider.dart';
 import 'package:l_alternative/src/features/relaxation/view/relaxation_view.dart';
 import 'package:monikode_event_store/monikode_event_store.dart';
@@ -102,7 +103,6 @@ class _HomeViewState extends ConsumerState<HomeView>
   final Map<Widget, int> _toolWidths = {};
   var _toolsChildren = <Widget>[];
   late SharedPreferences prefs;
-  final bool _hasNotification = false;
 
   Future<void> getUserConfig() async {
     prefs = await SharedPreferences.getInstance();
@@ -332,6 +332,7 @@ class _HomeViewState extends ConsumerState<HomeView>
   Widget build(BuildContext context) {
     var user = ref.watch(userProvider);
     final themeMode = ref.watch(themeModeProvider);
+    var notifProvider = ref.watch(notificationsProvider);
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,
@@ -341,562 +342,664 @@ class _HomeViewState extends ConsumerState<HomeView>
               Theme.of(context).colorScheme.primary,
               themeMode == ThemeMode.dark
                   ? Theme.of(context).colorScheme.onPrimary
-                  // ? Color(0xFFBBADA8)
                   : Color(0xFFFFEAE4),
             ],
-            // colors: [Theme.of(context).colorScheme.primary, Color(0xFFFFEAE4)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
         ),
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: SingleChildScrollView(
-              child: Column(
-                spacing: 16,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      ImageButton(
-                        imagePath: _hasNotification
-                            ? "bell-circle.png"
-                            : "bell.png",
-                        size: 32,
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/notifications');
-                        },
-                      ),
-                      Text(
-                        user.name,
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      ImageButton(
-                        imagePath: "user.png",
-                        size: 32,
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/profile');
-                        },
-                      ),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: SingleChildScrollView(
+                  child: Column(
                     spacing: 16,
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text(
-                            "Outils",
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          ImageButton(
+                            imagePath: notifProvider.notifications.isNotEmpty
+                                ? "bell-dot.png"
+                                : "bell.png",
+                            size: 32,
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/notifications');
+                            },
                           ),
-                          Row(
-                            children: [
-                              if (_isEditMode)
-                                ImageButton(
-                                  imagePath: "plus-circle.png",
-                                  size: 24,
-                                  onPressed: () {
-                                    showModalBottomSheet(
-                                      context: context,
-                                      builder: (context) {
-                                        return Container(
-                                          width: double.infinity,
-                                          decoration: BoxDecoration(
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.tertiary,
-                                            borderRadius: BorderRadius.vertical(
-                                              top: Radius.circular(24.0),
-                                            ),
-                                          ),
-                                          padding: const EdgeInsets.all(16.0),
-                                          child: SingleChildScrollView(
-                                            scrollDirection: Axis.horizontal,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              spacing: 16,
-                                              children: [
-                                                HomeToolsAddCard(
-                                                  tool: _streak,
-                                                  toolsChildren: _toolsChildren,
-                                                  imagePath: "streak.png",
-                                                  text: "Streak",
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      _toolsChildren.add(
-                                                        _streak,
-                                                      );
-                                                    });
-                                                    Navigator.pop(context);
-                                                  },
-                                                ),
-                                                HomeToolsAddCard(
-                                                  tool: _calendar,
-                                                  toolsChildren: _toolsChildren,
-                                                  imagePath: "calendar.png",
-                                                  text: "Calendrier",
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      _toolsChildren.add(
-                                                        _calendar,
-                                                      );
-                                                    });
-                                                    Navigator.pop(context);
-                                                  },
-                                                ),
-                                                HomeToolsAddCard(
-                                                  tool: _nextActivity,
-                                                  toolsChildren: _toolsChildren,
-                                                  imagePath: "calendar.png",
-                                                  text: "Activité",
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      _toolsChildren.add(
-                                                        _nextActivity,
-                                                      );
-                                                    });
-                                                    Navigator.pop(context);
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  },
-                                ),
-                              ImageButton(
-                                imagePath: _isEditMode
-                                    ? "save.png"
-                                    : "edit.png",
-                                size: 24,
-                                onPressed: () async {
-                                  if (_isEditMode) {
-                                    await prefs.setStringList(
-                                      "tools",
-                                      _toolsChildren.map((e) {
-                                        if (e == _streak) return "streak";
-                                        if (e == _calendar) return "calendar";
-                                        if (e == _nextActivity) {
-                                          return "nextActivity";
-                                        }
-                                        return "";
-                                      }).toList(),
-                                    );
-                                  }
-                                  setState(() {
-                                    _isEditMode = !_isEditMode;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        width: double.infinity,
-                        child: StaggeredGrid.count(
-                          crossAxisCount: 3,
-                          mainAxisSpacing: 16,
-                          crossAxisSpacing: 16,
-                          children: [
-                            for (var child in _toolsChildren)
-                              StaggeredGridTile.count(
-                                crossAxisCellCount: _toolWidths[child] ?? 1,
-                                mainAxisCellCount: 1,
-                                child: ShakeWidget(
-                                  animate: _isEditMode,
-                                  child: Stack(
-                                    children: [
-                                      child,
-                                      if (_isEditMode)
-                                        Positioned(
-                                          top: 0,
-                                          right: 0,
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              setState(() {
-                                                _toolsChildren.remove(child);
-                                              });
-                                            },
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                color: Colors.red,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: Icon(
-                                                Icons.close,
-                                                color: Colors.white,
-                                                size: 20,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: 0,
-                    children: [
-                      SizedBox(
-                        height: 30,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: ClipRect(
-                                child: AnimatedBuilder(
-                                  animation: _textAnimationController,
-                                  builder: (context, child) {
-                                    return Stack(
-                                      children: [
-                                        SlideTransition(
-                                          position: _slideAnimation,
-                                          child: Text(
-                                            _currentMoodPage == 0
-                                                ? "Humeur actuelle"
-                                                : "Fatigue actuelle",
-                                            style: TextStyle(
-                                              fontSize: 24,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        if (_textAnimationController
-                                            .isAnimating)
-                                          SlideTransition(
-                                            position: Tween<Offset>(
-                                              begin:
-                                                  _slideAnimation.value.dx < 0
-                                                  ? Offset(1.0, 0.0)
-                                                  : Offset(-1.0, 0.0),
-                                              end: Offset.zero,
-                                            ).animate(_textAnimationController),
-                                            child: Text(
-                                              _currentMoodPage == 0
-                                                  ? "Fatigue actuelle"
-                                                  : "Humeur actuelle",
-                                              style: TextStyle(
-                                                fontSize: 24,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                      ],
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                ImageButton(
-                                  imagePath: "arrow-left.png",
-                                  size: 24,
-                                  onPressed: () {
-                                    if (_currentMoodPage > 0) {
-                                      _pageController.animateToPage(
-                                        _currentMoodPage - 1,
-                                        duration: Duration(milliseconds: 300),
-                                        curve: Curves.easeInOut,
-                                      );
-                                    }
-                                  },
-                                  color: _currentMoodPage == 0
-                                      ? Colors.grey
-                                      : null,
-                                ),
-                                ImageButton(
-                                  imagePath: "arrow-right.png",
-                                  size: 24,
-                                  onPressed: () {
-                                    if (_currentMoodPage < 1) {
-                                      _pageController.animateToPage(
-                                        _currentMoodPage + 1,
-                                        duration: Duration(milliseconds: 300),
-                                        curve: Curves.easeInOut,
-                                      );
-                                    }
-                                  },
-                                  color: _currentMoodPage == 1
-                                      ? Colors.grey
-                                      : null,
-                                ),
-                              ],
-                            ),
-                            ImageButton(
-                              imagePath: "chart.png",
-                              size: 24,
-                              onPressed: () {
-                                Navigator.pushNamed(
-                                  context,
-                                  '/moodHistory',
-                                  arguments: {
-                                    "category": _currentMoodPage == 0
-                                        ? "mood_history"
-                                        : "fatigue_history",
-                                  },
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        height: 70,
-                        child: PageView(
-                          controller: _pageController,
-                          onPageChanged: (index) {
-                            _animateTextTransition(index);
-                          },
-                          children: [
-                            GestureDetector(
-                              onPanUpdate: (details) {
-                                // Swipe detection on mood row
-                                if (details.delta.dx > 10) {
-                                  // Swipe right - go to previous page
-                                  if (_currentMoodPage > 0) {
-                                    _pageController.animateToPage(
-                                      _currentMoodPage - 1,
-                                      duration: Duration(milliseconds: 300),
-                                      curve: Curves.easeInOut,
-                                    );
-                                  }
-                                } else if (details.delta.dx < -10) {
-                                  // Swipe left - go to next page
-                                  if (_currentMoodPage < 1) {
-                                    _pageController.animateToPage(
-                                      _currentMoodPage + 1,
-                                      duration: Duration(milliseconds: 300),
-                                      curve: Curves.easeInOut,
-                                    );
-                                  }
-                                }
-                              },
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  CircleImageButton(
-                                    imagePath: "moods/love.png",
-                                    isSelected: _selectedMood == "love.png",
-                                    onPressed: () {
-                                      setState(() {
-                                        _selectedMood = "love.png";
-                                      });
-                                      selectMood();
-                                    },
-                                  ),
-                                  CircleImageButton(
-                                    imagePath: "moods/happy.png",
-                                    isSelected: _selectedMood == "happy.png",
-                                    onPressed: () {
-                                      setState(() {
-                                        _selectedMood = "happy.png";
-                                      });
-                                      selectMood();
-                                    },
-                                  ),
-                                  CircleImageButton(
-                                    imagePath: "moods/neutral.png",
-                                    isSelected: _selectedMood == "neutral.png",
-                                    onPressed: () {
-                                      setState(() {
-                                        _selectedMood = "neutral.png";
-                                      });
-                                      selectMood();
-                                    },
-                                  ),
-                                  CircleImageButton(
-                                    imagePath: "moods/frowning.png",
-                                    isSelected: _selectedMood == "frowning.png",
-                                    onPressed: () {
-                                      setState(() {
-                                        _selectedMood = "frowning.png";
-                                      });
-                                      selectMood();
-                                    },
-                                  ),
-                                  CircleImageButton(
-                                    imagePath: "moods/sad.png",
-                                    isSelected: _selectedMood == "sad.png",
-                                    onPressed: () {
-                                      setState(() {
-                                        _selectedMood = "sad.png";
-                                      });
-                                      selectMood();
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                            GestureDetector(
-                              onPanUpdate: (details) {
-                                if (details.delta.dx > 10) {
-                                  if (_currentMoodPage > 0) {
-                                    _pageController.animateToPage(
-                                      _currentMoodPage - 1,
-                                      duration: Duration(milliseconds: 300),
-                                      curve: Curves.easeInOut,
-                                    );
-                                  }
-                                } else if (details.delta.dx < -10) {
-                                  if (_currentMoodPage < 1) {
-                                    _pageController.animateToPage(
-                                      _currentMoodPage + 1,
-                                      duration: Duration(milliseconds: 300),
-                                      curve: Curves.easeInOut,
-                                    );
-                                  }
-                                }
-                              },
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  CircleImageButton(
-                                    imagePath: "moods/cool.png",
-                                    isSelected: _selectedFatigue == "cool.png",
-                                    onPressed: () {
-                                      setState(() {
-                                        _selectedFatigue = "cool.png";
-                                      });
-                                      selectFatigue();
-                                    },
-                                  ),
-                                  CircleImageButton(
-                                    imagePath: "moods/okay.png",
-                                    isSelected: _selectedFatigue == "okay.png",
-                                    onPressed: () {
-                                      setState(() {
-                                        _selectedFatigue = "okay.png";
-                                      });
-                                      selectFatigue();
-                                    },
-                                  ),
-                                  CircleImageButton(
-                                    imagePath: "moods/empty.png",
-                                    isSelected: _selectedFatigue == "empty.png",
-                                    onPressed: () {
-                                      setState(() {
-                                        _selectedFatigue = "empty.png";
-                                      });
-                                      selectFatigue();
-                                    },
-                                  ),
-                                  CircleImageButton(
-                                    imagePath: "moods/tired.png",
-                                    isSelected: _selectedFatigue == "tired.png",
-                                    onPressed: () {
-                                      setState(() {
-                                        _selectedFatigue = "tired.png";
-                                      });
-                                      selectFatigue();
-                                    },
-                                  ),
-                                  CircleImageButton(
-                                    imagePath: "moods/sleep.png",
-                                    isSelected: _selectedFatigue == "sleep.png",
-                                    onPressed: () {
-                                      setState(() {
-                                        _selectedFatigue = "sleep.png";
-                                      });
-                                      selectFatigue();
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    spacing: 8,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
                           Text(
-                            "Activités",
+                            user.name,
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           ImageButton(
-                            imagePath: "arrow-right-circle.png",
-                            size: 24,
-                            onPressed: () {},
+                            imagePath: "user.png",
+                            size: 32,
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/profile');
+                            },
                           ),
                         ],
                       ),
-                      SizedBox(
-                        height: 350, // Provide explicit height for the stack
-                        width: double.infinity,
-                        child: Stack(
-                          children: [
-                            Positioned(
-                              top: 0,
-                              child: ActivityCard(
-                                title: "Continuer à bouger",
-                                description:
-                                    "Faire quelque exercices pour rester actif",
-                                imagePath: "assets/images/relaxation.png",
-                                actionView: RelaxationView(),
-                                color: Color(0xFFBAE6FD),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: 16,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Outils",
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  if (_isEditMode)
+                                    ImageButton(
+                                      imagePath: "plus-circle.png",
+                                      size: 24,
+                                      onPressed: () {
+                                        showModalBottomSheet(
+                                          context: context,
+                                          builder: (context) {
+                                            return Container(
+                                              width: double.infinity,
+                                              decoration: BoxDecoration(
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.tertiary,
+                                                borderRadius:
+                                                    BorderRadius.vertical(
+                                                      top: Radius.circular(
+                                                        24.0,
+                                                      ),
+                                                    ),
+                                              ),
+                                              padding: const EdgeInsets.all(
+                                                16.0,
+                                              ),
+                                              child: SingleChildScrollView(
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  spacing: 16,
+                                                  children: [
+                                                    HomeToolsAddCard(
+                                                      tool: _streak,
+                                                      toolsChildren:
+                                                          _toolsChildren,
+                                                      imagePath: "streak.png",
+                                                      text: "Streak",
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          _toolsChildren.add(
+                                                            _streak,
+                                                          );
+                                                        });
+                                                        Navigator.pop(context);
+                                                      },
+                                                    ),
+                                                    HomeToolsAddCard(
+                                                      tool: _calendar,
+                                                      toolsChildren:
+                                                          _toolsChildren,
+                                                      imagePath: "calendar.png",
+                                                      text: "Calendrier",
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          _toolsChildren.add(
+                                                            _calendar,
+                                                          );
+                                                        });
+                                                        Navigator.pop(context);
+                                                      },
+                                                    ),
+                                                    HomeToolsAddCard(
+                                                      tool: _nextActivity,
+                                                      toolsChildren:
+                                                          _toolsChildren,
+                                                      imagePath: "calendar.png",
+                                                      text: "Activité",
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          _toolsChildren.add(
+                                                            _nextActivity,
+                                                          );
+                                                        });
+                                                        Navigator.pop(context);
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      },
+                                    ),
+                                  ImageButton(
+                                    imagePath: _isEditMode
+                                        ? "save.png"
+                                        : "edit.png",
+                                    size: 24,
+                                    onPressed: () async {
+                                      if (_isEditMode) {
+                                        await prefs.setStringList(
+                                          "tools",
+                                          _toolsChildren.map((e) {
+                                            if (e == _streak) return "streak";
+                                            if (e == _calendar) {
+                                              return "calendar";
+                                            }
+                                            if (e == _nextActivity) {
+                                              return "nextActivity";
+                                            }
+                                            return "";
+                                          }).toList(),
+                                        );
+                                      }
+                                      setState(() {
+                                        _isEditMode = !_isEditMode;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            width: double.infinity,
+                            child: StaggeredGrid.count(
+                              crossAxisCount: 3,
+                              mainAxisSpacing: 16,
+                              crossAxisSpacing: 16,
+                              children: [
+                                for (var child in _toolsChildren)
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: _toolWidths[child] ?? 1,
+                                    mainAxisCellCount: 1,
+                                    child: ShakeWidget(
+                                      animate: _isEditMode,
+                                      child: Stack(
+                                        children: [
+                                          child,
+                                          if (_isEditMode)
+                                            Positioned(
+                                              top: 0,
+                                              right: 0,
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    _toolsChildren.remove(
+                                                      child,
+                                                    );
+                                                  });
+                                                },
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.red,
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.close,
+                                                    color: Colors.white,
+                                                    size: 20,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: 0,
+                        children: [
+                          SizedBox(
+                            height: 30,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: ClipRect(
+                                    child: AnimatedBuilder(
+                                      animation: _textAnimationController,
+                                      builder: (context, child) {
+                                        return Stack(
+                                          children: [
+                                            SlideTransition(
+                                              position: _slideAnimation,
+                                              child: Text(
+                                                _currentMoodPage == 0
+                                                    ? "Humeur actuelle"
+                                                    : "Fatigue actuelle",
+                                                style: TextStyle(
+                                                  fontSize: 24,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                            if (_textAnimationController
+                                                .isAnimating)
+                                              SlideTransition(
+                                                position:
+                                                    Tween<Offset>(
+                                                      begin:
+                                                          _slideAnimation
+                                                                  .value
+                                                                  .dx <
+                                                              0
+                                                          ? Offset(1.0, 0.0)
+                                                          : Offset(-1.0, 0.0),
+                                                      end: Offset.zero,
+                                                    ).animate(
+                                                      _textAnimationController,
+                                                    ),
+                                                child: Text(
+                                                  _currentMoodPage == 0
+                                                      ? "Fatigue actuelle"
+                                                      : "Humeur actuelle",
+                                                  style: TextStyle(
+                                                    fontSize: 24,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    ImageButton(
+                                      imagePath: "arrow-left.png",
+                                      size: 24,
+                                      onPressed: () {
+                                        if (_currentMoodPage > 0) {
+                                          _pageController.animateToPage(
+                                            _currentMoodPage - 1,
+                                            duration: Duration(
+                                              milliseconds: 300,
+                                            ),
+                                            curve: Curves.easeInOut,
+                                          );
+                                        }
+                                      },
+                                      color: _currentMoodPage == 0
+                                          ? Colors.grey
+                                          : null,
+                                    ),
+                                    SizedBox(width: 8),
+                                    ImageButton(
+                                      imagePath: "arrow-right.png",
+                                      size: 24,
+                                      onPressed: () {
+                                        if (_currentMoodPage < 1) {
+                                          _pageController.animateToPage(
+                                            _currentMoodPage + 1,
+                                            duration: Duration(
+                                              milliseconds: 300,
+                                            ),
+                                            curve: Curves.easeInOut,
+                                          );
+                                        }
+                                      },
+                                      color: _currentMoodPage == 1
+                                          ? Colors.grey
+                                          : null,
+                                    ),
+                                    SizedBox(width: 8),
+                                    ImageButton(
+                                      imagePath: "chart.png",
+                                      size: 24,
+                                      onPressed: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/moodHistory',
+                                          arguments: {
+                                            "category": _currentMoodPage == 0
+                                                ? "mood_history"
+                                                : "fatigue_history",
+                                          },
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            height: 70,
+                            child: PageView(
+                              controller: _pageController,
+                              onPageChanged: (index) {
+                                _animateTextTransition(index);
+                              },
+                              children: [
+                                GestureDetector(
+                                  onPanUpdate: (details) {
+                                    // Swipe detection on mood row
+                                    if (details.delta.dx > 10) {
+                                      // Swipe right - go to previous page
+                                      if (_currentMoodPage > 0) {
+                                        _pageController.animateToPage(
+                                          _currentMoodPage - 1,
+                                          duration: Duration(milliseconds: 300),
+                                          curve: Curves.easeInOut,
+                                        );
+                                      }
+                                    } else if (details.delta.dx < -10) {
+                                      // Swipe left - go to next page
+                                      if (_currentMoodPage < 1) {
+                                        _pageController.animateToPage(
+                                          _currentMoodPage + 1,
+                                          duration: Duration(milliseconds: 300),
+                                          curve: Curves.easeInOut,
+                                        );
+                                      }
+                                    }
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      CircleImageButton(
+                                        imagePath: "moods/love.png",
+                                        isSelected: _selectedMood == "love.png",
+                                        onPressed: () {
+                                          setState(() {
+                                            _selectedMood = "love.png";
+                                          });
+                                          selectMood();
+                                        },
+                                      ),
+                                      CircleImageButton(
+                                        imagePath: "moods/happy.png",
+                                        isSelected:
+                                            _selectedMood == "happy.png",
+                                        onPressed: () {
+                                          setState(() {
+                                            _selectedMood = "happy.png";
+                                          });
+                                          selectMood();
+                                        },
+                                      ),
+                                      CircleImageButton(
+                                        imagePath: "moods/neutral.png",
+                                        isSelected:
+                                            _selectedMood == "neutral.png",
+                                        onPressed: () {
+                                          setState(() {
+                                            _selectedMood = "neutral.png";
+                                          });
+                                          selectMood();
+                                        },
+                                      ),
+                                      CircleImageButton(
+                                        imagePath: "moods/frowning.png",
+                                        isSelected:
+                                            _selectedMood == "frowning.png",
+                                        onPressed: () {
+                                          setState(() {
+                                            _selectedMood = "frowning.png";
+                                          });
+                                          selectMood();
+                                        },
+                                      ),
+                                      CircleImageButton(
+                                        imagePath: "moods/sad.png",
+                                        isSelected: _selectedMood == "sad.png",
+                                        onPressed: () {
+                                          setState(() {
+                                            _selectedMood = "sad.png";
+                                          });
+                                          selectMood();
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onPanUpdate: (details) {
+                                    if (details.delta.dx > 10) {
+                                      if (_currentMoodPage > 0) {
+                                        _pageController.animateToPage(
+                                          _currentMoodPage - 1,
+                                          duration: Duration(milliseconds: 300),
+                                          curve: Curves.easeInOut,
+                                        );
+                                      }
+                                    } else if (details.delta.dx < -10) {
+                                      if (_currentMoodPage < 1) {
+                                        _pageController.animateToPage(
+                                          _currentMoodPage + 1,
+                                          duration: Duration(milliseconds: 300),
+                                          curve: Curves.easeInOut,
+                                        );
+                                      }
+                                    }
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      CircleImageButton(
+                                        imagePath: "moods/cool.png",
+                                        isSelected:
+                                            _selectedFatigue == "cool.png",
+                                        onPressed: () {
+                                          setState(() {
+                                            _selectedFatigue = "cool.png";
+                                          });
+                                          selectFatigue();
+                                        },
+                                      ),
+                                      CircleImageButton(
+                                        imagePath: "moods/okay.png",
+                                        isSelected:
+                                            _selectedFatigue == "okay.png",
+                                        onPressed: () {
+                                          setState(() {
+                                            _selectedFatigue = "okay.png";
+                                          });
+                                          selectFatigue();
+                                        },
+                                      ),
+                                      CircleImageButton(
+                                        imagePath: "moods/empty.png",
+                                        isSelected:
+                                            _selectedFatigue == "empty.png",
+                                        onPressed: () {
+                                          setState(() {
+                                            _selectedFatigue = "empty.png";
+                                          });
+                                          selectFatigue();
+                                        },
+                                      ),
+                                      CircleImageButton(
+                                        imagePath: "moods/tired.png",
+                                        isSelected:
+                                            _selectedFatigue == "tired.png",
+                                        onPressed: () {
+                                          setState(() {
+                                            _selectedFatigue = "tired.png";
+                                          });
+                                          selectFatigue();
+                                        },
+                                      ),
+                                      CircleImageButton(
+                                        imagePath: "moods/sleep.png",
+                                        isSelected:
+                                            _selectedFatigue == "sleep.png",
+                                        onPressed: () {
+                                          setState(() {
+                                            _selectedFatigue = "sleep.png";
+                                          });
+                                          selectFatigue();
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        spacing: 8,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Activités",
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              ImageButton(
+                                imagePath: "arrow-right-circle.png",
+                                size: 24,
+                                onPressed: () {},
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height:
+                                350, // Provide explicit height for the stack
+                            width: double.infinity,
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  top: 0,
+                                  child: ActivityCard(
+                                    title: "Continuer à bouger",
+                                    description:
+                                        "Faire quelque exercices pour rester actif",
+                                    imagePath: "assets/images/relaxation.png",
+                                    actionView: RelaxationView(),
+                                    color: Color(0xFFBAE6FD),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 90,
+                                  child: ActivityCard(
+                                    title: "Découvrir vos droits",
+                                    description:
+                                        "Connaissez tous les droits que vous avez suivant votre situation",
+                                    imagePath: "assets/images/relaxation.png",
+                                    actionView: RelaxationView(),
+                                    color: Color(0xFFDCA8FA),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 180,
+                                  child: ActivityCard(
+                                    title: "Pratiquer la relaxation",
+                                    description:
+                                        "Prend un moment pour te détendre",
+                                    imagePath: "assets/images/relaxation.png",
+                                    actionView: RelaxationView(),
+                                    color: Color(0xFFF7E879),
+                                    isLast: true,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (notifProvider.notifications
+                  .where((e) => e.date.isBefore(DateTime.now()))
+                  .isNotEmpty)
+                Builder(
+                  builder: (context) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text("Nouvelles notifications"),
+                          content: Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(notifProvider.notifications.first.body),
+                                Text(
+                                  notifProvider.notifications.first.bodyBold,
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  notifProvider
+                                      .notifications
+                                      .first
+                                      .actionDetails,
+                                ),
+                              ],
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                "Fermer",
+                                style: TextStyle(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.secondary,
+                                ),
                               ),
                             ),
-                            Positioned(
-                              top: 90,
-                              child: ActivityCard(
-                                title: "Découvrir vos droits",
-                                description:
-                                    "Connaissez tous les droits que vous avez suivant votre situation",
-                                imagePath: "assets/images/relaxation.png",
-                                actionView: RelaxationView(),
-                                color: Color(0xFFDCA8FA),
-                              ),
-                            ),
-                            Positioned(
-                              top: 180,
-                              child: ActivityCard(
-                                title: "Pratiquer la relaxation",
-                                description: "Prend un moment pour te détendre",
-                                imagePath: "assets/images/relaxation.png",
-                                actionView: RelaxationView(),
-                                color: Color(0xFFF7E879),
-                                isLast: true,
+                            TextButton(
+                              onPressed: () {
+                                ref
+                                    .read(notificationsProvider.notifier)
+                                    .removeNotification(0);
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                "Marquer comme lu",
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.tertiary,
+                                ),
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+                      );
+                    });
+                    return SizedBox.shrink();
+                  },
+                ),
+            ],
           ),
         ),
       ),

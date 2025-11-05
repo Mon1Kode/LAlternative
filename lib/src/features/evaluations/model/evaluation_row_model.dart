@@ -2,10 +2,13 @@
 // Unauthorized copying of this file, via any medium, is strictly prohibited.
 // Created by MoniK.
 
+import 'package:flutter/cupertino.dart';
+
 class EvaluationRowModel {
   String title;
   int score;
   String comments;
+  TextEditingController commentsController = TextEditingController();
 
   EvaluationRowModel({this.title = '', this.score = 0, this.comments = ''});
 

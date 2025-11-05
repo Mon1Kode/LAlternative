@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:l_alternative/src/features/evaluations/view/evalutaions_view.dart';
 import 'package:l_alternative/src/features/history/view/history_view.dart';
 import 'package:l_alternative/src/features/home/view/home_view.dart';
+import 'package:l_alternative/src/features/notifications/view/notifications_view.dart';
 import 'package:l_alternative/src/features/profile/model/evaluation_model.dart';
 import 'package:l_alternative/src/features/profile/view/profile_view.dart';
 
@@ -18,7 +19,7 @@ class MyApp extends ConsumerWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         brightness: Brightness.light,
-        fontFamily: 'Chillax',
+        fontFamily: 'Inclusive Sans',
         colorScheme: ColorScheme(
           brightness: Brightness.light,
           primary: Colors.white,
@@ -44,11 +45,11 @@ class MyApp extends ConsumerWidget {
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        fontFamily: 'Chillax',
+        fontFamily: 'Inclusive Sans',
         colorScheme: ColorScheme(
           brightness: Brightness.dark,
           primary: const Color(0xFF636C70),
-          onPrimary: const Color(0xFF434B4B),
+          onPrimary: Colors.white,
           secondary: Colors.white,
           onSecondary: Colors.black,
           tertiary: const Color(0xFFF8B29C),
@@ -76,6 +77,8 @@ class MyApp extends ConsumerWidget {
             return MaterialPageRoute(builder: (context) => const HomeView());
           case '/profile':
             return MaterialPageRoute(builder: (context) => const ProfileView());
+          case '/notifications':
+            return MaterialPageRoute(builder: (context) => NotificationsView());
           case '/evaluations':
             final args = settings.arguments;
             if (args is EvaluationModel) {

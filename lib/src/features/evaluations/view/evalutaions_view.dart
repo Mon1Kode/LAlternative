@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:l_alternative/src/core/components/circle_image_button.dart';
 import 'package:l_alternative/src/core/components/image_button.dart';
+import 'package:l_alternative/src/core/components/q_a_writer.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
 import 'package:l_alternative/src/features/evaluations/model/evaluation_row_model.dart';
 import 'package:l_alternative/src/features/profile/model/evaluation_model.dart';
@@ -23,13 +24,13 @@ class _EvaluationsViewState extends ConsumerState<EvaluationsView> {
   EvaluationModel _evalModel = EvaluationModel(date: DateTime.now(), rows: []);
 
   final List<String> _texts = [
-    "Comment évalues-tu globalement l’atelier ?",
-    "Cet atelier a-t-il répondu à tes attentes ?",
-    "Te sens-tu écouté·e et compris·e pendant l’atelier ?",
-    "Le contenu t’a-t-il semblé clair et accessible ?",
-    "Le thème abordé t’a-t-il semblé pertinent par rapport à tes besoins ?",
+    "Comment évaluez-vous globalement l’atelier ?",
+    "Cet atelier a-t-il répondu à vos attentes ?",
+    "Vous sentez écouté·e et compris·e pendant l’atelier ?",
+    "Le contenu vous a-t-il semblé clair et accessible ?",
+    "Le thème abordé vous a-t-il semblé pertinent par rapport à tes besoins ?",
     "Le rythme et la durée étaient-ils adaptés ?",
-    "L’animateur·rice t’a-t-il semblé bienveillant·e et compétent·e ?",
+    "L’animateur·rice vous a-t-il semblé bienveillant·e et compétent·e ?",
   ];
 
   @override
@@ -133,16 +134,9 @@ class _EvaluationsViewState extends ConsumerState<EvaluationsView> {
                       ),
                     ),
                     for (var i = 0; i < 4; i++)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 8,
-                        children: [
-                          Text(
-                            _evalModel.rows[i].title,
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          EvaluationsRow(eval: _evalModel.rows[i]),
-                        ],
+                      QAndAWriter(
+                        question: _evalModel.rows[i].title,
+                        controller: _evalModel.rows[i].commentsController,
                       ),
                   ],
                 ),
@@ -162,16 +156,9 @@ class _EvaluationsViewState extends ConsumerState<EvaluationsView> {
                       ),
                     ),
                     for (var i = 4; i < 7; i++)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 8,
-                        children: [
-                          Text(
-                            _evalModel.rows[i].title,
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          EvaluationsRow(eval: _evalModel.rows[i]),
-                        ],
+                      QAndAWriter(
+                        question: _evalModel.rows[i].title,
+                        controller: _evalModel.rows[i].commentsController,
                       ),
                   ],
                 ),

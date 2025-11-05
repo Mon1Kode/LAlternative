@@ -4,6 +4,8 @@ import 'package:l_alternative/src/core/components/image_button.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
 import 'package:l_alternative/src/core/provider/app_providers.dart';
 import 'package:l_alternative/src/core/utils/app_utils.dart';
+import 'package:l_alternative/src/features/notifications/model/notifications_model.dart';
+import 'package:l_alternative/src/features/notifications/provider/notifications_provider.dart';
 import 'package:l_alternative/src/features/profile/provider/evaluation_provider.dart';
 import 'package:l_alternative/src/features/profile/provider/user_provider.dart';
 
@@ -296,6 +298,55 @@ class _ProfileViewState extends ConsumerState<ProfileView>
                               );
                             },
                           );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            // if (kDebugMode)
+            RoundedContainer(
+              padding: const EdgeInsets.all(16.0),
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "DEBUG ZONE",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Add Notifs",
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      ImageButton(
+                        imagePath: "bell.png",
+                        color: Theme.of(context).colorScheme.secondary,
+                        size: 32,
+                        onPressed: () {
+                          ref
+                              .read(notificationsProvider.notifier)
+                              .addNotification(
+                                NotificationModel(
+                                  title: "Fin de l'activité",
+                                  body: 'Vous venez de finir l’activité',
+                                  date: DateTime.now().add(
+                                    Duration(seconds: 5),
+                                  ),
+                                  bodyBold: "Practiquer la relaxation",
+                                  actionDetails:
+                                      "Merci d’évaluer cette activité",
+                                  ctaText: "Évaluer",
+                                ),
+                              );
                         },
                       ),
                     ],

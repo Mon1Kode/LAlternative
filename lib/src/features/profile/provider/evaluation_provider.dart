@@ -20,8 +20,6 @@ class EvaluationsNotifier extends StateNotifier<EvaluationsModel> {
   }
 
   Future<void> _getStoredDate() async {
-    // Implementation to load stored evaluations
-    // For now, we initialize with an empty list
     state = EvaluationsModel(evaluations: []);
   }
 
@@ -35,15 +33,24 @@ class EvaluationsNotifier extends StateNotifier<EvaluationsModel> {
           .where((e) => e.date != eval.date)
           .toList(),
     );
+    await EventStore.getInstance().eventLogger.log(
+      "evaluation.delete",
+      EventLevel.warning,
+      {
+        "parameter": {"deleted_evaluation_date": eval.date.toIso8601String()},
+      },
+    );
   }
 
   Future<void> clearEvaluations() async {
     // Implementation to clear evaluations
     state = state.copyWith(newEvaluations: []);
-    EventStore.getInstance().localEventStore.log(
-      "evaluation_clear",
+    await EventStore.getInstance().eventLogger.log(
+      "evaluation.clear",
       EventLevel.warning,
-      {"message": "All evaluations cleared"},
+      {
+        "parameter": {"message": "All evaluations cleared"},
+      },
     );
   }
 }

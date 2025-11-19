@@ -122,8 +122,11 @@ class _HomeViewState extends ConsumerState<HomeView>
               .toList() ??
           _toolsChildren;
     });
-    EventStore.getInstance().localEventStore
-        .log("user_config_loaded", EventLevel.debug, {
+    await EventStore.getInstance().eventLogger.log(
+      "user.config.loaded",
+      EventLevel.debug,
+      {
+        "parameter": {
           "mood": _selectedMood,
           "tools": _toolsChildren.map((e) {
             if (e == _streak) return "streak";
@@ -131,7 +134,9 @@ class _HomeViewState extends ConsumerState<HomeView>
             if (e == _nextActivity) return "nextActivity";
             return "";
           }).toList(),
-        });
+        },
+      },
+    );
     getNextActivity();
   }
 
@@ -143,10 +148,12 @@ class _HomeViewState extends ConsumerState<HomeView>
     moodHistory.removeWhere((entry) => entry.startsWith(todayString));
     moodHistory.add("$todayString:$mood");
     await prefs.setStringList("mood_history", moodHistory);
-    EventStore.getInstance().localEventStore.log(
-      "mood_history_updated",
-      EventLevel.debug,
-      {"mood_history": moodHistory},
+    await EventStore.getInstance().eventLogger.log(
+      "mood.history.updated",
+      EventLevel.info,
+      {
+        "parameter": {"mood_history": moodHistory},
+      },
     );
   }
 
@@ -158,29 +165,35 @@ class _HomeViewState extends ConsumerState<HomeView>
     fatigueHistory.removeWhere((entry) => entry.startsWith(todayString));
     fatigueHistory.add("$todayString:$fatigue");
     await prefs.setStringList("fatigue_history", fatigueHistory);
-    EventStore.getInstance().localEventStore.log(
-      "fatigue_history_updated",
-      EventLevel.debug,
-      {"fatigue_history": fatigueHistory},
+    await EventStore.getInstance().eventLogger.log(
+      "fatigue.history.updated",
+      EventLevel.info,
+      {
+        "parameter": {"fatigue_history": fatigueHistory},
+      },
     );
   }
 
   Future<void> selectMood() async {
     await prefs.setString("mood", _selectedMood);
-    EventStore.getInstance().localEventStore.log(
-      "mood_selected",
+    await EventStore.getInstance().eventLogger.log(
+      "mood.selected",
       EventLevel.debug,
-      {"mood": _selectedMood},
+      {
+        "parameter": {"mood": _selectedMood},
+      },
     );
     updateMoodHistoryList(_selectedMood);
   }
 
   Future<void> selectFatigue() async {
     await prefs.setString("fatigue", _selectedFatigue);
-    EventStore.getInstance().localEventStore.log(
-      "fatigue_selected",
+    await EventStore.getInstance().eventLogger.log(
+      "fatigue.selected",
       EventLevel.debug,
-      {"fatigue": _selectedFatigue},
+      {
+        "parameter": {"fatigue": _selectedFatigue},
+      },
     );
     updateFatigueHistoryList(_selectedFatigue);
   }
@@ -267,10 +280,12 @@ class _HomeViewState extends ConsumerState<HomeView>
         return "";
       }).toList(),
     );
-    EventStore.getInstance().localEventStore.log(
-      "next_activity_loaded",
-      EventLevel.debug,
-      {"activity": "Prochaine activité"},
+    await EventStore.getInstance().eventLogger.log(
+      "next_activity.loaded",
+      EventLevel.info,
+      {
+        "parameter": {"activity": "Prochaine activité"},
+      },
     );
   }
 

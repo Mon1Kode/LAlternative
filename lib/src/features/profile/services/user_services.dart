@@ -2,6 +2,7 @@
 // Unauthorized copying of this file, via any medium, is strictly prohibited.
 // Created by MoniK.
 
+import 'package:monikode_event_store/monikode_event_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserServices {
@@ -9,11 +10,25 @@ class UserServices {
 
   Future<String> loadUserName() async {
     final prefs = await SharedPreferences.getInstance();
+    EventStore.getInstance().localEventStore.log(
+      "user.name.get",
+      EventLevel.debug,
+      {
+        "parameter": {"message": "User name loaded from local storage"},
+      },
+    );
     return prefs.getString(_counterKey) ?? "NAME";
   }
 
   Future<void> saveUserName(String name) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_counterKey, name);
+    await EventStore.getInstance().eventLogger.log(
+      "user.name.update",
+      EventLevel.info,
+      {
+        "parameter": {"new_name": name},
+      },
+    );
   }
 }

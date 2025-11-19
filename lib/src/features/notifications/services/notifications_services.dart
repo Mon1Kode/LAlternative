@@ -16,12 +16,17 @@ class NotificationService {
   static Future<void> onDidReceiveNotification(
     NotificationResponse notificationResponse,
   ) async {
-    EventStore.getInstance().localEventStore
-        .log("notif.received", EventLevel.info, {
+    await EventStore.getInstance().eventLogger.log(
+      "notif.received",
+      EventLevel.info,
+      {
+        "parameter": {
           "payload": notificationResponse.payload,
           "actionId": notificationResponse.actionId,
           "input": notificationResponse.input,
-        });
+        },
+      },
+    );
   }
 
   static Future<void> removeNotification(NotificationModel notif) async {
@@ -59,10 +64,24 @@ class NotificationService {
         >();
     final granted = await androidImpl?.requestNotificationsPermission();
 
-    EventStore.getInstance().localEventStore.log(
+    final iosImpl = flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin
+        >();
+    final iosGranted = await iosImpl?.requestPermissions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    await EventStore.getInstance().eventLogger.log(
       "notif.permission_result",
-      granted == true ? EventLevel.info : EventLevel.warning,
-      {"granted": granted ?? false},
+      granted == true || iosGranted == true
+          ? EventLevel.debug
+          : EventLevel.warning,
+      {
+        "parameter": {"granted": granted, "iosGranted": iosGranted},
+      },
     );
   }
 
@@ -152,11 +171,17 @@ class NotificationService {
   static void setNotification(NotificationModel notif) async {
     var id = notif.id;
     await scheduleNotification(id, notif.title, notif.body, notif.date);
-    EventStore.getInstance().localEventStore.log("notif.set", EventLevel.info, {
-      "id": id,
-      "title": notif.title,
-      "date": notif.date.toIso8601String(),
-    });
+    await EventStore.getInstance().eventLogger.log(
+      "notif.set",
+      EventLevel.info,
+      {
+        "parameter": {
+          "id": id,
+          "title": notif.title,
+          "date": notif.date.toIso8601String(),
+        },
+      },
+    );
   }
 
   static Future<void> persistNotifications(

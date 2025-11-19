@@ -41,10 +41,12 @@ class UserNotifier extends StateNotifier<UserModel> {
     await pref.clear();
     state = const UserModel("NAME");
     // ref.read(evaluationsProvider.notifier).clearEvaluations();
-    EventStore.getInstance().localEventStore.log(
-      "user_delete",
+    await EventStore.getInstance().eventLogger.log(
+      "user.delete",
       EventLevel.warning,
-      {"message": "User data deleted"},
+      {
+        "parameter": {"message": "User data deleted"},
+      },
     );
   }
 }

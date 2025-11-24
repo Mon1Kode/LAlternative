@@ -13,8 +13,8 @@ import 'package:l_alternative/src/core/components/image_button.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
 import 'package:l_alternative/src/core/provider/app_providers.dart';
 import 'package:l_alternative/src/core/utils/app_utils.dart';
+import 'package:l_alternative/src/features/connections/provider/user_provider.dart';
 import 'package:l_alternative/src/features/notifications/provider/notifications_provider.dart';
-import 'package:l_alternative/src/features/profile/provider/user_provider.dart';
 import 'package:l_alternative/src/features/relaxation/view/relaxation_view.dart';
 import 'package:monikode_event_store/monikode_event_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -126,7 +126,7 @@ class _HomeViewState extends ConsumerState<HomeView>
       "user.config.loaded",
       EventLevel.debug,
       {
-        "parameter": {
+        "parameters ": {
           "mood": _selectedMood,
           "tools": _toolsChildren.map((e) {
             if (e == _streak) return "streak";
@@ -152,7 +152,7 @@ class _HomeViewState extends ConsumerState<HomeView>
       "mood.history.updated",
       EventLevel.info,
       {
-        "parameter": {"mood_history": moodHistory},
+        "parameters ": {"mood_history": moodHistory},
       },
     );
   }
@@ -169,7 +169,7 @@ class _HomeViewState extends ConsumerState<HomeView>
       "fatigue.history.updated",
       EventLevel.info,
       {
-        "parameter": {"fatigue_history": fatigueHistory},
+        "parameters ": {"fatigue_history": fatigueHistory},
       },
     );
   }
@@ -180,7 +180,7 @@ class _HomeViewState extends ConsumerState<HomeView>
       "mood.selected",
       EventLevel.debug,
       {
-        "parameter": {"mood": _selectedMood},
+        "parameters ": {"mood": _selectedMood},
       },
     );
     updateMoodHistoryList(_selectedMood);
@@ -192,7 +192,7 @@ class _HomeViewState extends ConsumerState<HomeView>
       "fatigue.selected",
       EventLevel.debug,
       {
-        "parameter": {"fatigue": _selectedFatigue},
+        "parameters ": {"fatigue": _selectedFatigue},
       },
     );
     updateFatigueHistoryList(_selectedFatigue);
@@ -282,9 +282,9 @@ class _HomeViewState extends ConsumerState<HomeView>
     );
     await EventStore.getInstance().eventLogger.log(
       "next_activity.loaded",
-      EventLevel.info,
+      EventLevel.debug,
       {
-        "parameter": {"activity": "Prochaine activité"},
+        "parameters ": {"activity": "Prochaine activité"},
       },
     );
   }
@@ -385,7 +385,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                             },
                           ),
                           Text(
-                            user.name,
+                            user.displayName,
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,

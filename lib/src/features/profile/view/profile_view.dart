@@ -4,10 +4,10 @@ import 'package:l_alternative/src/core/components/image_button.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
 import 'package:l_alternative/src/core/provider/app_providers.dart';
 import 'package:l_alternative/src/core/utils/app_utils.dart';
+import 'package:l_alternative/src/features/connections/provider/user_provider.dart';
 import 'package:l_alternative/src/features/notifications/model/notifications_model.dart';
 import 'package:l_alternative/src/features/notifications/provider/notifications_provider.dart';
 import 'package:l_alternative/src/features/profile/provider/evaluation_provider.dart';
-import 'package:l_alternative/src/features/profile/provider/user_provider.dart';
 
 class ProfileView extends ConsumerStatefulWidget {
   const ProfileView({super.key});
@@ -28,7 +28,7 @@ class _ProfileViewState extends ConsumerState<ProfileView>
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this);
-    _nameController.text = ref.read(userProvider).name;
+    _nameController.text = ref.read(userProvider).displayName;
   }
 
   @override
@@ -69,292 +69,328 @@ class _ProfileViewState extends ConsumerState<ProfileView>
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          spacing: 24,
-          children: [
-            RoundedContainer(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16.0),
-              color: Theme.of(
-                context,
-              ).colorScheme.primary.withValues(alpha: 0.1),
-              child: Column(
-                spacing: 16,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Informations personnelles",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      ImageButton(
-                        imagePath: _isEditMode ? "save.png" : "edit.png",
-                        size: 32,
-                        onPressed: () async {
-                          if (_isEditMode) {
-                            await ref
-                                .read(userProvider.notifier)
-                                .changeName(_nameController.text.trim());
-                          }
-                          setState(() {
-                            _isEditMode = !_isEditMode;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                  Row(
-                    spacing: 16,
-                    children: [
-                      Image.asset("assets/images/avatar.png", width: 48),
-                      _isEditMode
-                          ? SizedBox(
-                              width: 200,
-                              child: TextField(
-                                controller: _nameController,
-                                autofocus: true,
-                                style: TextStyle(fontSize: 18),
-                                cursorColor: Theme.of(
-                                  context,
-                                ).colorScheme.tertiary,
-                                decoration: InputDecoration(
-                                  hintText: "Enter your name",
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    borderSide: BorderSide(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.secondary,
-                                      width: 1,
-                                    ),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    borderSide: BorderSide(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.secondary,
-                                      width: 1,
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    borderSide: BorderSide(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.secondary,
-                                      width: 1,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            )
-                          : Text(user.name, style: TextStyle(fontSize: 18)),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            RoundedContainer(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                spacing: 8,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Evaluations",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      ImageButton(
-                        imagePath: "plus-circle.png",
-                        size: 32,
-                        onPressed: () {
-                          Navigator.pushNamed(context, "/evaluations");
-                        },
-                      ),
-                    ],
-                  ),
-                  SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: 4,
+        child: SingleChildScrollView(
+          child: Column(
+            spacing: 24,
+            children: [
+              RoundedContainer(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16.0),
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.1),
+                child: Column(
+                  spacing: 16,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        if (sortedEvaluations.isEmpty)
-                          Text("Aucune évaluation pour le moment."),
-                        ...[
-                          for (
-                            int i = 0;
-                            i < sortedEvaluations.length;
-                            i++
-                          ) ...[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  Utils.formatDate(sortedEvaluations[i].date),
-                                  style: TextStyle(fontSize: 18),
-                                ),
-                                ImageButton(
-                                  imagePath: "eye.png",
-                                  size: 32,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.secondary,
-                                  onPressed: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      "/evaluations",
-                                      arguments: sortedEvaluations[i],
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                            if (i < sortedEvaluations.length - 1) Divider(),
-                          ],
-                        ],
+                        Text(
+                          "Informations personnelles",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        ImageButton(
+                          imagePath: _isEditMode ? "save.png" : "edit.png",
+                          size: 32,
+                          onPressed: () async {
+                            if (_isEditMode) {
+                              await ref
+                                  .read(userProvider.notifier)
+                                  .updateUserDetails(
+                                    displayName: _nameController.text.trim(),
+                                  );
+                            }
+                            setState(() {
+                              _isEditMode = !_isEditMode;
+                            });
+                          },
+                        ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-            ),
-            RoundedContainer(
-              padding: const EdgeInsets.all(16.0),
-              width: double.infinity,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Zone sensible",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Supprimer mes données",
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      ImageButton(
-                        imagePath: "trash.png",
-                        color: Colors.red,
-                        size: 32,
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: Text(
-                                  "Confirmer la suppression",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                content: Text(
-                                  "Êtes-vous sûr de vouloir supprimer toutes vos données ? Cette action est irréversible.",
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Text(
-                                      "Annuler",
-                                      style: TextStyle(
+                    Row(
+                      spacing: 16,
+                      children: [
+                        Image.asset("assets/images/avatar.png", width: 48),
+                        _isEditMode
+                            ? SizedBox(
+                                width: 200,
+                                child: TextField(
+                                  controller: _nameController,
+                                  autofocus: true,
+                                  style: TextStyle(fontSize: 18),
+                                  cursorColor: Theme.of(
+                                    context,
+                                  ).colorScheme.tertiary,
+                                  decoration: InputDecoration(
+                                    hintText: "Enter your name",
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: BorderSide(
                                         color: Theme.of(
                                           context,
-                                        ).colorScheme.tertiary,
+                                        ).colorScheme.secondary,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: BorderSide(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.secondary,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: BorderSide(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.secondary,
+                                        width: 1,
                                       ),
                                     ),
                                   ),
-                                  TextButton(
-                                    onPressed: () async {
-                                      ref
-                                          .read(userProvider.notifier)
-                                          .deleteUserData();
-                                      Navigator.of(context).pop();
+                                ),
+                              )
+                            : Text(
+                                user.displayName,
+                                style: TextStyle(fontSize: 18),
+                              ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              RoundedContainer(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 8,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Evaluations",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        ImageButton(
+                          imagePath: "plus-circle.png",
+                          size: 32,
+                          onPressed: () {
+                            Navigator.pushNamed(context, "/evaluations");
+                          },
+                        ),
+                      ],
+                    ),
+                    SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: 4,
+                        children: [
+                          if (sortedEvaluations.isEmpty)
+                            Text("Aucune évaluation pour le moment."),
+                          ...[
+                            for (
+                              int i = 0;
+                              i < sortedEvaluations.length;
+                              i++
+                            ) ...[
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    Utils.formatDate(sortedEvaluations[i].date),
+                                    style: TextStyle(fontSize: 18),
+                                  ),
+                                  ImageButton(
+                                    imagePath: "eye.png",
+                                    size: 32,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.secondary,
+                                    onPressed: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        "/evaluations",
+                                        arguments: sortedEvaluations[i],
+                                      );
                                     },
-                                    child: Text(
-                                      "Supprimer",
-                                      style: TextStyle(color: Colors.red),
-                                    ),
                                   ),
                                 ],
-                              );
-                            },
-                          );
-                        },
+                              ),
+                              if (i < sortedEvaluations.length - 1) Divider(),
+                            ],
+                          ],
+                        ],
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-            // if (kDebugMode)
-            RoundedContainer(
-              padding: const EdgeInsets.all(16.0),
-              width: double.infinity,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "DEBUG ZONE",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Add Notifs",
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
+              RoundedContainer(
+                padding: const EdgeInsets.all(16.0),
+                width: double.infinity,
+                child: Column(
+                  spacing: 16,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Zone sensible",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Se déconnecter",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      ImageButton(
-                        imagePath: "bell.png",
-                        color: Theme.of(context).colorScheme.secondary,
-                        size: 32,
-                        onPressed: () {
-                          ref
-                              .read(notificationsProvider.notifier)
-                              .addNotification(
-                                NotificationModel(
-                                  title: "Fin de l'activité",
-                                  body: 'Vous venez de finir l’activité',
-                                  date: DateTime.now().add(
-                                    Duration(seconds: 5),
+                        ImageButton(
+                          imagePath: "logout.png",
+                          size: 32,
+                          onPressed: () {
+                            ref.read(userProvider.notifier).logout(context);
+                          },
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Supprimer mes données",
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        ImageButton(
+                          imagePath: "trash.png",
+                          color: Colors.red,
+                          size: 32,
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text(
+                                    "Confirmer la suppression",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                  bodyBold: "Practiquer la relaxation",
-                                  actionDetails:
-                                      "Merci d’évaluer cette activité",
-                                  ctaText: "Évaluer",
-                                ),
-                              );
-                        },
-                      ),
-                    ],
-                  ),
-                ],
+                                  content: Text(
+                                    "Êtes-vous sûr de vouloir supprimer toutes vos données ? Cette action est irréversible.",
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text(
+                                        "Annuler",
+                                        style: TextStyle(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.tertiary,
+                                        ),
+                                      ),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        ref
+                                            .read(userProvider.notifier)
+                                            .removeUser();
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text(
+                                        "Supprimer",
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+              // if (kDebugMode)
+              RoundedContainer(
+                padding: const EdgeInsets.all(16.0),
+                width: double.infinity,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "DEBUG ZONE",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Add Notifs",
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        ImageButton(
+                          imagePath: "bell.png",
+                          color: Theme.of(context).colorScheme.secondary,
+                          size: 32,
+                          onPressed: () {
+                            ref
+                                .read(notificationsProvider.notifier)
+                                .addNotification(
+                                  NotificationModel(
+                                    title: "Fin de l'activité",
+                                    body: 'Vous venez de finir l’activité',
+                                    date: DateTime.now().add(
+                                      Duration(seconds: 5),
+                                    ),
+                                    bodyBold: "Practiquer la relaxation",
+                                    actionDetails:
+                                        "Merci d’évaluer cette activité",
+                                    ctaText: "Évaluer",
+                                  ),
+                                );
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

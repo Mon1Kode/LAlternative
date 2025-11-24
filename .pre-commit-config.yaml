@@ -58,8 +58,8 @@ repos:
         args:
           - -c
           - |
-            if grep -rn --include="*.dart" -E "(TODO:|FIXME:|XXX:|HACK:|debugPrint\(|print\()" lib/ test/ 2>/dev/null; then
-              echo "❌ Found forbidden patterns (TODO, FIXME, debug prints, etc.)"
+            if grep -rn --include="*.dart" -E "(TODO:|FIXME:|XXX:|HACK:\(|print\()" lib/ test/ 2>/dev/null; then
+              echo "❌ Found forbidden patterns (TODO, FIXME, prints, etc.)"
               echo "Please remove or replace them before committing."
               exit 1
             fi

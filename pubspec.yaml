@@ -23,6 +23,7 @@ dependencies:
   timezone: ^0.10.1
   firebase_auth: ^6.1.2
   firebase_core: ^4.2.1
+  image_picker: ^1.2.1
 
 dev_dependencies:
   flutter_test:

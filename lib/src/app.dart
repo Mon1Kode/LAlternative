@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:l_alternative/src/core/components/custom_button.dart';
+import 'package:l_alternative/src/features/connections/view/auth_wrapper.dart';
+import 'package:l_alternative/src/features/connections/view/login_view.dart';
+import 'package:l_alternative/src/features/connections/view/register_view.dart';
 import 'package:l_alternative/src/features/evaluations/view/evalutaions_view.dart';
 import 'package:l_alternative/src/features/history/view/history_view.dart';
 import 'package:l_alternative/src/features/home/view/home_view.dart';
 import 'package:l_alternative/src/features/notifications/view/notifications_view.dart';
 import 'package:l_alternative/src/features/profile/model/evaluation_model.dart';
 import 'package:l_alternative/src/features/profile/view/profile_view.dart';
+import 'package:monikode_event_store/monikode_event_store.dart';
 
 import 'core/provider/app_providers.dart';
 
@@ -74,6 +79,14 @@ class MyApp extends ConsumerWidget {
       onGenerateRoute: (settings) {
         switch (settings.name) {
           case '/':
+            return MaterialPageRoute(builder: (context) => const AuthWrapper());
+          case '/login':
+            return MaterialPageRoute(builder: (context) => const LoginView());
+          case '/register':
+            return MaterialPageRoute(
+              builder: (context) => const RegisterView(),
+            );
+          case '/home':
             return MaterialPageRoute(builder: (context) => const HomeView());
           case '/profile':
             return MaterialPageRoute(builder: (context) => const ProfileView());
@@ -108,9 +121,32 @@ class MyApp extends ConsumerWidget {
               );
             }
           default:
+            EventStore.getInstance().eventLogger.log(
+              'app.page_not_found',
+              EventLevel.warning,
+              {'route_name': settings.name ?? 'unknown'},
+            );
             return MaterialPageRoute(
-              builder: (context) =>
-                  const Scaffold(body: Center(child: Text('Page not found'))),
+              builder: (context) => Scaffold(
+                appBar: AppBar(title: const Text('Page non trouvée')),
+                body: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: const Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: 16,
+                      children: [
+                        Text('La page demandée est introuvable.'),
+                        CustomButton(
+                          text: "Retour à l'accueil",
+                          routeName: '/login',
+                          predicate: true,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             );
         }
       },

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:l_alternative/src/core/components/custom_button.dart';
+import 'package:l_alternative/src/features/admin/model/activity_model.dart';
+import 'package:l_alternative/src/features/admin/views/admin_view.dart';
+import 'package:l_alternative/src/features/admin/views/new_activity_pre_view.dart';
 import 'package:l_alternative/src/features/connections/view/auth_wrapper.dart';
 import 'package:l_alternative/src/features/connections/view/login_view.dart';
 import 'package:l_alternative/src/features/connections/view/register_view.dart';
@@ -120,6 +123,14 @@ class MyApp extends ConsumerWidget {
                     const HistoryView(category: 'mood_history'),
               );
             }
+          case '/admin':
+            return MaterialPageRoute(builder: (context) => AdminView());
+          case '/admin/new_activity':
+            return MaterialPageRoute(
+              builder: (context) => NewActivityPreView(
+                activityModel: settings.arguments as ActivityModel,
+              ),
+            );
           default:
             EventStore.getInstance().eventLogger.log(
               'app.page_not_found',

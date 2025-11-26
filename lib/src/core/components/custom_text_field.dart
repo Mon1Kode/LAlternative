@@ -94,3 +94,45 @@ class _CustomTextFieldState extends State<CustomTextField> {
     );
   }
 }
+
+class TextFieldWithTitle extends StatefulWidget {
+  final String title;
+  final String hintText;
+  final TextEditingController? textController;
+  final Function(String)? onChanged;
+  const TextFieldWithTitle({
+    super.key,
+    required this.title,
+    required this.hintText,
+    this.textController,
+    this.onChanged,
+  });
+
+  @override
+  State<TextFieldWithTitle> createState() => _TextFieldWithTitleState();
+}
+
+class _TextFieldWithTitleState extends State<TextFieldWithTitle> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      spacing: 3,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          widget.title,
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+        ),
+        CustomTextField(
+          textController: widget.textController ?? TextEditingController(),
+          hintText: widget.hintText,
+          onChanged: (String value) {
+            if (widget.onChanged != null) {
+              widget.onChanged!(value);
+            }
+          },
+        ),
+      ],
+    );
+  }
+}

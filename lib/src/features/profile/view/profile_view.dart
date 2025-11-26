@@ -54,6 +54,14 @@ class _ProfileViewState extends ConsumerState<ProfileView>
         ),
         actions: [
           ImageButton(
+            imagePath: "settings.png",
+            onPressed: () {
+              Navigator.pushNamed(context, "/admin");
+            },
+            size: 32,
+            borderRadius: 16,
+          ),
+          ImageButton(
             imagePath: themeMode == ThemeMode.dark
                 ? "sunny.png"
                 : "nightlight.png",

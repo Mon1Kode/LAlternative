@@ -10,6 +10,7 @@ import 'package:l_alternative/src/core/components/popup_modal.dart';
 import 'package:l_alternative/src/core/service/error_service.dart';
 import 'package:l_alternative/src/features/connections/provider/user_provider.dart';
 import 'package:l_alternative/src/features/connections/service/connection_service.dart';
+import 'package:monikode_event_store/monikode_event_store.dart';
 
 class RegisterView extends ConsumerStatefulWidget {
   const RegisterView({super.key});
@@ -181,6 +182,17 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                                     onPressed: gcvu
                                         ? () async {
                                             try {
+                                              EventStore.getInstance()
+                                                  .localEventStore
+                                                  .log(
+                                                    "firebase.auth.connecting",
+                                                    EventLevel.debug,
+                                                    {
+                                                      "email": emailController
+                                                          .text
+                                                          .trim(),
+                                                    },
+                                                  );
                                               var cred = await connectionService
                                                   .signUpViaFirebaseEmailPassword(
                                                     emailController.text,

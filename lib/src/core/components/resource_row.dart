@@ -38,7 +38,7 @@ class _ResourceRowState extends ConsumerState<ResourceRow>
             children: [
               SizedBox(
                 width: MediaQuery.of(context).size.width * 0.6,
-                child: Text(widget.title, style: TextStyle(fontSize: 16)),
+                child: Text(widget.title, style: TextStyle(fontSize: 15)),
               ),
               Material(
                 child: InkWell(

@@ -8,6 +8,7 @@ import 'package:l_alternative/src/features/connections/view/auth_wrapper.dart';
 import 'package:l_alternative/src/features/connections/view/login_view.dart';
 import 'package:l_alternative/src/features/connections/view/register_view.dart';
 import 'package:l_alternative/src/features/evaluations/view/evalutaions_view.dart';
+import 'package:l_alternative/src/features/faq/faq_view.dart';
 import 'package:l_alternative/src/features/history/view/history_view.dart';
 import 'package:l_alternative/src/features/home/view/home_view.dart';
 import 'package:l_alternative/src/features/notifications/view/notifications_view.dart';
@@ -131,6 +132,8 @@ class MyApp extends ConsumerWidget {
                 activityModel: settings.arguments as ActivityModel,
               ),
             );
+          case '/faq':
+            return MaterialPageRoute(builder: (context) => FaqView());
           default:
             EventStore.getInstance().eventLogger.log(
               'app.page_not_found',

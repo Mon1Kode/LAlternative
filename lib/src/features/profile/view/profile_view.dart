@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:l_alternative/src/core/components/image_button.dart';
@@ -61,6 +62,7 @@ class _ProfileViewState extends ConsumerState<ProfileView>
             size: 32,
             borderRadius: 16,
           ),
+          const SizedBox(width: 4),
           ImageButton(
             imagePath: themeMode == ThemeMode.dark
                 ? "sunny.png"
@@ -73,6 +75,7 @@ class _ProfileViewState extends ConsumerState<ProfileView>
             size: 32,
             borderRadius: 16,
           ),
+          const SizedBox(width: 16),
         ],
       ),
       body: Padding(
@@ -248,6 +251,43 @@ class _ProfileViewState extends ConsumerState<ProfileView>
               ),
               RoundedContainer(
                 padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 8,
+                  children: [
+                    Text(
+                      "Support & Informations",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 4,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("FAQ", style: TextStyle(fontSize: 18)),
+                            ImageButton(
+                              imagePath: "badge-info.png",
+                              size: 32,
+                              onPressed: () {
+                                Navigator.pushNamed(context, "/faq");
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              RoundedContainer(
+                padding: const EdgeInsets.all(16.0),
                 width: double.infinity,
                 child: Column(
                   spacing: 16,
@@ -345,58 +385,61 @@ class _ProfileViewState extends ConsumerState<ProfileView>
                   ],
                 ),
               ),
-              // if (kDebugMode)
-              RoundedContainer(
-                padding: const EdgeInsets.all(16.0),
-                width: double.infinity,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "DEBUG ZONE",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Add Notifs",
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        ImageButton(
-                          imagePath: "bell.png",
-                          color: Theme.of(context).colorScheme.secondary,
-                          size: 32,
-                          onPressed: () {
-                            ref
-                                .read(notificationsProvider.notifier)
-                                .addNotification(
-                                  NotificationModel(
-                                    title: "Fin de l'activité",
-                                    body: 'Vous venez de finir l’activité',
-                                    date: DateTime.now().add(
-                                      Duration(seconds: 5),
-                                    ),
-                                    bodyBold: "Practiquer la relaxation",
-                                    actionDetails:
-                                        "Merci d’évaluer cette activité",
-                                    ctaText: "Évaluer",
-                                  ),
-                                );
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+              Center(
+                child: Text("Créer par IncluSens. Tous droits réservés © 2025"),
               ),
+              if (kDebugMode)
+                RoundedContainer(
+                  padding: const EdgeInsets.all(16.0),
+                  width: double.infinity,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "DEBUG ZONE",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Add Notifs",
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          ImageButton(
+                            imagePath: "bell.png",
+                            color: Theme.of(context).colorScheme.secondary,
+                            size: 32,
+                            onPressed: () {
+                              ref
+                                  .read(notificationsProvider.notifier)
+                                  .addNotification(
+                                    NotificationModel(
+                                      title: "Fin de l'activité",
+                                      body: 'Vous venez de finir l’activité',
+                                      date: DateTime.now().add(
+                                        Duration(seconds: 5),
+                                      ),
+                                      bodyBold: "Practiquer la relaxation",
+                                      actionDetails:
+                                          "Merci d’évaluer cette activité",
+                                      ctaText: "Évaluer",
+                                    ),
+                                  );
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
             ],
           ),
         ),

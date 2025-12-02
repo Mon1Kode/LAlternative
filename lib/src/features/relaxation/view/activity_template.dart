@@ -30,6 +30,14 @@ class _ActivityTemplateState extends ConsumerState<ActivityTemplate> {
   final TextEditingController descriptionController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(newActivityProvider.notifier).updateActivity(widget.model);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final newActivity = ref.watch(newActivityProvider);
     final newActivityNotifier = ref.read(newActivityProvider.notifier);

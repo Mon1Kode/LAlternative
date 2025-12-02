@@ -13,8 +13,10 @@ import 'package:l_alternative/src/core/components/image_button.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
 import 'package:l_alternative/src/core/provider/app_providers.dart';
 import 'package:l_alternative/src/core/utils/app_utils.dart';
+import 'package:l_alternative/src/features/admin/provider/activities_provider.dart';
 import 'package:l_alternative/src/features/connections/provider/user_provider.dart';
 import 'package:l_alternative/src/features/notifications/provider/notifications_provider.dart';
+import 'package:l_alternative/src/features/relaxation/view/activity_template.dart';
 import 'package:l_alternative/src/features/relaxation/view/relaxation_view.dart';
 import 'package:monikode_event_store/monikode_event_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -348,6 +350,7 @@ class _HomeViewState extends ConsumerState<HomeView>
     var user = ref.watch(userProvider);
     final themeMode = ref.watch(themeModeProvider);
     var notifProvider = ref.watch(notificationsProvider);
+    var activities = ref.watch(activitiesProvider);
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,
@@ -901,49 +904,16 @@ class _HomeViewState extends ConsumerState<HomeView>
                               ),
                             ],
                           ),
-                          SizedBox(
-                            height:
-                                350, // Provide explicit height for the stack
-                            width: double.infinity,
-                            child: Stack(
-                              children: [
-                                Positioned(
-                                  top: 0,
-                                  child: ActivityCard(
-                                    title: "Continuer à bouger",
-                                    description:
-                                        "Faire quelque exercices pour rester actif",
-                                    imagePath: "assets/images/relaxation.png",
-                                    actionView: RelaxationView(),
-                                    color: Color(0xFFBAE6FD),
-                                  ),
-                                ),
-                                Positioned(
-                                  top: 90,
-                                  child: ActivityCard(
-                                    title: "Découvrir vos droits",
-                                    description:
-                                        "Connaissez tous les droits que vous avez suivant votre situation",
-                                    imagePath: "assets/images/relaxation.png",
-                                    actionView: RelaxationView(),
-                                    color: Color(0xFFDCA8FA),
-                                  ),
-                                ),
-                                Positioned(
-                                  top: 180,
-                                  child: ActivityCard(
-                                    title: "Pratiquer la relaxation",
-                                    description:
-                                        "Prend un moment pour te détendre",
-                                    imagePath: "assets/images/relaxation.png",
-                                    actionView: RelaxationView(),
-                                    color: Color(0xFFF7E879),
-                                    isLast: true,
-                                  ),
-                                ),
-                              ],
+                          for (var activity in activities.activities) ...[
+                            ActivityCard(
+                              title: activity.title,
+                              description: activity.subTitle,
+                              imagePath: "assets/images/relaxation.png",
+                              actionView: ActivityTemplate(model: activity),
+                              color: activity.color,
+                              isLast: activity == activities.activities.last,
                             ),
-                          ),
+                          ],
                         ],
                       ),
                     ],

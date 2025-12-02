@@ -1,4 +1,4 @@
-package com.monikode.l_alternative
+package com.monikode.lAlternative
 
 import io.flutter.embedding.android.FlutterActivity
 

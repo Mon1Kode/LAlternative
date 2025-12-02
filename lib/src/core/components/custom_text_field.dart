@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 class CustomTextField extends StatefulWidget {
   final TextEditingController textController;
   final String hintText;
+  final TextInputType? textInputType;
   final Function(String)? onChanged;
   final bool obscureText;
   final double? height;
@@ -15,6 +16,7 @@ class CustomTextField extends StatefulWidget {
     super.key,
     required this.textController,
     required this.hintText,
+    this.textInputType,
     this.obscureText = false,
     this.onChanged,
     this.height,
@@ -38,6 +40,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         child: TextField(
           controller: widget.textController,
           showCursor: true,
+          keyboardType: widget.textInputType,
           maxLines: widget.maxLines,
           cursorColor: Theme.of(context).colorScheme.onPrimary,
           obscureText: widget.obscureText ? _isObscured : false,

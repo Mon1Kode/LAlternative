@@ -47,4 +47,31 @@ class CustomButton extends StatelessWidget {
       child: Center(child: Text(text)),
     );
   }
+
+  static dotted({
+    required String text,
+    required Future<Null> Function() onPressed,
+    required bool predicate,
+  }) {
+    return ElevatedButton(
+      onPressed: () async {
+        await onPressed();
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.transparent,
+        foregroundColor: Colors.black,
+        minimumSize: Size(double.infinity, 50),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: BorderSide(
+            color: Colors.black,
+            width: 2,
+            style: BorderStyle.solid,
+          ),
+        ),
+        maximumSize: Size(double.infinity, 50),
+      ),
+      child: Center(child: Text(text)),
+    );
+  }
 }

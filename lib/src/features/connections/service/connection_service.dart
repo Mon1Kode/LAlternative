@@ -3,6 +3,7 @@
 // Created by MoniK.
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:l_alternative/src/core/service/database_services.dart';
 import 'package:monikode_event_store/monikode_event_store.dart';
 
 class ConnectionService {
@@ -47,6 +48,10 @@ class ConnectionService {
       throw FirebaseAuthException(code: 'user-not-found');
     }
     await ConnectionService().sendEmailVerification();
+    DatabaseServices.update("/users/${userCredential.user?.uid}", {
+      "email": email,
+      "id": userCredential.user?.uid,
+    });
     EventStore.getInstance().eventLogger.log("user.signup", EventLevel.info, {
       "parameters": {"email": email},
     });
@@ -72,12 +77,17 @@ class ConnectionService {
         "parameters": {"email": FirebaseAuth.instance.currentUser?.email},
       },
     );
+    DatabaseServices.remove("/users/${FirebaseAuth.instance.currentUser?.uid}");
     FirebaseAuth.instance.currentUser?.delete();
     FirebaseAuth.instance.signOut();
   }
 
   Future<void> updateEmail(String newEmail) async {
     await FirebaseAuth.instance.currentUser?.verifyBeforeUpdateEmail(newEmail);
+    DatabaseServices.update(
+      "/users/${FirebaseAuth.instance.currentUser?.uid}",
+      {"email": newEmail},
+    );
     EventStore.getInstance().eventLogger.log(
       "user.update_email",
       EventLevel.warning,

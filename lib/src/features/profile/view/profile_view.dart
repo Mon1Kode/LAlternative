@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:l_alternative/src/core/components/image_button.dart';
@@ -6,8 +5,6 @@ import 'package:l_alternative/src/core/components/rounded_container.dart';
 import 'package:l_alternative/src/core/provider/app_providers.dart';
 import 'package:l_alternative/src/core/utils/app_utils.dart';
 import 'package:l_alternative/src/features/connections/provider/user_provider.dart';
-import 'package:l_alternative/src/features/notifications/model/notifications_model.dart';
-import 'package:l_alternative/src/features/notifications/provider/notifications_provider.dart';
 import 'package:l_alternative/src/features/profile/provider/evaluation_provider.dart';
 
 class ProfileView extends ConsumerStatefulWidget {
@@ -271,12 +268,81 @@ class _ProfileViewState extends ConsumerState<ProfileView>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text("FAQ", style: TextStyle(fontSize: 18)),
+                            Text(
+                              "Foire aux questions",
+                              style: TextStyle(fontSize: 18),
+                            ),
                             ImageButton(
                               imagePath: "badge-info.png",
                               size: 32,
                               onPressed: () {
                                 Navigator.pushNamed(context, "/faq");
+                              },
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Appel d'urgence",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                            ImageButton(
+                              imagePath: "phone-call.png",
+                              size: 28,
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) {
+                                    return Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          ListTile(
+                                            leading: Icon(Icons.phone),
+                                            title: Text("Appeler le samu - 15"),
+                                            onTap: () {
+                                              Utils.launchPhoneDialer("15");
+                                              Navigator.of(context).pop();
+                                            },
+                                          ),
+                                          ListTile(
+                                            leading: Icon(Icons.phone),
+                                            title: Text(
+                                              "Appeler les pompier - 18",
+                                            ),
+                                            onTap: () {
+                                              Navigator.of(context).pop();
+                                              Utils.launchPhoneDialer("18");
+                                            },
+                                          ),
+                                          ListTile(
+                                            leading: Icon(Icons.phone),
+                                            title: Text(
+                                              "Appeler les urgences - 112",
+                                            ),
+                                            onTap: () {
+                                              Navigator.of(context).pop();
+                                              Utils.launchPhoneDialer("112");
+                                            },
+                                          ),
+                                          ListTile(
+                                            leading: Icon(Icons.phone),
+                                            title: Text("Appeler les Test "),
+                                            onTap: () {
+                                              Navigator.of(context).pop();
+                                              Utils.launchPhoneDialer(
+                                                "+33652562104",
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
                               },
                             ),
                           ],
@@ -388,58 +454,58 @@ class _ProfileViewState extends ConsumerState<ProfileView>
               Center(
                 child: Text("Créer par IncluSens. Tous droits réservés © 2025"),
               ),
-              if (kDebugMode)
-                RoundedContainer(
-                  padding: const EdgeInsets.all(16.0),
-                  width: double.infinity,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "DEBUG ZONE",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Add Notifs",
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          ImageButton(
-                            imagePath: "bell.png",
-                            color: Theme.of(context).colorScheme.secondary,
-                            size: 32,
-                            onPressed: () {
-                              ref
-                                  .read(notificationsProvider.notifier)
-                                  .addNotification(
-                                    NotificationModel(
-                                      title: "Fin de l'activité",
-                                      body: 'Vous venez de finir l’activité',
-                                      date: DateTime.now().add(
-                                        Duration(seconds: 5),
-                                      ),
-                                      bodyBold: "Practiquer la relaxation",
-                                      actionDetails:
-                                          "Merci d’évaluer cette activité",
-                                      ctaText: "Évaluer",
-                                    ),
-                                  );
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+              // if (kDebugMode)
+              //   RoundedContainer(
+              //     padding: const EdgeInsets.all(16.0),
+              //     width: double.infinity,
+              //     child: Column(
+              //       crossAxisAlignment: CrossAxisAlignment.start,
+              //       children: [
+              //         Text(
+              //           "DEBUG ZONE",
+              //           style: TextStyle(
+              //             fontSize: 20,
+              //             fontWeight: FontWeight.bold,
+              //           ),
+              //         ),
+              //         Row(
+              //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //           children: [
+              //             Text(
+              //               "Add Notifs",
+              //               style: TextStyle(
+              //                 color: Colors.red,
+              //                 fontSize: 18,
+              //                 fontWeight: FontWeight.w500,
+              //               ),
+              //             ),
+              //             ImageButton(
+              //               imagePath: "bell.png",
+              //               color: Theme.of(context).colorScheme.secondary,
+              //               size: 32,
+              //               onPressed: () {
+              //                 ref
+              //                     .read(notificationsProvider.notifier)
+              //                     .addNotification(
+              //                       NotificationModel(
+              //                         title: "Fin de l'activité",
+              //                         body: 'Vous venez de finir l’activité',
+              //                         date: DateTime.now().add(
+              //                           Duration(seconds: 5),
+              //                         ),
+              //                         bodyBold: "Practiquer la relaxation",
+              //                         actionDetails:
+              //                             "Merci d’évaluer cette activité",
+              //                         ctaText: "Évaluer",
+              //                       ),
+              //                     );
+              //               },
+              //             ),
+              //           ],
+              //         ),
+              //       ],
+              //     ),
+              //   ),
             ],
           ),
         ),

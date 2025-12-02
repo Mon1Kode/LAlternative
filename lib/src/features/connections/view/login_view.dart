@@ -57,6 +57,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                     CustomTextField(
                       textController: emailController,
                       hintText: "john.doe@gmail.com",
+                      textInputType: TextInputType.emailAddress,
                       onChanged: (value) {
                         emailController.text = value;
                         if (_errorMessage != null) {

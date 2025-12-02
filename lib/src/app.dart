@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:l_alternative/src/core/components/custom_button.dart';
 import 'package:l_alternative/src/features/admin/model/activity_model.dart';
+import 'package:l_alternative/src/features/admin/provider/new_activity_provier.dart';
 import 'package:l_alternative/src/features/admin/views/admin_view.dart';
-import 'package:l_alternative/src/features/admin/views/new_activity_pre_view.dart';
 import 'package:l_alternative/src/features/connections/view/auth_wrapper.dart';
 import 'package:l_alternative/src/features/connections/view/login_view.dart';
 import 'package:l_alternative/src/features/connections/view/register_view.dart';
@@ -14,6 +14,7 @@ import 'package:l_alternative/src/features/home/view/home_view.dart';
 import 'package:l_alternative/src/features/notifications/view/notifications_view.dart';
 import 'package:l_alternative/src/features/profile/model/evaluation_model.dart';
 import 'package:l_alternative/src/features/profile/view/profile_view.dart';
+import 'package:l_alternative/src/features/relaxation/view/activity_template.dart';
 import 'package:monikode_event_store/monikode_event_store.dart';
 
 import 'core/provider/app_providers.dart';
@@ -128,9 +129,17 @@ class MyApp extends ConsumerWidget {
             return MaterialPageRoute(builder: (context) => AdminView());
           case '/admin/new_activity':
             return MaterialPageRoute(
-              builder: (context) => NewActivityPreView(
-                activityModel: settings.arguments as ActivityModel,
-              ),
+              builder: (context) =>
+                  ActivityTemplate(model: settings.arguments as ActivityModel),
+            );
+          case '/admin/edit_activity':
+            var model = settings.arguments as ActivityModel;
+            model = model.copyWith(isCompleted: false);
+            ref.watch(newActivityProvider.notifier).updateActivity(model);
+            ref.watch(newActivityProvider.notifier).updateCompletion(false);
+            return MaterialPageRoute(
+              builder: (context) =>
+                  ActivityTemplate(model: ref.read(newActivityProvider)),
             );
           case '/faq':
             return MaterialPageRoute(builder: (context) => FaqView());

@@ -7,6 +7,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:l_alternative/src/core/components/block_picker.dart';
 import 'package:l_alternative/src/core/components/custom_button.dart';
 import 'package:l_alternative/src/core/components/custom_text_field.dart';
+import 'package:l_alternative/src/core/components/image_button.dart';
+import 'package:l_alternative/src/core/components/rounded_container.dart';
+import 'package:l_alternative/src/core/service/app_service.dart';
+import 'package:l_alternative/src/features/admin/provider/activities_provider.dart';
 import 'package:l_alternative/src/features/admin/provider/new_activity_provier.dart';
 
 class AdminView extends ConsumerStatefulWidget {
@@ -17,15 +21,161 @@ class AdminView extends ConsumerStatefulWidget {
 }
 
 class _AdminViewState extends ConsumerState<AdminView> {
+  final StatService _statService = StatService();
+
   @override
   Widget build(BuildContext context) {
     var newActivity = ref.watch(newActivityProvider.notifier);
+    var activities = ref.watch(activitiesProvider);
     return Scaffold(
       appBar: AppBar(
-        title: Text("Admin", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          "Admin Dashboard",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: false,
       ),
-      body: Center(child: Text("Admin View")),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          spacing: 16,
+          children: [
+            RoundedContainer(
+              padding: EdgeInsets.all(16),
+              child: FutureBuilder<Map<String, int>>(
+                future: _statService.getLoginStatsPerDay(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text("Error: ${snapshot.error}"));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text("Aucune donnée valide"));
+                  } else {
+                    final stats = snapshot.data!;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 16,
+                      children: [
+                        Text(
+                          "Statistiques de connexion par jour",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 180,
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                ...stats.entries.map((entry) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 4.0,
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          entry.key,
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                        Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.secondary,
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            "${entry.value} connection${entry.value > 1 ? 's' : ''}",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: Theme.of(
+                                                context,
+                                              ).primaryColor,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                },
+              ),
+            ),
+            Expanded(
+              child: RoundedContainer(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 16,
+                  children: [
+                    Text(
+                      "Activités créées",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: activities.activities.length,
+                        itemBuilder: (context, index) {
+                          final activity = activities.activities[index];
+                          return ListTile(
+                            tileColor: Theme.of(
+                              context,
+                            ).colorScheme.secondary.withValues(alpha: 0.1),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            leading: CircleAvatar(
+                              backgroundColor: activity.color,
+                            ),
+                            trailing: ImageButton(
+                              imagePath: "edit.png",
+                              size: 24,
+                            ),
+                            title: Text(activity.title),
+                            subtitle: Text(
+                              "${activity.steps.length} partie${activity.steps.length > 1 ? 's' : ''}",
+                            ),
+                            onTap: () {
+                              activity.setCompleted(false);
+                              Navigator.pushNamed(
+                                context,
+                                "/admin/edit_activity",
+                                arguments: activity,
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showDialog(
@@ -61,96 +211,9 @@ class _AdminViewState extends ConsumerState<AdminView> {
                 actions: [
                   CustomButton(
                     text: "Ajouter des catégories",
-                    onPressed: () async {
-                      await showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: Text("Ajouter une nouvelle catégorie"),
-                            content: SingleChildScrollView(
-                              child: Column(
-                                spacing: 16,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  TextFieldWithTitle(
-                                    textController:
-                                        newActivity.categoryController,
-                                    title: "Titre",
-                                    hintText: "Titre de la catégorie",
-                                  ),
-                                ],
-                              ),
-                            ),
-                            actions: [
-                              CustomButton(
-                                text: "Ajouter des paragraphes",
-                                onPressed: () async {
-                                  newActivity.addCategory(
-                                    newActivity.categoryController.text,
-                                  );
-                                  await showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        title: Text("Ajouter un paragraphe"),
-                                        content: SingleChildScrollView(
-                                          child: Column(
-                                            spacing: 16,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              TextFieldWithTitle(
-                                                title: "Titre",
-                                                hintText: "Titre du paragraphe",
-                                                textController:
-                                                    newActivity.titleController,
-                                              ),
-                                              TextFieldWithTitle(
-                                                title: "Contenu",
-                                                hintText:
-                                                    "Contenu du paragraphe",
-                                                textController: newActivity
-                                                    .paragraphController,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        actions: [
-                                          CustomButton(
-                                            text: "Ajouter",
-                                            onPressed: () {
-                                              newActivity
-                                                  .addParagraphInACategory(
-                                                    newActivity
-                                                        .categoryController
-                                                        .text,
-                                                    {
-                                                      newActivity
-                                                          .titleController
-                                                          .text: newActivity
-                                                          .paragraphController
-                                                          .text,
-                                                    },
-                                                  );
-                                              Navigator.of(context).pop();
-                                            },
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                  //ignore: use_build_context_synchronously
-                                  if (mounted) Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                      //ignore: use_build_context_synchronously
-                      if (mounted) Navigator.of(context).pop();
+                    onPressed: () {
+                      Navigator.of(context).pop();
                       Navigator.pushNamed(
-                        //ignore: use_build_context_synchronously
                         context,
                         "/admin/new_activity",
                         arguments: ref.read(newActivityProvider),

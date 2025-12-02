@@ -3,13 +3,14 @@
 // Created by MoniK.
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:l_alternative/src/core/service/database_services.dart';
 import 'package:l_alternative/src/features/connections/model/user_model.dart';
 import 'package:l_alternative/src/features/connections/service/connection_service.dart';
 import 'package:monikode_event_store/monikode_event_store.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 var userProvider = StateNotifierProvider<UserProvider, UserModel>(
   (ref) => UserProvider(),
@@ -112,47 +113,51 @@ class UserProvider extends StateNotifier<UserModel> {
   }
 
   Future<void> loadUserData() async {
-    var prefs = await SharedPreferences.getInstance();
-    var userId = prefs.getString('user_id') ?? '';
-    var email = prefs.getString('user_email') ?? '';
-    var displayName = prefs.getString('user_display_name') ?? '';
-    var firstName = prefs.getString('user_first_name') ?? '';
-    var lastName = prefs.getString('user_last_name') ?? '';
-    var profilePicturePath = prefs.getString('user_profile_picture') ?? '';
-    XFile? profilePicture;
-    if (profilePicturePath.isNotEmpty) {
-      profilePicture = XFile(profilePicturePath);
-    }
-    state = UserModel(
-      id: userId,
-      email: email,
-      displayName: displayName,
-      firstName: firstName,
-      lastName: lastName,
-      profilePicture: profilePicture,
-    );
+    DatabaseServices.get(
+      "/users/${FirebaseAuth.instance.currentUser?.uid}",
+    ).then((DataSnapshot snapshot) {
+      var data = snapshot.value as Map<dynamic, dynamic>?;
+      if (data != null) {
+        var userId =
+            data['id'] as String? ??
+            FirebaseAuth.instance.currentUser?.uid ??
+            '';
+        var email =
+            data['email'] as String? ??
+            FirebaseAuth.instance.currentUser?.email ??
+            '';
+        var displayName =
+            data['display_name'] as String? ??
+            FirebaseAuth.instance.currentUser?.displayName ??
+            '';
+        var firstName = data['first_name'] as String? ?? '';
+        var lastName = data['last_name'] as String? ?? '';
+        var profilePicturePath = data['profile_picture'] as String? ?? '';
+        XFile? profilePicture;
+        if (profilePicturePath.isNotEmpty) {
+          profilePicture = XFile(profilePicturePath);
+        }
+        state = UserModel(
+          id: userId,
+          email: email,
+          displayName: displayName,
+          firstName: firstName,
+          lastName: lastName,
+          profilePicture: profilePicture,
+        );
+      }
+    });
   }
 
   Future<void> saveUserData() async {
-    var prefs = await SharedPreferences.getInstance();
-    await prefs.setString('user_id', state.id);
-    await prefs.setString('user_email', state.email);
-    await prefs.setString('user_display_name', state.displayName);
-    await prefs.setString('user_first_name', state.firstName);
-    await prefs.setString('user_last_name', state.lastName);
-    if (state.profilePicture != null) {
-      await prefs.setString('user_profile_picture', state.profilePicture!.path);
-    }
-  }
-
-  Future<void> clearUserData() async {
-    var prefs = await SharedPreferences.getInstance();
-    await prefs.remove('user_id');
-    await prefs.remove('user_email');
-    await prefs.remove('user_display_name');
-    await prefs.remove('user_first_name');
-    await prefs.remove('user_last_name');
-    await prefs.remove('user_profile_picture');
+    DatabaseServices.update("/users/${state.id}", {
+      'id': state.id,
+      'email': state.email,
+      'display_name': state.displayName,
+      'first_name': state.firstName,
+      'last_name': state.lastName,
+      'profile_picture': state.profilePicture?.path ?? '',
+    });
   }
 
   Future<void> removeUser() async {
@@ -164,6 +169,5 @@ class UserProvider extends StateNotifier<UserModel> {
       email: '',
     );
     ConnectionService().delete();
-    await clearUserData();
   }
 }

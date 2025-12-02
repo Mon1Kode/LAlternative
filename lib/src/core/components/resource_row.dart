@@ -9,8 +9,18 @@ import 'package:l_alternative/src/core/provider/app_providers.dart';
 class ResourceRow extends ConsumerStatefulWidget {
   final String title;
   final String content;
+  final bool isEditable;
+  final void Function(String)? onTitleSubmitted;
+  final void Function(String)? onContentSubmitted;
 
-  const ResourceRow({super.key, required this.title, required this.content});
+  const ResourceRow({
+    super.key,
+    required this.title,
+    required this.content,
+    this.isEditable = false,
+    this.onTitleSubmitted,
+    this.onContentSubmitted,
+  });
 
   @override
   ConsumerState<ResourceRow> createState() => _ResourceRowState();
@@ -38,7 +48,22 @@ class _ResourceRowState extends ConsumerState<ResourceRow>
             children: [
               SizedBox(
                 width: MediaQuery.of(context).size.width * 0.6,
-                child: Text(widget.title, style: TextStyle(fontSize: 15)),
+                child: widget.isEditable
+                    ? TextField(
+                        controller: TextEditingController(text: widget.title),
+                        showCursor: true,
+                        cursorColor: Colors.black,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        style: TextStyle(fontSize: 15),
+                        onSubmitted: (value) {
+                          widget.onTitleSubmitted?.call(value);
+                        },
+                      )
+                    : Text(widget.title, style: TextStyle(fontSize: 15)),
               ),
               Material(
                 child: InkWell(
@@ -64,22 +89,40 @@ class _ResourceRowState extends ConsumerState<ResourceRow>
           AnimatedSize(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
+            alignment: Alignment.topLeft,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
               height: _expanded ? null : 40,
-              child: Text(
-                widget.content,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: ref.watch(themeModeProvider) == ThemeMode.dark
-                      ? Colors.grey
-                      : Color(0xFF6D6D6D),
-                ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: _expanded ? 20 : 2,
-                textAlign: TextAlign.start,
-              ),
+              child: widget.isEditable
+                  ? TextField(
+                      controller: TextEditingController(text: widget.content),
+                      showCursor: true,
+                      cursorColor: Colors.black,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: ref.watch(themeModeProvider) == ThemeMode.dark
+                            ? Colors.grey
+                            : Color(0xFF6D6D6D),
+                      ),
+                      maxLines: _expanded ? 20 : 2,
+                      textAlign: TextAlign.start,
+                      onSubmitted: (value) {
+                        widget.onContentSubmitted?.call(value);
+                      },
+                    )
+                  : Text(
+                      widget.content,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: ref.watch(themeModeProvider) == ThemeMode.dark
+                            ? Colors.grey
+                            : Color(0xFF6D6D6D),
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: _expanded ? 20 : 2,
+                      textAlign: TextAlign.start,
+                    ),
             ),
           ),
         ],

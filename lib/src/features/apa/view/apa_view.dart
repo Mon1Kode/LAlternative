@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class ApaView extends ConsumerStatefulWidget {
   const ApaView({super.key});
@@ -143,48 +144,60 @@ class _ApaViewState extends ConsumerState<ApaView> {
 class SupportRoundedContainer extends StatelessWidget {
   final String imagePath;
   final String text;
+  final String? url;
 
   const SupportRoundedContainer({
     super.key,
     required this.imagePath,
     required this.text,
+    this.url,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 100,
-      height: 100,
-      decoration: BoxDecoration(
-        image: DecorationImage(image: AssetImage(imagePath), fit: BoxFit.cover),
-        borderRadius: BorderRadius.circular(24),
-      ),
+    return GestureDetector(
+      onTap: () {
+        if (url != null) {
+          launchUrlString(url!);
+        }
+      },
       child: Container(
+        width: 100,
+        height: 100,
         decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(imagePath),
+            fit: BoxFit.cover,
+          ),
           borderRadius: BorderRadius.circular(24),
-          color: Theme.of(
-            context,
-          ).colorScheme.secondary.withValues(alpha: 0.75),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          spacing: 4,
-          children: [
-            Image.asset(
-              "assets/images/play-circle.png",
-              color: Theme.of(context).colorScheme.primary,
-              width: 32,
-            ),
-            Text(
-              text,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 11,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            color: Theme.of(
+              context,
+            ).colorScheme.secondary.withValues(alpha: 0.75),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 4,
+            children: [
+              Image.asset(
+                "assets/images/play-circle.png",
                 color: Theme.of(context).colorScheme.primary,
+                width: 32,
               ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+              Text(
+                text,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 11,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     );

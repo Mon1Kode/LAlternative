@@ -4,6 +4,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:l_alternative/src/core/service/database_services.dart';
 import 'package:l_alternative/src/features/admin/model/activity_model.dart';
 
 var newActivityProvider =
@@ -23,6 +24,12 @@ class NewActivityProvider extends StateNotifier<ActivityModel> {
     state = activity;
   }
 
+  Future<void> completeActivity() async {
+    var id = state.id.replaceAll(RegExp(r'[.#$[\]/]'), '');
+    state = state.copyWith(isCompleted: true, id: id);
+    await DatabaseServices.update("/activites", {id: state.toMap()});
+  }
+
   void updateCreationDate(DateTime creationDate) {
     state = state.copyWith(creationDate: creationDate);
   }
@@ -33,6 +40,10 @@ class NewActivityProvider extends StateNotifier<ActivityModel> {
 
   void updateTitle(String title) {
     state = state.copyWith(title: title);
+  }
+
+  void updateSubTitle(String subTitle) {
+    state = state.copyWith(subTitle: subTitle);
   }
 
   void updateDescription(String description) {
@@ -108,5 +119,57 @@ class NewActivityProvider extends StateNotifier<ActivityModel> {
       return {categoryTitle: updatedParagraphs};
     }).toList();
     state = state.copyWith(newSteps: updatedSteps);
+  }
+
+  void updateContent(String party, String paragraphe, String newContent) {
+    final updatedSteps = state.steps.map((step) {
+      if (step.keys.first == party) {
+        final updatedParagraphs = step[party]!.map((paragraph) {
+          if (paragraph.keys.first == paragraphe) {
+            return {paragraphe: newContent};
+          }
+          return paragraph;
+        }).toList();
+        return {party: updatedParagraphs};
+      }
+      return step;
+    }).toList();
+    state = state.copyWith(newSteps: updatedSteps);
+  }
+
+  void updateParagraphTitle(String party, String paragraph, String newTitle) {
+    final updatedSteps = state.steps.map((step) {
+      if (step.keys.first == party) {
+        final updatedParagraphs = step[party]!.map((para) {
+          if (para.keys.first == paragraph) {
+            return {newTitle: para.values.first};
+          }
+          return para;
+        }).toList();
+        return {party: updatedParagraphs};
+      }
+      return step;
+    }).toList();
+    state = state.copyWith(newSteps: updatedSteps);
+  }
+
+  void set(ActivityModel model) {
+    state = model;
+  }
+
+  void updateCompletion(bool bool) {
+    state = state.copyWith(isCompleted: bool);
+  }
+
+  void addVideoResource(String title, String url) {
+    final updatedVideos = List<Map>.from(state.videos)
+      ..add({"title": title, "url": url});
+    state = state.copyWith(videos: updatedVideos);
+  }
+
+  void addTestimonialResource(String title, String url) {
+    final updatedTestimonials = List<Map>.from(state.testimonials)
+      ..add({"title": title, "url": url});
+    state = state.copyWith(testimonials: updatedTestimonials);
   }
 }

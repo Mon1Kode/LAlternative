@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:l_alternative/src/core/components/activity_card.dart';
 import 'package:l_alternative/src/core/components/circle_image_button.dart';
+import 'package:l_alternative/src/core/components/custom_button.dart';
 import 'package:l_alternative/src/core/components/image_button.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
 import 'package:l_alternative/src/core/provider/app_providers.dart';
@@ -18,6 +19,7 @@ import 'package:l_alternative/src/features/connections/provider/user_provider.da
 import 'package:l_alternative/src/features/notifications/provider/notifications_provider.dart';
 import 'package:l_alternative/src/features/relaxation/view/activity_template.dart';
 import 'package:l_alternative/src/features/relaxation/view/relaxation_view.dart';
+import 'package:l_alternative/src/features/widgets/views/wd_streak.dart';
 import 'package:monikode_event_store/monikode_event_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -39,30 +41,6 @@ class _HomeViewState extends ConsumerState<HomeView>
   String _selectedMood = "love.png";
   String _selectedFatigue = "cool.png";
   int _currentMoodPage = 0;
-
-  final Widget _streak = Stack(
-    children: [
-      ClipRRect(
-        borderRadius: BorderRadius.circular(24.0),
-        child: Image.asset("assets/images/streak.png", width: 150, height: 150),
-      ),
-      RoundedContainer(
-        width: 150,
-        height: 150,
-        borderWidth: 1,
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Text(
-              "3 jours",
-              style: TextStyle(fontSize: 16, color: Colors.black),
-            ),
-          ],
-        ),
-      ),
-    ],
-  );
 
   final Widget _calendar = Stack(
     children: [
@@ -115,7 +93,7 @@ class _HomeViewState extends ConsumerState<HomeView>
           prefs
               .getStringList("tools")
               ?.map((tool) {
-                if (tool == "streak") return _streak;
+                if (tool.toString() == "WdStreak") return WdStreak();
                 if (tool == "calendar") return _calendar;
                 if (tool == "nextActivity") return _nextActivity;
                 return null;
@@ -128,10 +106,10 @@ class _HomeViewState extends ConsumerState<HomeView>
       "user.config.loaded",
       EventLevel.debug,
       {
-        "parameters ": {
+        "parameters": {
           "mood": _selectedMood,
           "tools": _toolsChildren.map((e) {
-            if (e == _streak) return "streak";
+            if (e == WdStreak()) return "streak";
             if (e == _calendar) return "calendar";
             if (e == _nextActivity) return "nextActivity";
             return "";
@@ -154,7 +132,7 @@ class _HomeViewState extends ConsumerState<HomeView>
       "mood.history.updated",
       EventLevel.info,
       {
-        "parameters ": {"mood_history": moodHistory},
+        "parameters": {"mood_history": moodHistory},
       },
     );
   }
@@ -171,7 +149,7 @@ class _HomeViewState extends ConsumerState<HomeView>
       "fatigue.history.updated",
       EventLevel.info,
       {
-        "parameters ": {"fatigue_history": fatigueHistory},
+        "parameters": {"fatigue_history": fatigueHistory},
       },
     );
   }
@@ -182,7 +160,7 @@ class _HomeViewState extends ConsumerState<HomeView>
       "mood.selected",
       EventLevel.debug,
       {
-        "parameters ": {"mood": _selectedMood},
+        "parameters": {"mood": _selectedMood},
       },
     );
     updateMoodHistoryList(_selectedMood);
@@ -194,7 +172,7 @@ class _HomeViewState extends ConsumerState<HomeView>
       "fatigue.selected",
       EventLevel.debug,
       {
-        "parameters ": {"fatigue": _selectedFatigue},
+        "parameters": {"fatigue": _selectedFatigue},
       },
     );
     updateFatigueHistoryList(_selectedFatigue);
@@ -276,7 +254,7 @@ class _HomeViewState extends ConsumerState<HomeView>
     await prefs.setStringList(
       "tools",
       _toolsChildren.map((e) {
-        if (e == _streak) return "streak";
+        if (e == WdStreak()) return "streak";
         if (e == _calendar) return "calendar";
         if (e == _nextActivity) return "nextActivity";
         return "";
@@ -286,7 +264,7 @@ class _HomeViewState extends ConsumerState<HomeView>
       "next_activity.loaded",
       EventLevel.debug,
       {
-        "parameters ": {"activity": "Prochaine activité"},
+        "parameters": {"activity": "Prochaine activité"},
       },
     );
   }
@@ -307,7 +285,7 @@ class _HomeViewState extends ConsumerState<HomeView>
             curve: Curves.easeInOut,
           ),
         );
-    _toolWidths[_streak] = 1;
+    _toolWidths[WdStreak()] = 1;
     _toolWidths[_calendar] = 1;
     _toolWidths[_nextActivity] = 2;
     getUserConfig();
@@ -453,15 +431,16 @@ class _HomeViewState extends ConsumerState<HomeView>
                                                   spacing: 16,
                                                   children: [
                                                     HomeToolsAddCard(
-                                                      tool: _streak,
+                                                      tool: WdStreak(),
                                                       toolsChildren:
                                                           _toolsChildren,
-                                                      imagePath: "streak.png",
+                                                      imagePath:
+                                                          "plants/${user.streakIcon.toString().split(".").last}/${user.streakCount > 15 ? "15" : user.streakCount}.png",
                                                       text: "Streak",
                                                       onPressed: () {
                                                         setState(() {
                                                           _toolsChildren.add(
-                                                            _streak,
+                                                            WdStreak(),
                                                           );
                                                         });
                                                         Navigator.pop(context);
@@ -515,7 +494,9 @@ class _HomeViewState extends ConsumerState<HomeView>
                                         await prefs.setStringList(
                                           "tools",
                                           _toolsChildren.map((e) {
-                                            if (e == _streak) return "streak";
+                                            if (e.toString() == "WdStreak") {
+                                              return "streak";
+                                            }
                                             if (e == _calendar) {
                                               return "calendar";
                                             }
@@ -525,6 +506,30 @@ class _HomeViewState extends ConsumerState<HomeView>
                                             return "";
                                           }).toList(),
                                         );
+                                        EventStore.getInstance().eventLogger
+                                            .log(
+                                              "user.tools.update",
+                                              EventLevel.debug,
+                                              {
+                                                "parameters": {
+                                                  "tools": _toolsChildren.map((
+                                                    e,
+                                                  ) {
+                                                    if (e.toString() ==
+                                                        "WdStreak") {
+                                                      return "streak";
+                                                    }
+                                                    if (e == _calendar) {
+                                                      return "calendar";
+                                                    }
+                                                    if (e == _nextActivity) {
+                                                      return "nextActivity";
+                                                    }
+                                                    return "";
+                                                  }).toList(),
+                                                },
+                                              },
+                                            );
                                       }
                                       setState(() {
                                         _isEditMode = !_isEditMode;
@@ -582,6 +587,14 @@ class _HomeViewState extends ConsumerState<HomeView>
                                   ),
                               ],
                             ),
+                          ),
+                          CustomButton(
+                            text: "Plus",
+                            onPressed: () {
+                              ref
+                                  .watch(userProvider.notifier)
+                                  .incrementStreak();
+                            },
                           ),
                         ],
                       ),

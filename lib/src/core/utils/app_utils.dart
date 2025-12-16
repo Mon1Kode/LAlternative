@@ -22,4 +22,10 @@ class Utils {
       throw Exception('Could not launch phone dialer for $phoneNumber');
     }
   }
+
+  static bool isSameDay(DateTime dateTime, DateTime dateTime2) {
+    return dateTime.year == dateTime2.year &&
+        dateTime.month == dateTime2.month &&
+        dateTime.day == dateTime2.day;
+  }
 }

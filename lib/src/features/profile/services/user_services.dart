@@ -14,7 +14,7 @@ class UserServices {
       "user.name.get",
       EventLevel.debug,
       {
-        "parameters ": {"message": "User name loaded from local storage"},
+        "parameters": {"message": "User name loaded from local storage"},
       },
     );
     return prefs.getString(_counterKey) ?? "NAME";
@@ -27,7 +27,7 @@ class UserServices {
       "user.name.update",
       EventLevel.info,
       {
-        "parameters ": {"new_name": name},
+        "parameters": {"new_name": name},
       },
     );
   }

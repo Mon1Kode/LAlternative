@@ -4,6 +4,8 @@
 
 import 'package:image_picker/image_picker.dart';
 
+enum StreakIcon { rose, flame, star, diamond, crown }
+
 class UserModel {
   final String id;
   final String email;
@@ -11,6 +13,10 @@ class UserModel {
   final String firstName;
   final String lastName;
   XFile? profilePicture;
+  final int streakCount;
+  final StreakIcon streakIcon;
+  final bool hasTodayLoggedIn;
+  final DateTime? lastLoginDate;
 
   UserModel({
     this.id = 'XX00XX',
@@ -19,6 +25,10 @@ class UserModel {
     this.firstName = 'FIRST_NAME',
     this.lastName = 'LAST_NAME',
     this.profilePicture,
+    this.streakCount = 1,
+    this.streakIcon = StreakIcon.rose,
+    this.hasTodayLoggedIn = false,
+    this.lastLoginDate,
   });
 
   factory UserModel.fromMap(Map<String, dynamic> data, String documentId) {
@@ -31,6 +41,15 @@ class UserModel {
       profilePicture: data['profilePicture'] != null
           ? XFile(data['profilePicture'])
           : null,
+      streakCount: data['streakCount'] ?? 1,
+      streakIcon: StreakIcon.values.firstWhere(
+        (e) => e.toString() == 'StreakIcon.${data['streakIcon'] ?? 'rose'}',
+        orElse: () => StreakIcon.rose,
+      ),
+      hasTodayLoggedIn: data["hasTodayLoggedIn"] ?? false,
+      lastLoginDate: data["lastLoginDate"] != null
+          ? DateTime.fromMillisecondsSinceEpoch(data["lastLoginDate"])
+          : null,
     );
   }
 
@@ -41,6 +60,10 @@ class UserModel {
       'firstName': firstName,
       'lastName': lastName,
       'profilePicture': profilePicture?.path,
+      'streakCount': streakCount,
+      'streakIcon': streakIcon.toString().split('.').last,
+      'hasTodayLoggedIn': hasTodayLoggedIn,
+      'lastLoginDate': lastLoginDate,
     };
   }
 
@@ -51,6 +74,10 @@ class UserModel {
     String? firstName,
     String? lastName,
     XFile? profilePicture,
+    int? streakCount,
+    StreakIcon? streakIcon,
+    bool? hasTodayLoggedIn,
+    DateTime? lastLoginDate,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -59,11 +86,24 @@ class UserModel {
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
       profilePicture: profilePicture ?? this.profilePicture,
+      streakCount: streakCount ?? this.streakCount,
+      streakIcon: streakIcon ?? this.streakIcon,
+      hasTodayLoggedIn: hasTodayLoggedIn ?? this.hasTodayLoggedIn,
+      lastLoginDate: lastLoginDate ?? this.lastLoginDate,
     );
   }
 
   @override
   String toString() {
-    return 'UserModel{id: $id, email: $email, displayName: $displayName, firstName: $firstName, lastName: $lastName, profilePicture: ${profilePicture?.path}}';
+    return 'UserModel{id: $id,'
+        'email: $email,'
+        'displayName: $displayName,'
+        'firstName: $firstName,'
+        'lastName: $lastName,'
+        'profilePicture: ${profilePicture?.path},'
+        'streakCount: $streakCount,'
+        'streakIcon: $streakIcon'
+        'hasTodayLoggedIn: $hasTodayLoggedIn,'
+        'lastLoginDate: $lastLoginDate}';
   }
 }

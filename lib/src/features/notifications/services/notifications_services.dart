@@ -20,7 +20,7 @@ class NotificationService {
       "notif.received",
       EventLevel.info,
       {
-        "parameters ": {
+        "parameters": {
           "payload": notificationResponse.payload,
           "actionId": notificationResponse.actionId,
           "input": notificationResponse.input,
@@ -80,7 +80,7 @@ class NotificationService {
           ? EventLevel.debug
           : EventLevel.warning,
       {
-        "parameters ": {"granted": granted, "iosGranted": iosGranted},
+        "parameters": {"granted": granted, "iosGranted": iosGranted},
       },
     );
   }
@@ -175,7 +175,7 @@ class NotificationService {
       "notif.set",
       EventLevel.info,
       {
-        "parameters ": {
+        "parameters": {
           "id": id,
           "title": notif.title,
           "date": notif.date.toIso8601String(),

@@ -3,7 +3,6 @@
 // Created by MoniK.
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -51,6 +50,10 @@ class UserProvider extends StateNotifier<UserModel> {
     String? lastName,
     String? displayName,
     XFile? profilePicture,
+    int? streakCount,
+    String? streakIcon,
+    bool? hasTodayLoggedIn,
+    DateTime? lastLoginDate,
   }) async {
     state = state.copyWith(
       email: email ?? state.email,
@@ -58,6 +61,15 @@ class UserProvider extends StateNotifier<UserModel> {
       lastName: lastName ?? state.lastName,
       displayName: displayName ?? state.displayName,
       profilePicture: profilePicture ?? state.profilePicture,
+      streakCount: streakCount ?? state.streakCount,
+      streakIcon: streakIcon != null
+          ? StreakIcon.values.firstWhere(
+              (e) => e.toString() == 'StreakIcon.$streakIcon',
+              orElse: () => state.streakIcon,
+            )
+          : state.streakIcon,
+      hasTodayLoggedIn: hasTodayLoggedIn ?? state.hasTodayLoggedIn,
+      lastLoginDate: lastLoginDate ?? state.lastLoginDate,
     );
     if (email != null) {
       var user = FirebaseAuth.instance.currentUser;
@@ -84,7 +96,7 @@ class UserProvider extends StateNotifier<UserModel> {
       return;
     }
     EventStore.getInstance().eventLogger.log("user.update", EventLevel.info, {
-      "parameters ": {
+      "parameters": {
         "email": state.email,
         "first_name": state.firstName,
         "last_name": state.lastName,
@@ -113,40 +125,53 @@ class UserProvider extends StateNotifier<UserModel> {
   }
 
   Future<void> loadUserData() async {
-    DatabaseServices.get(
+    var snapshot = await DatabaseServices.get(
       "/users/${FirebaseAuth.instance.currentUser?.uid}",
-    ).then((DataSnapshot snapshot) {
-      var data = snapshot.value as Map<dynamic, dynamic>?;
-      if (data != null) {
-        var userId =
-            data['id'] as String? ??
-            FirebaseAuth.instance.currentUser?.uid ??
-            '';
-        var email =
-            data['email'] as String? ??
-            FirebaseAuth.instance.currentUser?.email ??
-            '';
-        var displayName =
-            data['display_name'] as String? ??
-            FirebaseAuth.instance.currentUser?.displayName ??
-            '';
-        var firstName = data['first_name'] as String? ?? '';
-        var lastName = data['last_name'] as String? ?? '';
-        var profilePicturePath = data['profile_picture'] as String? ?? '';
-        XFile? profilePicture;
-        if (profilePicturePath.isNotEmpty) {
-          profilePicture = XFile(profilePicturePath);
-        }
-        state = UserModel(
-          id: userId,
-          email: email,
-          displayName: displayName,
-          firstName: firstName,
-          lastName: lastName,
-          profilePicture: profilePicture,
+    );
+    var data = snapshot.value as Map<dynamic, dynamic>?;
+    if (data != null) {
+      var userId =
+          data['id'] as String? ?? FirebaseAuth.instance.currentUser?.uid ?? '';
+      var email =
+          data['email'] as String? ??
+          FirebaseAuth.instance.currentUser?.email ??
+          '';
+      var displayName =
+          data['display_name'] as String? ??
+          FirebaseAuth.instance.currentUser?.displayName ??
+          '';
+      var firstName = data['first_name'] as String? ?? '';
+      var lastName = data['last_name'] as String? ?? '';
+      var profilePicturePath = data['profile_picture'] as String? ?? '';
+      XFile? profilePicture;
+      if (profilePicturePath.isNotEmpty) {
+        profilePicture = XFile(profilePicturePath);
+      }
+      var streakIconString = data['streak_icon'] as String? ?? 'default';
+      var streakIcon = StreakIcon.values.firstWhere(
+        (e) => e.toString() == 'StreakIcon.$streakIconString',
+        orElse: () => StreakIcon.rose,
+      );
+      var hasTodayLoggedIn = data['has_today_logged_in'] as bool? ?? false;
+      DateTime? lastLoginDate;
+      if (data['last_login_date'] != null) {
+        lastLoginDate = DateTime.fromMillisecondsSinceEpoch(
+          data['last_login_date'] as int,
         );
       }
-    });
+      state = UserModel(
+        id: userId,
+        email: email,
+        displayName: displayName,
+        firstName: firstName,
+        lastName: lastName,
+        profilePicture: profilePicture,
+        streakCount: data['streak_count'] as int? ?? 0,
+        streakIcon: streakIcon,
+        hasTodayLoggedIn: hasTodayLoggedIn,
+        lastLoginDate: lastLoginDate,
+      );
+    }
   }
 
   Future<void> saveUserData() async {
@@ -157,6 +182,10 @@ class UserProvider extends StateNotifier<UserModel> {
       'first_name': state.firstName,
       'last_name': state.lastName,
       'profile_picture': state.profilePicture?.path ?? '',
+      'streak_count': state.streakCount,
+      'streak_icon': state.streakIcon.toString().split('.').last,
+      'has_today_logged_in': state.hasTodayLoggedIn,
+      'last_login_date': state.lastLoginDate?.millisecondsSinceEpoch,
     });
   }
 
@@ -169,5 +198,23 @@ class UserProvider extends StateNotifier<UserModel> {
       email: '',
     );
     ConnectionService().delete();
+  }
+
+  void incrementStreak({int nb = 1}) {
+    state = state.copyWith(streakCount: state.streakCount + nb);
+  }
+
+  Future<void> resetStreak() async {
+    EventStore.getInstance().eventLogger.log(
+      "user.streak.reset",
+      EventLevel.info,
+      {
+        "parameters": {"old_streak_count": state.streakCount},
+      },
+    );
+    state = state.copyWith(streakCount: 1);
+    await DatabaseServices.update("/users/${state.id}", {
+      'streak_count': state.streakCount,
+    });
   }
 }

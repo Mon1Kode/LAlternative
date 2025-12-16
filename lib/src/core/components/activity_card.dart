@@ -56,8 +56,7 @@ class ActivityCard extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.55,
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -94,7 +93,11 @@ class ActivityCard extends StatelessWidget {
                 ],
               ),
             ),
-            if (hasImage) Image.asset(imagePath, height: 100),
+            if (hasImage)
+              Image.asset(
+                imagePath,
+                width: MediaQuery.of(context).size.width * 0.3,
+              ),
           ],
         ),
       ),

@@ -37,7 +37,7 @@ class EvaluationsNotifier extends StateNotifier<EvaluationsModel> {
       "evaluation.delete",
       EventLevel.warning,
       {
-        "parameters ": {"deleted_evaluation_date": eval.date.toIso8601String()},
+        "parameters": {"deleted_evaluation_date": eval.date.toIso8601String()},
       },
     );
   }
@@ -49,7 +49,7 @@ class EvaluationsNotifier extends StateNotifier<EvaluationsModel> {
       "evaluation.clear",
       EventLevel.warning,
       {
-        "parameters ": {"message": "All evaluations cleared"},
+        "parameters": {"message": "All evaluations cleared"},
       },
     );
   }

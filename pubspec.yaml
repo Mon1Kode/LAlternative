@@ -58,6 +58,7 @@ flutter:
     - assets/images/
     - assets/images/moods/
     - assets/images/plants/rose/
+    - assets/images/avatars/
     - assets/fonts/
 
   fonts:

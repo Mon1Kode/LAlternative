@@ -2,8 +2,6 @@
 // Unauthorized copying of this file, via any medium, is strictly prohibited.
 // Created by MoniK.
 
-import 'package:image_picker/image_picker.dart';
-
 enum StreakIcon { rose, flame, star, diamond, crown }
 
 class UserModel {
@@ -12,7 +10,7 @@ class UserModel {
   final String displayName;
   final String firstName;
   final String lastName;
-  XFile? profilePicture;
+  String profilePicture;
   final int streakCount;
   final StreakIcon streakIcon;
   final bool hasTodayLoggedIn;
@@ -24,7 +22,7 @@ class UserModel {
     this.displayName = 'NAME',
     this.firstName = 'FIRST_NAME',
     this.lastName = 'LAST_NAME',
-    this.profilePicture,
+    this.profilePicture = "m",
     this.streakCount = 1,
     this.streakIcon = StreakIcon.rose,
     this.hasTodayLoggedIn = false,
@@ -38,9 +36,7 @@ class UserModel {
       displayName: data['displayName'] ?? 'NAME',
       firstName: data['firstName'] ?? '',
       lastName: data['lastName'] ?? '',
-      profilePicture: data['profilePicture'] != null
-          ? XFile(data['profilePicture'])
-          : null,
+      profilePicture: data['profilePicture'] ?? "m",
       streakCount: data['streakCount'] ?? 1,
       streakIcon: StreakIcon.values.firstWhere(
         (e) => e.toString() == 'StreakIcon.${data['streakIcon'] ?? 'rose'}',
@@ -59,7 +55,7 @@ class UserModel {
       'displayName': displayName,
       'firstName': firstName,
       'lastName': lastName,
-      'profilePicture': profilePicture?.path,
+      'profilePicture': profilePicture,
       'streakCount': streakCount,
       'streakIcon': streakIcon.toString().split('.').last,
       'hasTodayLoggedIn': hasTodayLoggedIn,
@@ -73,7 +69,7 @@ class UserModel {
     String? displayName,
     String? firstName,
     String? lastName,
-    XFile? profilePicture,
+    String? profilePicture,
     int? streakCount,
     StreakIcon? streakIcon,
     bool? hasTodayLoggedIn,
@@ -100,7 +96,7 @@ class UserModel {
         'displayName: $displayName,'
         'firstName: $firstName,'
         'lastName: $lastName,'
-        'profilePicture: ${profilePicture?.path},'
+        'profilePicture: $profilePicture,'
         'streakCount: $streakCount,'
         'streakIcon: $streakIcon'
         'hasTodayLoggedIn: $hasTodayLoggedIn,'

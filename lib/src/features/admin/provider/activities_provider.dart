@@ -48,4 +48,12 @@ class ActivitiesProvider extends StateNotifier<ActivitiesModel> {
     }
     state = state.copyWith(newActivities: updatedActivities);
   }
+
+  Future<void> deleteActivity(String id) async {
+    final updatedActivities = state.activities
+        .where((activity) => activity.id != id)
+        .toList();
+    await DatabaseServices.remove("/activites/$id");
+    state = state.copyWith(newActivities: updatedActivities);
+  }
 }

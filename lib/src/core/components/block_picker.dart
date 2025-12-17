@@ -44,13 +44,13 @@ class BlockPickerState extends State<BlockPicker> {
           return GestureDetector(
             onTap: () {
               setState(() {
-                _selectedColor = Colors.primaries[index].shade500;
+                _selectedColor = Colors.primaries[index].shade200;
               });
-              widget.onColorChanged(Colors.primaries[index].shade500);
+              widget.onColorChanged(Colors.primaries[index].shade200);
             },
             child: Container(
-              color: Colors.primaries[index],
-              child: _selectedColor == Colors.primaries[index].shade500
+              color: Colors.primaries[index].shade200,
+              child: _selectedColor == Colors.primaries[index].shade200
                   ? const Icon(Icons.check)
                   : null,
             ),

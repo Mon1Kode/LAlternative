@@ -373,6 +373,56 @@ class _ActivityTemplateState extends ConsumerState<ActivityTemplate> {
                   ],
                 ),
               ),
+              if (!newActivity.isCompleted)
+                CustomButton.dotted(
+                  text: "Supprimer l'activité",
+                  color: Theme.of(context).colorScheme.error,
+                  onPressed: () async {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text("Supprimer l'activité"),
+                          content: Text(
+                            "Êtes-vous sûr de vouloir supprimer cette activité ? Cette action est irréversible.",
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text(
+                                "Annuler",
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.tertiary,
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                activitiesNotifier.deleteActivity(
+                                  newActivity.id,
+                                );
+                                newActivityNotifier.resetActivity();
+                                setState(() {});
+                                Navigator.of(context)
+                                  ..pop()
+                                  ..pop();
+                              },
+                              child: Text(
+                                "Supprimer",
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.error,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  predicate: false,
+                ),
             ],
           ),
         ),
@@ -409,7 +459,9 @@ class _ActivityDetailsTemplateState
         foregroundColor: Colors.black,
         leading: IconButton(
           onPressed: () {
-            ref.read(newActivityProvider.notifier).resetActivity();
+            if (!widget.model.isCompleted) {
+              newActivityNotifier.updateActivity(currentActivity);
+            }
             Navigator.of(context).pop();
           },
           icon: Icon(Icons.chevron_left),
@@ -489,24 +541,48 @@ class _ActivityDetailsTemplateState
                             ),
                             for (var texts in step.values) ...{
                               for (var text in texts)
-                                ResourceRow(
-                                  title: text.keys.first,
-                                  content: text.values.first,
-                                  isEditable: true,
-                                  onTitleSubmitted: (newTitle) {
-                                    newActivityNotifier.updateParagraphTitle(
-                                      step.keys.first,
-                                      text.keys.first,
-                                      newTitle,
-                                    );
-                                  },
-                                  onContentSubmitted: (newContent) {
-                                    newActivityNotifier.updateContent(
-                                      step.keys.first,
-                                      text.keys.first,
-                                      newContent,
-                                    );
-                                  },
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: ResourceRow(
+                                        title: text.keys.first,
+                                        content: text.values.first,
+                                        isEditable: true,
+                                        onTitleSubmitted: (newTitle) {
+                                          newActivityNotifier
+                                              .updateParagraphTitle(
+                                                step.keys.first,
+                                                text.keys.first,
+                                                newTitle,
+                                              );
+                                        },
+                                        onContentSubmitted: (newContent) {
+                                          newActivityNotifier.updateContent(
+                                            step.keys.first,
+                                            text.keys.first,
+                                            newContent,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    ImageButton(
+                                      imagePath: "trash.png",
+                                      width: 24,
+                                      height: 24,
+                                      onPressed: () {
+                                        newActivityNotifier
+                                            .deleteParagraphInACategory(
+                                              step.keys.first,
+                                              text.keys.first,
+                                            );
+                                        setState(() {
+                                          currentActivity = ref.read(
+                                            newActivityProvider,
+                                          );
+                                        });
+                                      },
+                                    ),
+                                  ],
                                 ),
                               if (!currentActivity.isCompleted) ...{
                                 CustomButton.dotted(
@@ -527,6 +603,11 @@ class _ActivityDetailsTemplateState
                                             "Contenu du paragraphe",
                                       },
                                     );
+                                    setState(() {
+                                      currentActivity = ref.read(
+                                        newActivityProvider,
+                                      );
+                                    });
                                   },
                                   predicate: true,
                                 ),
@@ -542,6 +623,9 @@ class _ActivityDetailsTemplateState
                           newActivityNotifier.addCategory(
                             "PARTIE ${currentActivity.steps.length + 1}",
                           );
+                          setState(() {
+                            currentActivity = ref.read(newActivityProvider);
+                          });
                         },
                         predicate: true,
                       ),

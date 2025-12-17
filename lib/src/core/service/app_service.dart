@@ -27,7 +27,7 @@ class StatService {
     try {
       final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('logs')
-          .where('event', isEqualTo: 'user.login')
+          .where('event', isEqualTo: 'user.daily_login')
           .get();
 
       return querySnapshot.docs

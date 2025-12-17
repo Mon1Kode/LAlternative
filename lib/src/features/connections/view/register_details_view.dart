@@ -2,11 +2,8 @@
 // Unauthorized copying of this file, via any medium, is strictly prohibited.
 // Created by MoniK.
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:l_alternative/src/core/components/custom_button.dart';
 import 'package:l_alternative/src/core/components/custom_text_field.dart';
 import 'package:l_alternative/src/features/connections/provider/user_provider.dart';
@@ -22,7 +19,6 @@ class RegisterDetailsView extends ConsumerStatefulWidget {
 class _RegisterDetailsViewState extends ConsumerState<RegisterDetailsView> {
   TextEditingController nameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
-  File? _profilePicture;
 
   @override
   Widget build(BuildContext context) {
@@ -84,101 +80,102 @@ class _RegisterDetailsViewState extends ConsumerState<RegisterDetailsView> {
                     child: InkWell(
                       borderRadius: BorderRadius.circular(8),
                       onTap: () async {
-                        _profilePicture = await showModalBottomSheet<File>(
-                          context: context,
-                          builder: (_) {
-                            return SizedBox(
-                              child: Padding(
-                                padding: const EdgeInsets.all(24.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  spacing: 16,
-                                  children: [
-                                    CustomButton(
-                                      onPressed: () {
-                                        final ImagePicker picker =
-                                            ImagePicker();
-                                        picker
-                                            .pickImage(
-                                              source: ImageSource.gallery,
-                                            )
-                                            .then((pickedFile) {
-                                              if (pickedFile != null) {
-                                                Navigator.pop(
-                                                  // ignore: use_build_context_synchronously
-                                                  context,
-                                                  File(pickedFile.path),
-                                                );
-                                              }
-                                            });
-                                      },
-                                      text: "Depuis la galerie",
-                                    ),
-                                    CustomButton(
-                                      onPressed: () async {
-                                        final ImagePicker picker =
-                                            ImagePicker();
-                                        final XFile? pickedFile = await picker
-                                            .pickImage(
-                                              source: ImageSource.camera,
-                                            );
-                                        if (pickedFile != null) {
-                                          WidgetsBinding.instance
-                                              .addPostFrameCallback((_) {
-                                                if (!mounted) return;
-                                                Navigator.pop(
-                                                  context,
-                                                  File(pickedFile.path),
-                                                );
-                                              });
-                                        }
-                                      },
-                                      text: "Prendre une photo",
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        );
+                        // _profilePicture = await showModalBottomSheet<File>(
+                        //   context: context,
+                        //   builder: (_) {
+                        //     return SizedBox(
+                        //       child: Padding(
+                        //         padding: const EdgeInsets.all(24.0),
+                        //         child: Column(
+                        //           mainAxisSize: MainAxisSize.min,
+                        //           spacing: 16,
+                        //           children: [
+                        //             CustomButton(
+                        //               onPressed: () {
+                        //                 final ImagePicker picker =
+                        //                     ImagePicker();
+                        //                 picker
+                        //                     .pickImage(
+                        //                       source: ImageSource.gallery,
+                        //                     )
+                        //                     .then((pickedFile) {
+                        //                       if (pickedFile != null) {
+                        //                         Navigator.pop(
+                        //                           // ignore: use_build_context_synchronously
+                        //                           context,
+                        //                           File(pickedFile.path),
+                        //                         );
+                        //                       }
+                        //                     });
+                        //               },
+                        //               text: "Depuis la galerie",
+                        //             ),
+                        //             CustomButton(
+                        //               onPressed: () async {
+                        //                 final ImagePicker picker =
+                        //                     ImagePicker();
+                        //                 final XFile? pickedFile = await picker
+                        //                     .pickImage(
+                        //                       source: ImageSource.camera,
+                        //                     );
+                        //                 if (pickedFile != null) {
+                        //                   WidgetsBinding.instance
+                        //                       .addPostFrameCallback((_) {
+                        //                         if (!mounted) return;
+                        //                         Navigator.pop(
+                        //                           context,
+                        //                           File(pickedFile.path),
+                        //                         );
+                        //                       });
+                        //                 }
+                        //               },
+                        //               text: "Prendre une photo",
+                        //             ),
+                        //           ],
+                        //         ),
+                        //       ),
+                        //     );
+                        //   },
+                        // );
                         setState(() {});
                       },
-                      child: _profilePicture?.path != null
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.file(
-                                File(_profilePicture!.path),
-                                height: 108,
-                                width: double.infinity,
-                                fit: BoxFit.fitHeight,
-                              ),
-                            )
-                          : SizedBox(
-                              height: 108,
-                              child: Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.cloud_upload_outlined,
+                      child: //_profilePicture?.path != null
+                          //     ? ClipRRect(
+                          //         borderRadius: BorderRadius.circular(8),
+                          //         child: Image.file(
+                          //           File(_profilePicture!.path),
+                          //           height: 108,
+                          //           width: double.infinity,
+                          //           fit: BoxFit.fitHeight,
+                          //         ),
+                          //       )
+                          //     :
+                          SizedBox(
+                            height: 108,
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.cloud_upload_outlined,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimary
+                                        .withValues(alpha: 0.7),
+                                  ),
+                                  Text(
+                                    "Appuyez pour choisir une photo",
+                                    style: TextStyle(
                                       color: Theme.of(context)
                                           .colorScheme
                                           .onPrimary
                                           .withValues(alpha: 0.7),
                                     ),
-                                    Text(
-                                      "Appuyez pour choisir une photo",
-                                      style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary
-                                            .withValues(alpha: 0.7),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
+                          ),
                     ),
                   ),
                 ],
@@ -186,12 +183,15 @@ class _RegisterDetailsViewState extends ConsumerState<RegisterDetailsView> {
               CustomButton(
                 onPressed: () async {
                   if (nameController.text.isNotEmpty &&
-                      lastNameController.text.isNotEmpty &&
-                      _profilePicture != null) {
+                      lastNameController
+                          .text
+                          .isNotEmpty //&&
+                  //_profilePicture != null
+                  ) {
                     await user.updateUserDetails(
                       firstName: nameController.text,
                       lastName: lastNameController.text,
-                      profilePicture: XFile(_profilePicture!.path),
+                      // profilePicture: _profilePicture!.path,
                     );
                     Navigator.pushNamedAndRemoveUntil(
                       // ignore: use_build_context_synchronously

@@ -5,7 +5,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:l_alternative/src/core/service/database_services.dart';
 import 'package:l_alternative/src/features/connections/model/user_model.dart';
 import 'package:l_alternative/src/features/connections/service/connection_service.dart';
@@ -49,7 +48,7 @@ class UserProvider extends StateNotifier<UserModel> {
     String? firstName,
     String? lastName,
     String? displayName,
-    XFile? profilePicture,
+    String? profilePicture,
     int? streakCount,
     String? streakIcon,
     bool? hasTodayLoggedIn,
@@ -142,11 +141,7 @@ class UserProvider extends StateNotifier<UserModel> {
           '';
       var firstName = data['first_name'] as String? ?? '';
       var lastName = data['last_name'] as String? ?? '';
-      var profilePicturePath = data['profile_picture'] as String? ?? '';
-      XFile? profilePicture;
-      if (profilePicturePath.isNotEmpty) {
-        profilePicture = XFile(profilePicturePath);
-      }
+      var profilePicturePath = data['profile_picture'] as String? ?? 'm';
       var streakIconString = data['streak_icon'] as String? ?? 'default';
       var streakIcon = StreakIcon.values.firstWhere(
         (e) => e.toString() == 'StreakIcon.$streakIconString',
@@ -165,7 +160,7 @@ class UserProvider extends StateNotifier<UserModel> {
         displayName: displayName,
         firstName: firstName,
         lastName: lastName,
-        profilePicture: profilePicture,
+        profilePicture: profilePicturePath,
         streakCount: data['streak_count'] as int? ?? 0,
         streakIcon: streakIcon,
         hasTodayLoggedIn: hasTodayLoggedIn,
@@ -181,7 +176,7 @@ class UserProvider extends StateNotifier<UserModel> {
       'display_name': state.displayName,
       'first_name': state.firstName,
       'last_name': state.lastName,
-      'profile_picture': state.profilePicture?.path ?? '',
+      'profile_picture': state.profilePicture,
       'streak_count': state.streakCount,
       'streak_icon': state.streakIcon.toString().split('.').last,
       'has_today_logged_in': state.hasTodayLoggedIn,

@@ -51,14 +51,15 @@ class CustomButton extends StatelessWidget {
   static dotted({
     required String text,
     required Future<Null> Function() onPressed,
-    required bool predicate,
+    Color? color,
+    bool predicate = false,
   }) {
     return ElevatedButton(
       onPressed: () async {
         await onPressed();
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.transparent,
+        backgroundColor: color?.withValues(alpha: 0.7) ?? Colors.transparent,
         foregroundColor: Colors.black,
         minimumSize: Size(double.infinity, 50),
         shape: RoundedRectangleBorder(

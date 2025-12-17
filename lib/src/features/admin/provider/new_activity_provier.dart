@@ -172,4 +172,17 @@ class NewActivityProvider extends StateNotifier<ActivityModel> {
       ..add({"title": title, "url": url});
     state = state.copyWith(testimonials: updatedTestimonials);
   }
+
+  Future<void> deleteParagraphInACategory(String cate, String para) async {
+    final updatedSteps = state.steps.map((step) {
+      if (step.keys.first == cate) {
+        final updatedParagraphs = step[cate]!
+            .where((paragraph) => paragraph.keys.first != para)
+            .toList();
+        return {cate: updatedParagraphs};
+      }
+      return step;
+    }).toList();
+    state = state.copyWith(newSteps: updatedSteps);
+  }
 }

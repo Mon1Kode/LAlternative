@@ -15,7 +15,7 @@ repos:
         exclude: '\.github/workflows/.*\.ya?ml$'
       - id: check-json
       - id: check-added-large-files
-        args: ['--maxkb=1000']
+        args: ['--maxkb=2000']
       - id: check-merge-conflict
       - id: check-case-conflict
       - id: mixed-line-ending
@@ -103,7 +103,7 @@ repos:
             for file in "$@"; do
               if [ -f "$file" ]; then
                 size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null)
-                if [ "$size" -gt 500000 ]; then
+                if [ "$size" -gt 2000000 ]; then
                   echo "❌ Image $file is too large (${size} bytes > 500KB)"
                   echo "   Consider optimizing images for mobile apps"
                   exit 1

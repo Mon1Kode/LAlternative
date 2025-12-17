@@ -139,32 +139,35 @@ class _AdminViewState extends ConsumerState<AdminView> {
                         itemCount: activities.activities.length,
                         itemBuilder: (context, index) {
                           final activity = activities.activities[index];
-                          return ListTile(
-                            tileColor: Theme.of(
-                              context,
-                            ).colorScheme.secondary.withValues(alpha: 0.1),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            leading: CircleAvatar(
-                              backgroundColor: activity.color,
-                            ),
-                            trailing: ImageButton(
-                              imagePath: "edit.png",
-                              size: 24,
-                            ),
-                            title: Text(activity.title),
-                            subtitle: Text(
-                              "${activity.steps.length} partie${activity.steps.length > 1 ? 's' : ''}",
-                            ),
-                            onTap: () {
-                              activity.setCompleted(false);
-                              Navigator.pushNamed(
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4.0),
+                            child: ListTile(
+                              tileColor: Theme.of(
                                 context,
-                                "/admin/edit_activity",
-                                arguments: activity,
-                              );
-                            },
+                              ).colorScheme.secondary.withValues(alpha: 0.1),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              leading: CircleAvatar(
+                                backgroundColor: activity.color,
+                              ),
+                              trailing: ImageButton(
+                                imagePath: "edit.png",
+                                size: 24,
+                              ),
+                              title: Text(activity.title),
+                              subtitle: Text(
+                                "${activity.steps.length} partie${activity.steps.length > 1 ? 's' : ''}",
+                              ),
+                              onTap: () {
+                                activity.setCompleted(false);
+                                Navigator.pushNamed(
+                                  context,
+                                  "/admin/edit_activity",
+                                  arguments: activity,
+                                );
+                              },
+                            ),
                           );
                         },
                       ),

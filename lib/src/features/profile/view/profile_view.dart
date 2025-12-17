@@ -121,7 +121,75 @@ class _ProfileViewState extends ConsumerState<ProfileView>
                     Row(
                       spacing: 16,
                       children: [
-                        Image.asset("assets/images/avatar.png", width: 48),
+                        GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text(
+                                    "Photo de profil",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  // grid with the avatars file in the assets/images/avatars folder
+                                  content: SingleChildScrollView(
+                                    child: Wrap(
+                                      spacing: 8,
+                                      runSpacing: 8,
+                                      children: [
+                                        for (var i = 1; i <= 4; i++)
+                                          GestureDetector(
+                                            onTap: () async {
+                                              await ref
+                                                  .read(userProvider.notifier)
+                                                  .updateUserDetails(
+                                                    profilePicture: "$i.png",
+                                                  );
+                                              setState(() {});
+                                              // ignore: use_build_context_synchronously
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(4.0),
+                                              child: Image.asset(
+                                                "assets/images/avatars/$i.png",
+                                                width: 64,
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text(
+                                        "Fermer",
+                                        style: TextStyle(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.tertiary,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(24.0),
+                            child: Image.asset(
+                              "assets/images/avatars/${user.profilePicture}",
+                              width: 48,
+                            ),
+                          ),
+                        ),
                         _isEditMode
                             ? SizedBox(
                                 width: 200,

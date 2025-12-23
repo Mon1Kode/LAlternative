@@ -29,6 +29,7 @@ class ResourceRow extends ConsumerStatefulWidget {
 class _ResourceRowState extends ConsumerState<ResourceRow>
     with SingleTickerProviderStateMixin {
   bool _expanded = false;
+  late final _contentController = TextEditingController(text: widget.content);
 
   @override
   Widget build(BuildContext context) {
@@ -46,10 +47,9 @@ class _ResourceRowState extends ConsumerState<ResourceRow>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.6,
-                child: widget.isEditable
-                    ? TextField(
+              widget.isEditable
+                  ? Expanded(
+                      child: TextField(
                         controller: TextEditingController(text: widget.title),
                         showCursor: true,
                         cursorColor: Colors.black,
@@ -62,9 +62,15 @@ class _ResourceRowState extends ConsumerState<ResourceRow>
                         onSubmitted: (value) {
                           widget.onTitleSubmitted?.call(value);
                         },
-                      )
-                    : Text(widget.title, style: TextStyle(fontSize: 15)),
-              ),
+                      ),
+                    )
+                  : Expanded(
+                      child: Text(
+                        widget.title,
+                        style: TextStyle(fontSize: 15),
+                        maxLines: 2,
+                      ),
+                    ),
               Material(
                 child: InkWell(
                   onTap: () {
@@ -92,22 +98,29 @@ class _ResourceRowState extends ConsumerState<ResourceRow>
             alignment: Alignment.topLeft,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
+              padding: EdgeInsets.all(2),
               curve: Curves.easeInOut,
+              alignment: Alignment.topLeft,
               height: _expanded ? null : 40,
               child: widget.isEditable
                   ? TextField(
-                      controller: TextEditingController(text: widget.content),
+                      controller: _contentController,
                       showCursor: true,
                       cursorColor: Colors.black,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
                       style: TextStyle(
                         fontSize: 12,
                         color: ref.watch(themeModeProvider) == ThemeMode.dark
                             ? Colors.grey
                             : Color(0xFF6D6D6D),
+                        overflow: TextOverflow.ellipsis,
                       ),
                       maxLines: _expanded ? 20 : 2,
                       textAlign: TextAlign.start,
-                      onSubmitted: (value) {
+                      onChanged: (value) {
                         widget.onContentSubmitted?.call(value);
                       },
                     )

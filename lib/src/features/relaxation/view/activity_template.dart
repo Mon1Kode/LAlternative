@@ -68,7 +68,8 @@ class _ActivityTemplateState extends ConsumerState<ActivityTemplate> {
                 newActivityNotifier.updateTitle(newActivity.title);
                 newActivityNotifier.updateSubTitle(newActivity.subTitle);
                 newActivityNotifier.updateDescription(newActivity.description);
-                activitiesNotifier.addOrUpdateActivity(newActivity);
+                final updatedActivity = ref.read(newActivityProvider);
+                activitiesNotifier.addOrUpdateActivity(updatedActivity);
                 if (mounted) {
                   // ignore: use_build_context_synchronously
                   Navigator.of(context).pop();
@@ -90,6 +91,7 @@ class _ActivityTemplateState extends ConsumerState<ActivityTemplate> {
                 child: Column(
                   spacing: 2,
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     !newActivity.isCompleted
                         ? TextField(
@@ -140,6 +142,7 @@ class _ActivityTemplateState extends ConsumerState<ActivityTemplate> {
                             onSubmitted: (value) {
                               newActivityNotifier.updateDescription(value);
                             },
+                            maxLines: 10,
                           )
                         : Text(
                             widget.model.description,
@@ -538,6 +541,7 @@ class _ActivityDetailsTemplateState
                                   value,
                                 );
                               },
+                              maxLines: 2,
                             ),
                             for (var texts in step.values) ...{
                               for (var text in texts)
@@ -569,6 +573,9 @@ class _ActivityDetailsTemplateState
                                       imagePath: "trash.png",
                                       width: 24,
                                       height: 24,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.error,
                                       onPressed: () {
                                         newActivityNotifier
                                             .deleteParagraphInACategory(

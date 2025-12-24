@@ -12,7 +12,14 @@ final notificationsProvider =
     );
 
 class NotificationsNotifier extends StateNotifier<NotificationsModel> {
-  NotificationsNotifier() : super(NotificationsModel(notifications: []));
+  NotificationsNotifier() : super(NotificationsModel(notifications: [])) {
+    loadNotifications();
+  }
+
+  Future<void> loadNotifications() async {
+    final notifications = await NotificationService.getPersistedNotifications();
+    state = state.copyWith(newNotifications: notifications);
+  }
 
   Future<void> _persistNotifications(
     List<NotificationModel> notifications,
@@ -29,11 +36,27 @@ class NotificationsNotifier extends StateNotifier<NotificationsModel> {
     state = state.copyWith(newNotifications: updatedNotifications);
   }
 
-  void removeNotification(int index) {
+  void removeNotification(int id) {
+    final index = state.notifications.indexWhere(
+      (notification) => notification.id == id,
+    );
     NotificationService.removeNotification(state.notifications[index]);
     final updatedNotifications = List<NotificationModel>.from(
       state.notifications,
     )..removeAt(index);
+    _persistNotifications(updatedNotifications);
+    state = state.copyWith(newNotifications: updatedNotifications);
+  }
+
+  void removeNotificationsBefore(DateTime dateTime) {
+    final updatedNotifications = state.notifications
+        .where((notification) => notification.date.isAfter(dateTime))
+        .toList();
+    for (var notif in state.notifications) {
+      if (notif.date.isBefore(dateTime)) {
+        NotificationService.removeNotification(notif);
+      }
+    }
     _persistNotifications(updatedNotifications);
     state = state.copyWith(newNotifications: updatedNotifications);
   }

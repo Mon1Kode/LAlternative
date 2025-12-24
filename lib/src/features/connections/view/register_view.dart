@@ -202,32 +202,33 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                                                 cred,
                                               );
 
-                                              // ignore: use_build_context_synchronously
-                                              Navigator.of(context).pop();
-                                              showDialog(
-                                                // ignore: use_build_context_synchronously
-                                                context: context,
-                                                builder: (_) {
-                                                  return PopupModal(
-                                                    title:
-                                                        "Vérifiez votre boîte mail",
-                                                    content:
-                                                        "Un email de vérification vous a été envoyé à l’adresse ${anonymousEmail(emailController.text)}",
-                                                    ctaText: "Fermer",
-                                                    onPressed: (newContext) {
-                                                      Navigator.pop(newContext);
-                                                      Navigator.pushNamedAndRemoveUntil(
-                                                        newContext,
-                                                        '/home',
-                                                        (route) => false,
-                                                      );
-                                                    },
-                                                  );
-                                                },
-                                              );
+                                              if (context.mounted) {
+                                                Navigator.of(context).pop();
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (_) {
+                                                    return PopupModal(
+                                                      title:
+                                                          "Vérifiez votre boîte mail",
+                                                      content:
+                                                          "Un email de vérification vous a été envoyé à l’adresse ${anonymousEmail(emailController.text)}",
+                                                      ctaText: "Fermer",
+                                                      onPressed: (newContext) {
+                                                        Navigator.pop(
+                                                          newContext,
+                                                        );
+                                                        Navigator.pushNamedAndRemoveUntil(
+                                                          newContext,
+                                                          '/home',
+                                                          (route) => false,
+                                                        );
+                                                      },
+                                                    );
+                                                  },
+                                                );
+                                              }
                                             } catch (e, stackTrace) {
-                                              if (mounted) {
-                                                // ignore: use_build_context_synchronously
+                                              if (context.mounted) {
                                                 Navigator.of(context).pop();
                                               }
 

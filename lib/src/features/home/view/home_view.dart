@@ -37,6 +37,7 @@ class _HomeViewState extends ConsumerState<HomeView>
   late AnimationController _textAnimationController;
   late Animation<Offset> _slideAnimation;
   bool _isEditMode = false;
+  bool _hasShownNotificationsDialog = false;
 
   String _selectedMood = "love.png";
   String _selectedFatigue = "cool.png";
@@ -357,7 +358,12 @@ class _HomeViewState extends ConsumerState<HomeView>
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           ImageButton(
-                            imagePath: notifProvider.notifications.isNotEmpty
+                            imagePath:
+                                notifProvider.notifications
+                                    .where(
+                                      (e) => e.date.isBefore(DateTime.now()),
+                                    )
+                                    .isNotEmpty
                                 ? "bell-dot.png"
                                 : "bell.png",
                             size: 32,
@@ -934,65 +940,82 @@ class _HomeViewState extends ConsumerState<HomeView>
                 ),
               ),
               if (notifProvider.notifications
-                  .where((e) => e.date.isBefore(DateTime.now()))
-                  .isNotEmpty)
+                      .where((e) => e.date.isBefore(DateTime.now()))
+                      .isNotEmpty &&
+                  !_hasShownNotificationsDialog)
                 Builder(
                   builder: (context) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: Text("Nouvelles notifications"),
-                          content: Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(notifProvider.notifications.first.body),
-                                Text(
-                                  notifProvider.notifications.first.bodyBold,
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  notifProvider
-                                      .notifications
-                                      .first
-                                      .actionDetails,
-                                ),
-                              ],
+                    _hasShownNotificationsDialog = true;
+                    Future.microtask(() {
+                      if (context.mounted) {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text("Nouvelles notifications"),
+                            content: Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  for (var notif
+                                      in notifProvider.notifications.where(
+                                        (e) => e.date.isBefore(DateTime.now()),
+                                      ))
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(notif.body),
+                                        if (notif.bodyBold.isNotEmpty)
+                                          Text(
+                                            notif.bodyBold,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        if (notif.actionDetails.isNotEmpty)
+                                          Text(notif.actionDetails),
+                                        SizedBox(height: 16),
+                                      ],
+                                    ),
+                                ],
+                              ),
                             ),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: Text(
-                                "Fermer",
-                                style: TextStyle(
-                                  color: Theme.of(
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text(
+                                  "Fermer",
+                                  style: TextStyle(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.secondary,
+                                  ),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  Navigator.pushNamed(
                                     context,
-                                  ).colorScheme.secondary,
+                                    "/notifications",
+                                  );
+                                },
+                                child: Text(
+                                  "Voir",
+                                  style: TextStyle(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.tertiary,
+                                  ),
                                 ),
                               ),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                ref
-                                    .read(notificationsProvider.notifier)
-                                    .removeNotification(0);
-                                Navigator.pop(context);
-                              },
-                              child: Text(
-                                "Marquer comme lu",
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.tertiary,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
+                            ],
+                          ),
+                        );
+                      }
                     });
                     return SizedBox.shrink();
                   },

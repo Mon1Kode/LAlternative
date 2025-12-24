@@ -70,8 +70,7 @@ class _ActivityTemplateState extends ConsumerState<ActivityTemplate> {
                 newActivityNotifier.updateDescription(newActivity.description);
                 final updatedActivity = ref.read(newActivityProvider);
                 activitiesNotifier.addOrUpdateActivity(updatedActivity);
-                if (mounted) {
-                  // ignore: use_build_context_synchronously
+                if (context.mounted) {
                   Navigator.of(context).pop();
                 }
               },

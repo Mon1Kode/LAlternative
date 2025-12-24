@@ -206,16 +206,14 @@ class _LoginViewState extends ConsumerState<LoginView> {
                           );
                       await user.setUserFromCredentials(userData);
                       await user.loadUserData();
-                      if (mounted) {
+                      if (context.mounted) {
                         Navigator.pushNamedAndRemoveUntil(
-                          // ignore: use_build_context_synchronously
                           context,
                           '/home',
                           (route) => false,
                         );
                       }
                     } catch (e, stackTrace) {
-                      // Use ErrorService to get user-friendly error message
                       final errorMessage = ErrorService.getErrorMessage(e);
                       ErrorService.logError(e, stackTrace);
 

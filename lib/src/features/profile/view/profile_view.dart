@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:l_alternative/src/core/components/image_button.dart';
@@ -5,6 +6,9 @@ import 'package:l_alternative/src/core/components/rounded_container.dart';
 import 'package:l_alternative/src/core/provider/app_providers.dart';
 import 'package:l_alternative/src/core/utils/app_utils.dart';
 import 'package:l_alternative/src/features/connections/provider/user_provider.dart';
+import 'package:l_alternative/src/features/notifications/model/notifications_model.dart';
+import 'package:l_alternative/src/features/notifications/provider/notifications_provider.dart';
+import 'package:l_alternative/src/features/notifications/services/cloud_functions_service.dart';
 import 'package:l_alternative/src/features/profile/provider/evaluation_provider.dart';
 
 class ProfileView extends ConsumerStatefulWidget {
@@ -148,8 +152,9 @@ class _ProfileViewState extends ConsumerState<ProfileView>
                                                     profilePicture: "$i.png",
                                                   );
                                               setState(() {});
-                                              // ignore: use_build_context_synchronously
-                                              Navigator.of(context).pop();
+                                              if (context.mounted) {
+                                                Navigator.of(context).pop();
+                                              }
                                             },
                                             child: ClipRRect(
                                               borderRadius:
@@ -522,6 +527,7 @@ class _ProfileViewState extends ConsumerState<ProfileView>
               Center(
                 child: Text("Créer par IncluSens. Tous droits réservés © 2025"),
               ),
+
               // if (kDebugMode)
               //   RoundedContainer(
               //     padding: const EdgeInsets.all(16.0),
@@ -574,6 +580,95 @@ class _ProfileViewState extends ConsumerState<ProfileView>
               //       ],
               //     ),
               //   ),
+              if (kDebugMode)
+                RoundedContainer(
+                  padding: const EdgeInsets.all(16.0),
+                  width: double.infinity,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "DEBUG ZONE",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Add Notifs",
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          ImageButton(
+                            imagePath: "bell.png",
+                            color: Theme.of(context).colorScheme.secondary,
+                            size: 32,
+                            onPressed: () async {
+                              var notifModel = NotificationModel(
+                                title: "Test Notification 🔔",
+                                body:
+                                    "This notification was scheduled 10 seconds ago! Kill the app test successful.",
+                                date: DateTime.now().add(Duration(seconds: 10)),
+                              );
+                              final success =
+                                  await CloudFunctionsService.scheduleDelayedNotification(
+                                    userId: user.id,
+                                    title: notifModel.title,
+                                    body: notifModel.body,
+                                    delaySeconds: notifModel.date
+                                        .difference(DateTime.now())
+                                        .inSeconds,
+                                    data: {
+                                      'type': 'test',
+                                      'timestamp': DateTime.now()
+                                          .toIso8601String(),
+                                    },
+                                  );
+
+                              if (success) {
+                                // Add notification to provider
+                                ref
+                                    .read(notificationsProvider.notifier)
+                                    .addNotification(notifModel);
+
+                                // Show snackbar to confirm
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        "Notification scheduled in 10 seconds! Kill the app now to test.",
+                                      ),
+                                      duration: Duration(seconds: 3),
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
+                                }
+                              } else {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        "Failed to schedule notification. Check Cloud Functions deployment.",
+                                      ),
+                                      duration: Duration(seconds: 3),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
             ],
           ),
         ),

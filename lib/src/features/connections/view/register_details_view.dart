@@ -193,12 +193,13 @@ class _RegisterDetailsViewState extends ConsumerState<RegisterDetailsView> {
                       lastName: lastNameController.text,
                       // profilePicture: _profilePicture!.path,
                     );
-                    Navigator.pushNamedAndRemoveUntil(
-                      // ignore: use_build_context_synchronously
-                      context,
-                      '/home',
-                      ModalRoute.withName('/'),
-                    );
+                    if (context.mounted) {
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        '/home',
+                        ModalRoute.withName('/'),
+                      );
+                    }
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(

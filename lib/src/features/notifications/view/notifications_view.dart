@@ -34,13 +34,67 @@ class _NotificationsViewState extends ConsumerState<NotificationsView> {
                     .where((e) => e.date.isBefore(DateTime.now()))
                     .toList()
                     .reversed)
-              ListTile(
-                leading: Icon(Icons.notifications),
-                title: Text(notif.title),
-                subtitle: Text(notif.body),
-                trailing: Text(
-                  "${notif.date.hour}:${notif.date.minute.toString().padLeft(2, '0')}",
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
+              Material(
+                child: InkWell(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text("Nouvelles notifications"),
+                        content: Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(notif.body),
+                              Text(
+                                notif.bodyBold,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Text(notif.actionDetails),
+                            ],
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Text(
+                              "Fermer",
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.secondary,
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              ref
+                                  .read(notificationsProvider.notifier)
+                                  .removeNotification(notif.id);
+                              Navigator.pop(context);
+                              Navigator.pushNamed(context, '/evaluations');
+                            },
+                            child: Text(
+                              notif.ctaText,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.tertiary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  child: ListTile(
+                    leading: Icon(Icons.notifications),
+                    title: Text(notif.title),
+                    subtitle: Text(notif.body),
+                    trailing: Text(
+                      "${notif.date.hour}:${notif.date.minute.toString().padLeft(2, '0')}",
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                  ),
                 ),
               ),
           ],

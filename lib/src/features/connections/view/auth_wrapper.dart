@@ -49,10 +49,11 @@ class AuthWrapper extends ConsumerWidget {
         await DatabaseServices.update("/users/${user.id}/", {
           "last_login_date": DateTime.now().millisecondsSinceEpoch,
         });
-        Navigator.of(
-          // ignore: use_build_context_synchronously
-          context,
-        ).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
+        if (context.mounted) {
+          Navigator.of(
+            context,
+          ).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
+        }
       } else {
         Navigator.of(context).pushReplacementNamed('/login');
       }

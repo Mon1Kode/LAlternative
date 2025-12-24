@@ -2,6 +2,8 @@
 // // Monikode Mobile Solutions
 // // Created by MoniK on 2024.
 
+import 'dart:convert';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:l_alternative/src/features/notifications/model/notifications_model.dart';
 import 'package:monikode_event_store/monikode_event_store.dart';
@@ -191,7 +193,36 @@ class NotificationService {
     final notificationsModel = NotificationsModel(notifications: notifications);
     await prefs.setString(
       'stored_notifications',
-      notificationsModel.toJson().toString(),
+      jsonEncode(notificationsModel.toJson()),
     );
+  }
+
+  static Future<List<NotificationModel>> getPersistedNotifications() async {
+    final prefs = await SharedPreferences.getInstance();
+    final storedNotificationsString = prefs.getString('stored_notifications');
+
+    if (storedNotificationsString != null &&
+        storedNotificationsString.isNotEmpty) {
+      try {
+        final Map<String, dynamic> jsonMap = jsonDecode(
+          storedNotificationsString,
+        );
+        NotificationsModel notificationsModel = NotificationsModel(
+          notifications: [],
+        ).fromJson(jsonMap);
+        return notificationsModel.notifications;
+      } catch (e) {
+        await EventStore.getInstance().eventLogger.log(
+          "notif.load_error",
+          EventLevel.error,
+          {
+            "parameters": {"error": e.toString()},
+          },
+        );
+        return [];
+      }
+    } else {
+      return [];
+    }
   }
 }

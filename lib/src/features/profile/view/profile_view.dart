@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:l_alternative/src/core/components/custom_button.dart';
 import 'package:l_alternative/src/core/components/image_button.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
 import 'package:l_alternative/src/core/provider/app_providers.dart';
@@ -21,8 +22,6 @@ class ProfileView extends ConsumerStatefulWidget {
 class _ProfileViewState extends ConsumerState<ProfileView>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-
-  bool _isEditMode = false;
 
   final TextEditingController _nameController = TextEditingController();
 
@@ -93,156 +92,73 @@ class _ProfileViewState extends ConsumerState<ProfileView>
                 ).colorScheme.primary.withValues(alpha: 0.1),
                 child: Column(
                   spacing: 16,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Informations personnelles",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        ImageButton(
-                          imagePath: _isEditMode ? "save.png" : "edit.png",
-                          size: 32,
-                          onPressed: () async {
-                            if (_isEditMode) {
-                              await ref
-                                  .read(userProvider.notifier)
-                                  .updateUserDetails(
-                                    displayName: _nameController.text.trim(),
-                                  );
-                            }
-                            setState(() {
-                              _isEditMode = !_isEditMode;
-                            });
-                          },
-                        ),
-                      ],
+                    Text(
+                      "Informations personnelles",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    Row(
-                      spacing: 16,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  title: Text(
-                                    "Photo de profil",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  // grid with the avatars file in the assets/images/avatars folder
-                                  content: SingleChildScrollView(
-                                    child: Wrap(
-                                      spacing: 8,
-                                      runSpacing: 8,
-                                      children: [
-                                        for (var i = 1; i <= 4; i++)
-                                          GestureDetector(
-                                            onTap: () async {
-                                              await ref
-                                                  .read(userProvider.notifier)
-                                                  .updateUserDetails(
-                                                    profilePicture: "$i.png",
-                                                  );
-                                              setState(() {});
-                                              if (context.mounted) {
-                                                Navigator.of(context).pop();
-                                              }
-                                            },
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(4.0),
-                                              child: Image.asset(
-                                                "assets/images/avatars/$i.png",
-                                                width: 64,
-                                              ),
-                                            ),
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text(
-                                        "Fermer",
-                                        style: TextStyle(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.tertiary,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(24.0),
-                            child: Image.asset(
-                              "assets/images/avatars/${user.profilePicture}",
-                              width: 48,
-                            ),
-                          ),
-                        ),
-                        _isEditMode
-                            ? SizedBox(
-                                width: 200,
-                                child: TextField(
-                                  controller: _nameController,
-                                  autofocus: true,
-                                  style: TextStyle(fontSize: 18),
-                                  cursorColor: Theme.of(
-                                    context,
-                                  ).colorScheme.tertiary,
-                                  decoration: InputDecoration(
-                                    hintText: "Enter your name",
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      borderSide: BorderSide(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.secondary,
-                                        width: 1,
-                                      ),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      borderSide: BorderSide(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.secondary,
-                                        width: 1,
-                                      ),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      borderSide: BorderSide(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.secondary,
-                                        width: 1,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : Text(
-                                user.displayName,
-                                style: TextStyle(fontSize: 18),
-                              ),
-                      ],
+                    CustomButton(
+                      text: "Modifier l'adresse e-mail\n\t\t${user.email}",
+                      onPressed: () {
+                        setState(() {});
+                      },
                     ),
+                    CustomButton(
+                      text: "Modifier le mot de passe",
+                      onPressed: () {
+                        // Navigator.pushNamed(context, "/change-password");
+                      },
+                    ),
+                    // _isEditMode
+                    //     ? SizedBox(
+                    //         width: 200,
+                    //         child: TextField(
+                    //           controller: _nameController,
+                    //           autofocus: true,
+                    //           style: TextStyle(fontSize: 18),
+                    //           cursorColor: Theme.of(
+                    //             context,
+                    //           ).colorScheme.tertiary,
+                    //           decoration: InputDecoration(
+                    //             hintText: "Enter your name",
+                    //             border: OutlineInputBorder(
+                    //               borderRadius: BorderRadius.circular(8.0),
+                    //               borderSide: BorderSide(
+                    //                 color: Theme.of(
+                    //                   context,
+                    //                 ).colorScheme.secondary,
+                    //                 width: 1,
+                    //               ),
+                    //             ),
+                    //             enabledBorder: OutlineInputBorder(
+                    //               borderRadius: BorderRadius.circular(8.0),
+                    //               borderSide: BorderSide(
+                    //                 color: Theme.of(
+                    //                   context,
+                    //                 ).colorScheme.secondary,
+                    //                 width: 1,
+                    //               ),
+                    //             ),
+                    //             focusedBorder: OutlineInputBorder(
+                    //               borderRadius: BorderRadius.circular(8.0),
+                    //               borderSide: BorderSide(
+                    //                 color: Theme.of(
+                    //                   context,
+                    //                 ).colorScheme.secondary,
+                    //                 width: 1,
+                    //               ),
+                    //             ),
+                    //           ),
+                    //         ),
+                    //       )
+                    //     : Text(
+                    //         user.displayName,
+                    //         style: TextStyle(fontSize: 18),
+                    //       ),
                   ],
                 ),
               ),
@@ -260,7 +176,7 @@ class _ProfileViewState extends ConsumerState<ProfileView>
                         Text(
                           "Evaluations",
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -330,7 +246,7 @@ class _ProfileViewState extends ConsumerState<ProfileView>
                     Text(
                       "Support & Informations",
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -435,7 +351,7 @@ class _ProfileViewState extends ConsumerState<ProfileView>
                     Text(
                       "Zone sensible",
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -462,7 +378,7 @@ class _ProfileViewState extends ConsumerState<ProfileView>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Supprimer mes données",
+                          "Supprimer mon compte",
                           style: TextStyle(
                             color: Colors.red,
                             fontSize: 18,
@@ -524,9 +440,7 @@ class _ProfileViewState extends ConsumerState<ProfileView>
                   ],
                 ),
               ),
-              Center(
-                child: Text("Créer par IncluSens. Tous droits réservés © 2025"),
-              ),
+              Center(child: Text("©1825 IncluSens. Tous droits réservés ")),
 
               // if (kDebugMode)
               //   RoundedContainer(
@@ -538,7 +452,7 @@ class _ProfileViewState extends ConsumerState<ProfileView>
               //         Text(
               //           "DEBUG ZONE",
               //           style: TextStyle(
-              //             fontSize: 20,
+              //             fontSize: 18,
               //             fontWeight: FontWeight.bold,
               //           ),
               //         ),
@@ -590,7 +504,7 @@ class _ProfileViewState extends ConsumerState<ProfileView>
                       Text(
                         "DEBUG ZONE",
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

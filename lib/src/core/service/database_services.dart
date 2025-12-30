@@ -1,4 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:monikode_event_store/monikode_event_store.dart';
 
 /// A utility class for interacting with Firebase Database.
 class DatabaseServices {
@@ -146,6 +147,27 @@ class DatabaseServices {
   /// [path] is a string representing the path in the Firebase Database.
   static Stream<DatabaseEvent> onChildMoved(String? path) =>
       ref(path).onChildMoved;
+
+  static Future<void> checkDatabaseStatus() async {
+    try {
+      var healthCheck = await DatabaseServices.get("/health_check");
+      if (healthCheck.value != "ok") {
+        throw Exception("Database health check failed");
+      }
+    } catch (e) {
+      EventStore.getInstance().eventLogger.log(
+        "database.status_error",
+        EventLevel.error,
+        {
+          "parameters": {
+            "error": e.toString(),
+            "hint": "read/write permission issue",
+          },
+        },
+      );
+      rethrow;
+    }
+  }
 
   //endregion
 }

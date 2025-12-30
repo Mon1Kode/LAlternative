@@ -28,4 +28,32 @@ class Utils {
         dateTime.month == dateTime2.month &&
         dateTime.day == dateTime2.day;
   }
+
+  static timeRemainingString(String dateString) {
+    DateFormat formatter = DateFormat('d MMMM, y');
+    DateTime date = formatter.parse(dateString);
+    Duration difference = date.difference(DateTime.now());
+    if (difference.inDays > 0) {
+      return '**${difference.inDays} jours**';
+    } else if (difference.inHours > 0) {
+      return '**${difference.inHours} heures**';
+    } else if (difference.inMinutes > 0) {
+      return '**${difference.inMinutes} minutes**';
+    } else {
+      return 'Maintenant';
+    }
+  }
+
+  static timeRemaining(DateTime date) {
+    Duration difference = date.difference(DateTime.now());
+    if (difference.inDays > 0) {
+      return '**${difference.inDays} jours**';
+    } else if (difference.inHours > 0) {
+      return '**${difference.inHours} heures**';
+    } else if (difference.inMinutes > 0) {
+      return '**${difference.inMinutes} minutes**';
+    } else {
+      return 'Maintenant';
+    }
+  }
 }

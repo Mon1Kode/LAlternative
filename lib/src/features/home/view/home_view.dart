@@ -18,7 +18,10 @@ import 'package:l_alternative/src/features/admin/provider/activities_provider.da
 import 'package:l_alternative/src/features/connections/provider/user_provider.dart';
 import 'package:l_alternative/src/features/notifications/provider/notifications_provider.dart';
 import 'package:l_alternative/src/features/relaxation/view/activity_template.dart';
-import 'package:l_alternative/src/features/relaxation/view/relaxation_view.dart';
+import 'package:l_alternative/src/features/widgets/model/custom_widget.dart';
+import 'package:l_alternative/src/features/widgets/model/next_activity_model.dart';
+import 'package:l_alternative/src/features/widgets/provider/next_activity_provider.dart';
+import 'package:l_alternative/src/features/widgets/views/next_activity.dart';
 import 'package:l_alternative/src/features/widgets/views/wd_streak.dart';
 import 'package:monikode_event_store/monikode_event_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -43,46 +46,9 @@ class _HomeViewState extends ConsumerState<HomeView>
   String _selectedFatigue = "cool.png";
   int _currentMoodPage = 0;
 
-  final Widget _calendar = Stack(
-    children: [
-      ClipRRect(
-        borderRadius: BorderRadius.circular(24.0),
-        child: Image.asset(
-          "assets/images/calendar.png",
-          width: 150,
-          height: 150,
-        ),
-      ),
-      RoundedContainer(
-        width: 150,
-        height: 150,
-        borderWidth: 1,
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Text(
-              "Calendrier",
-              style: TextStyle(fontSize: 16, color: Colors.black),
-            ),
-          ],
-        ),
-      ),
-    ],
-  );
-
-  // loader
-  Widget _nextActivity = RoundedContainer(
-    width: 300,
-    height: 150,
-    borderWidth: 1,
-    padding: const EdgeInsets.all(8.0),
-    child: Center(child: CircularProgressIndicator()),
-  );
-
   // Map to define tool widths (in grid units)
-  final Map<Widget, int> _toolWidths = {};
-  var _toolsChildren = <Widget>[];
+  final Map<CustomWidget, int> _toolWidths = {};
+  var _toolsChildren = <CustomWidget>[];
   late SharedPreferences prefs;
 
   Future<void> getUserConfig() async {
@@ -94,15 +60,16 @@ class _HomeViewState extends ConsumerState<HomeView>
           prefs
               .getStringList("tools")
               ?.map((tool) {
-                if (tool.toString() == "WdStreak") return WdStreak();
-                if (tool == "calendar") return _calendar;
-                if (tool == "nextActivity") return _nextActivity;
-                return null;
+                if (tool == WdStreak().toString()) return WdStreak();
+                if (tool == NextActivity().toString()) return NextActivity();
               })
-              .whereType<Widget>()
+              .whereType<CustomWidget>()
               .toList() ??
           _toolsChildren;
     });
+    for (CustomWidget child in _toolsChildren) {
+      _toolWidths[child] = child.widthInGrid;
+    }
     await EventStore.getInstance().eventLogger.log(
       "user.config.loaded",
       EventLevel.debug,
@@ -110,9 +77,12 @@ class _HomeViewState extends ConsumerState<HomeView>
         "parameters": {
           "mood": _selectedMood,
           "tools": _toolsChildren.map((e) {
-            if (e == WdStreak()) return "streak";
-            if (e == _calendar) return "calendar";
-            if (e == _nextActivity) return "nextActivity";
+            if (e.toString() == WdStreak().toString()) {
+              return WdStreak().toString();
+            }
+            if (e.toString() == NextActivity().toString()) {
+              return NextActivity().toString();
+            }
             return "";
           }).toList(),
         },
@@ -180,92 +150,34 @@ class _HomeViewState extends ConsumerState<HomeView>
   }
 
   Future<void> getNextActivity() async {
-    var storedActivity = prefs.getStringList("next_activity");
-    String title = storedActivity != null && storedActivity.isNotEmpty
-        ? storedActivity[0]
-        : "Pratiquer la relaxation";
-    String description = storedActivity != null && storedActivity.length > 1
-        ? storedActivity[1]
-        : "Prend un moment pour te détendre";
-    String imagePath = storedActivity != null && storedActivity.length > 2
-        ? storedActivity[2]
-        : "assets/images/relaxation.png";
-    Color color = storedActivity != null && storedActivity.length > 3
-        ? Color(int.parse(storedActivity[3]))
-        : Color(0xFFF7E879);
-    Widget actionView = RelaxationView();
-    List<String> storedTools = prefs.getStringList("tools") ?? [];
-    setState(() {
-      _nextActivity = Stack(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(24.0),
-            child: ActivityCard(
-              title: title,
-              description: description,
-              imagePath: imagePath,
-              actionView: actionView,
-              color: color,
-              hasImage: false,
-              padding: EdgeInsets.all(4),
+    var activities = ref.read(activitiesProvider);
+    var nextActivity = activities.getNextScheduledActivity();
+    if (nextActivity != null) {
+      ref
+          .read(nextActivityProvider.notifier)
+          .updateNextActivity(
+            NextActivityModel(
+              title: nextActivity.title,
+              dateString: Utils.formatShortDate(nextActivity.date),
+              color: nextActivity.color,
             ),
-          ),
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(24.0),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => actionView),
-                );
-              },
-              child: RoundedContainer(
-                width: 300,
-                height: 150,
-                borderWidth: 1,
-                padding: const EdgeInsets.all(8.0),
-                color: Colors.black.withValues(alpha: 0.7),
-                child: Center(
-                  child: Text(
-                    Utils.formatShortDate(DateTime.now()),
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
+          );
+    } else {
+      ref
+          .read(nextActivityProvider.notifier)
+          .updateNextActivity(
+            NextActivityModel(
+              title: "Aucune activité programmée",
+              dateString: Utils.formatShortDate(DateTime.now()),
+              color: Colors.grey,
             ),
-          ),
-        ],
-      );
-      _toolWidths[_nextActivity] = 2;
-      if (!storedTools.contains("nextActivity")) {
-        _toolsChildren.add(_nextActivity);
-      } else {
-        int index = storedTools.indexWhere((tool) => tool == "nextActivity");
-        if (index != -1) {
-          _toolsChildren[index] = _nextActivity;
-        }
-      }
-    });
-    await prefs.setStringList("next_activity", [title, description, imagePath]);
-    await prefs.setStringList(
-      "tools",
-      _toolsChildren.map((e) {
-        if (e == WdStreak()) return "streak";
-        if (e == _calendar) return "calendar";
-        if (e == _nextActivity) return "nextActivity";
-        return "";
-      }).toList(),
-    );
+          );
+    }
     await EventStore.getInstance().eventLogger.log(
       "next_activity.loaded",
       EventLevel.debug,
       {
-        "parameters": {"activity": "Prochaine activité"},
+        "parameters": {"activity": nextActivity?.toMap() ?? "none"},
       },
     );
   }
@@ -286,9 +198,6 @@ class _HomeViewState extends ConsumerState<HomeView>
             curve: Curves.easeInOut,
           ),
         );
-    _toolWidths[WdStreak()] = 1;
-    _toolWidths[_calendar] = 1;
-    _toolWidths[_nextActivity] = 2;
     getUserConfig();
   }
 
@@ -440,9 +349,8 @@ class _HomeViewState extends ConsumerState<HomeView>
                                                       tool: WdStreak(),
                                                       toolsChildren:
                                                           _toolsChildren,
-                                                      imagePath:
-                                                          "plants/${user.streakIcon.toString().split(".").last}/${user.streakCount > 15 ? "15" : user.streakCount}.png",
-                                                      text: "Streak",
+                                                      imagePath: "streak.png",
+                                                      text: "Assiduité",
                                                       onPressed: () {
                                                         setState(() {
                                                           _toolsChildren.add(
@@ -453,22 +361,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                                                       },
                                                     ),
                                                     HomeToolsAddCard(
-                                                      tool: _calendar,
-                                                      toolsChildren:
-                                                          _toolsChildren,
-                                                      imagePath: "calendar.png",
-                                                      text: "Calendrier",
-                                                      onPressed: () {
-                                                        setState(() {
-                                                          _toolsChildren.add(
-                                                            _calendar,
-                                                          );
-                                                        });
-                                                        Navigator.pop(context);
-                                                      },
-                                                    ),
-                                                    HomeToolsAddCard(
-                                                      tool: _nextActivity,
+                                                      tool: NextActivity(),
                                                       toolsChildren:
                                                           _toolsChildren,
                                                       imagePath: "calendar.png",
@@ -476,7 +369,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                                                       onPressed: () {
                                                         setState(() {
                                                           _toolsChildren.add(
-                                                            _nextActivity,
+                                                            NextActivity(),
                                                           );
                                                         });
                                                         Navigator.pop(context);
@@ -500,14 +393,13 @@ class _HomeViewState extends ConsumerState<HomeView>
                                         await prefs.setStringList(
                                           "tools",
                                           _toolsChildren.map((e) {
-                                            if (e.toString() == "WdStreak") {
-                                              return "streak";
+                                            if (e.toString() ==
+                                                WdStreak().toString()) {
+                                              return WdStreak().toString();
                                             }
-                                            if (e == _calendar) {
-                                              return "calendar";
-                                            }
-                                            if (e == _nextActivity) {
-                                              return "nextActivity";
+                                            if (e.toString() ==
+                                                NextActivity().toString()) {
+                                              return NextActivity().toString();
                                             }
                                             return "";
                                           }).toList(),
@@ -523,13 +415,14 @@ class _HomeViewState extends ConsumerState<HomeView>
                                                   ) {
                                                     if (e.toString() ==
                                                         "WdStreak") {
-                                                      return "streak";
+                                                      return WdStreak()
+                                                          .toString();
                                                     }
-                                                    if (e == _calendar) {
-                                                      return "calendar";
-                                                    }
-                                                    if (e == _nextActivity) {
-                                                      return "nextActivity";
+                                                    if (e.toString() ==
+                                                        NextActivity()
+                                                            .toString()) {
+                                                      return NextActivity()
+                                                          .toString();
                                                     }
                                                     return "";
                                                   }).toList(),
@@ -555,13 +448,13 @@ class _HomeViewState extends ConsumerState<HomeView>
                               children: [
                                 for (var child in _toolsChildren)
                                   StaggeredGridTile.count(
-                                    crossAxisCellCount: _toolWidths[child] ?? 1,
+                                    crossAxisCellCount: child.widthInGrid,
                                     mainAxisCellCount: 1,
                                     child: ShakeWidget(
                                       animate: _isEditMode,
                                       child: Stack(
                                         children: [
-                                          child,
+                                          child as Widget,
                                           if (_isEditMode)
                                             Positioned(
                                               top: 0,
@@ -609,7 +502,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                         spacing: 0,
                         children: [
                           SizedBox(
-                            height: 30,
+                            height: 32,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -1097,8 +990,8 @@ class _ShakeWidgetState extends State<ShakeWidget>
 }
 
 class HomeToolsAddCard extends StatefulWidget {
-  final Widget tool;
-  final List<Widget> toolsChildren;
+  final CustomWidget tool;
+  final List<CustomWidget> toolsChildren;
   final String imagePath;
   final String text;
   final VoidCallback onPressed;
@@ -1130,13 +1023,17 @@ class _HomeToolsAddCardState extends State<HomeToolsAddCard> {
           alignment: Alignment.bottomCenter,
           isColored: false,
           onPressed: () {
-            if (widget.toolsChildren.contains(widget.tool)) {
+            if (widget.toolsChildren
+                .where((e) => e.toString() == widget.tool.toString())
+                .isNotEmpty) {
               return;
             }
             widget.onPressed();
           },
         ),
-        if (widget.toolsChildren.contains(widget.tool))
+        if (widget.toolsChildren
+            .where((e) => e.toString() == widget.tool.toString())
+            .isNotEmpty)
           RoundedContainer(
             width: 100,
             height: 100,

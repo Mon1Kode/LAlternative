@@ -185,4 +185,8 @@ class NewActivityProvider extends StateNotifier<ActivityModel> {
     }).toList();
     state = state.copyWith(newSteps: updatedSteps);
   }
+
+  void updateDate(DateTime date) {
+    state = state.copyWith(date: date);
+  }
 }

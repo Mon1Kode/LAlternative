@@ -10,6 +10,7 @@ import 'package:l_alternative/src/core/components/custom_text_field.dart';
 import 'package:l_alternative/src/core/components/image_button.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
 import 'package:l_alternative/src/core/service/app_service.dart';
+import 'package:l_alternative/src/core/utils/app_utils.dart';
 import 'package:l_alternative/src/features/admin/provider/activities_provider.dart';
 import 'package:l_alternative/src/features/admin/provider/new_activity_provier.dart';
 
@@ -46,7 +47,11 @@ class _AdminViewState extends ConsumerState<AdminView> {
                 future: _statService.getLoginStatsPerDay(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
+                    return Center(
+                      child: CircularProgressIndicator(
+                        color: Theme.of(context).colorScheme.tertiary,
+                      ),
+                    );
                   } else if (snapshot.hasError) {
                     return Center(child: Text("Error: ${snapshot.error}"));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -126,6 +131,7 @@ class _AdminViewState extends ConsumerState<AdminView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: 16,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       "Activités créées",
@@ -138,7 +144,7 @@ class _AdminViewState extends ConsumerState<AdminView> {
                       child: ListView.builder(
                         itemCount: activities.activities.length,
                         itemBuilder: (context, index) {
-                          final activity = activities.activities[index];
+                          var activity = activities.activities[index];
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 4.0),
                             child: ListTile(
@@ -157,7 +163,7 @@ class _AdminViewState extends ConsumerState<AdminView> {
                               ),
                               title: Text(activity.title),
                               subtitle: Text(
-                                "${activity.steps.length} partie${activity.steps.length > 1 ? 's' : ''}",
+                                Utils.formatShortDate(activity.date),
                               ),
                               onTap: () {
                                 activity.setCompleted(false);

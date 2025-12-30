@@ -30,6 +30,7 @@ dependencies:
   url_launcher: ^6.3.2
   cloud_firestore: ^6.1.0
   http: ^1.6.0
+  components_toolbox: ^7.0.0+1
 
 dev_dependencies:
   flutter_test:

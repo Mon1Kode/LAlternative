@@ -44,6 +44,10 @@ class ActivityCard extends StatelessWidget {
             color: Theme.of(context).colorScheme.secondary,
             width: 4,
           ),
+          bottom: BorderSide(
+            color: Theme.of(context).colorScheme.secondary,
+            width: 0.5,
+          ),
         ),
         borderRadius: BorderRadius.circular(24),
       ),

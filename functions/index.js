@@ -269,88 +269,88 @@ exports.scheduleNotification = onRequest({
   }
 });
 
-/**
- * Scheduled function to send daily reminders
- * Runs every day at 9 AM (adjust as needed)
- *
- * Configure in Firebase Console or via CLI:
- * firebase deploy --only functions:sendDailyReminders
- */
-exports.sendDailyReminders = onSchedule({
-  schedule: "0 9 * * *", // Every day at 9 AM
-  timeZone: "Europe/Paris", // Adjust to your timezone
-}, async (event) => {
-  try {
-    logger.info("Starting daily reminder job");
-
-    // Get all users who have enabled daily reminders
-    const usersSnapshot = await admin.database()
-        .ref("users")
-        .once("value");
-
-    const users = usersSnapshot.val();
-    const notifications = [];
-
-    // Iterate through users and send notifications
-    for (const [userId, userData] of Object.entries(users)) {
-      if (userData.fcmToken && userData.fcmToken.token) {
-        // Check if user has reminders enabled
-        if (userData.settings?.dailyReminder !== false) {
-          const message = {
-            notification: {
-              title: "Bonjour ! 🌞",
-              body: "N'oubliez pas de prendre un moment pour vous aujourd'hui",
-            },
-            token: userData.fcmToken.token,
-            android: {
-              priority: "high",
-              notification: {
-                channelId: "high_importance_channel",
-                priority: "high",
-              },
-            },
-            apns: {
-              payload: {
-                aps: {
-                  contentAvailable: true,
-                  sound: "default",
-                },
-              },
-            },
-          };
-
-          notifications.push(
-              admin.messaging().send(message)
-                  .then((response) => {
-                    logger.info(
-                        `Reminder sent to ${userId}: ${response}`,
-                    );
-                    return {userId, success: true};
-                  })
-                  .catch((error) => {
-                    logger.error(
-                        `Failed to send to ${userId}:`,
-                        error,
-                    );
-                    return {userId, success: false, error: error.message};
-                  }),
-          );
-        }
-      }
-    }
-
-    // Wait for all notifications to be sent
-    const results = await Promise.all(notifications);
-    const successCount = results.filter((r) => r.success).length;
-    const failCount = results.filter((r) => !r.success).length;
-
-    logger.info(
-        `Daily reminders completed. Success: ${successCount}, Failed: ${failCount}`,
-    );
-  } catch (error) {
-    logger.error("Error in daily reminders job:", error);
-  }
-});
+///**
+// * Scheduled function to send daily reminders
+// * Runs every day at 9 AM (adjust as needed)
+// *
+// * Configure in Firebase Console or via CLI:
+// * firebase deploy --only functions:sendDailyReminders
+// */
+//exports.sendDailyReminders = onSchedule({
+//  schedule: "0 9 * * *", // Every day at 9 AM
+//  timeZone: "Europe/Paris", // Adjust to your timezone
+//}, async (event) => {
+//  try {
+//    logger.info("Starting daily reminder job");
+//
+//    // Get all users who have enabled daily reminders
+//    const usersSnapshot = await admin.database()
+//        .ref("users")
+//        .once("value");
+//
+//    const users = usersSnapshot.val();
+//    const notifications = [];
+//
+//    // Iterate through users and send notifications
+//    for (const [userId, userData] of Object.entries(users)) {
+//      if (userData.fcmToken && userData.fcmToken.token) {
+//        // Check if user has reminders enabled
+//        if (userData.settings?.dailyReminder !== false) {
+//          const message = {
+//            notification: {
+//              title: "Bonjour ! 🌞",
+//              body: "N'oubliez pas de prendre un moment pour vous aujourd'hui",
+//            },
+//            token: userData.fcmToken.token,
+//            android: {
+//              priority: "high",
+//              notification: {
+//                channelId: "high_importance_channel",
+//                priority: "high",
+//              },
+//            },
+//            apns: {
+//              payload: {
+//                aps: {
+//                  contentAvailable: true,
+//                  sound: "default",
+//                },
+//              },
+//            },
+//          };
+//
+//          notifications.push(
+//              admin.messaging().send(message)
+//                  .then((response) => {
+//                    logger.info(
+//                        `Reminder sent to ${userId}: ${response}`,
+//                    );
+//                    return {userId, success: true};
+//                  })
+//                  .catch((error) => {
+//                    logger.error(
+//                        `Failed to send to ${userId}:`,
+//                        error,
+//                    );
+//                    return {userId, success: false, error: error.message};
+//                  }),
+//          );
+//        }
+//      }
+//    }
+//
+//    // Wait for all notifications to be sent
+//    const results = await Promise.all(notifications);
+//    const successCount = results.filter((r) => r.success).length;
+//    const failCount = results.filter((r) => !r.success).length;
+//
+//    logger.info(
+//        `Daily reminders completed. Success: ${successCount}, Failed: ${failCount}`,
+//    );
+//  } catch (error) {
+//    logger.error("Error in daily reminders job:", error);
+//  }
+//});
 
 /**
  * Trigger notification when a new activity is completed

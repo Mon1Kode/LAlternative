@@ -19,6 +19,14 @@ class ActivitiesModel {
 
   ActivitiesModel copyWith({List<ActivityModel>? newActivities}) =>
       ActivitiesModel(activities: newActivities ?? activities);
+
+  ActivityModel? getNextScheduledActivity() {
+    final upcomingActivities = activities
+        .where((activity) => activity.date.isAfter(DateTime.now()))
+        .toList();
+    upcomingActivities.sort((a, b) => a.date.compareTo(b.date));
+    return upcomingActivities.isNotEmpty ? upcomingActivities.first : null;
+  }
 }
 
 class ActivitiesProvider extends StateNotifier<ActivitiesModel> {
@@ -46,6 +54,7 @@ class ActivitiesProvider extends StateNotifier<ActivitiesModel> {
     } else {
       updatedActivities.add(read);
     }
+    DatabaseServices.update("/activites", {read.id: read.toMap()});
     state = state.copyWith(newActivities: updatedActivities);
   }
 

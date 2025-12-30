@@ -4,12 +4,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:l_alternative/src/core/components/block_picker.dart';
 import 'package:l_alternative/src/core/components/custom_button.dart';
 import 'package:l_alternative/src/core/components/custom_text_field.dart';
 import 'package:l_alternative/src/core/components/image_button.dart';
 import 'package:l_alternative/src/core/components/resource_row.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
 import 'package:l_alternative/src/core/provider/app_providers.dart';
+import 'package:l_alternative/src/core/utils/app_utils.dart';
 import 'package:l_alternative/src/features/admin/model/activity_model.dart';
 import 'package:l_alternative/src/features/admin/provider/activities_provider.dart';
 import 'package:l_alternative/src/features/admin/provider/new_activity_provier.dart';
@@ -46,7 +48,7 @@ class _ActivityTemplateState extends ConsumerState<ActivityTemplate> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: widget.model.color,
+        backgroundColor: newActivity.color,
         foregroundColor: Colors.black,
         leading: IconButton(
           onPressed: () {
@@ -57,7 +59,7 @@ class _ActivityTemplateState extends ConsumerState<ActivityTemplate> {
         ),
         title: Text(
           widget.model.title,
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
         actions: [
@@ -68,6 +70,7 @@ class _ActivityTemplateState extends ConsumerState<ActivityTemplate> {
                 newActivityNotifier.updateTitle(newActivity.title);
                 newActivityNotifier.updateSubTitle(newActivity.subTitle);
                 newActivityNotifier.updateDescription(newActivity.description);
+                newActivityNotifier.updateUpdatedDate(DateTime.now());
                 final updatedActivity = ref.read(newActivityProvider);
                 activitiesNotifier.addOrUpdateActivity(updatedActivity);
                 if (context.mounted) {
@@ -84,9 +87,92 @@ class _ActivityTemplateState extends ConsumerState<ActivityTemplate> {
           child: Column(
             spacing: 24,
             children: [
+              if (!newActivity.isCompleted) ...{
+                CustomButton(
+                  text: "Changer la couleur",
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text("Choisir une couleur"),
+                          content: SingleChildScrollView(
+                            child: SizedBox(
+                              height: 100,
+                              width: 200,
+                              child: BlockPicker(
+                                pickerColor: ref
+                                    .read(newActivityProvider)
+                                    .color,
+                                onColorChanged: (color) {
+                                  newActivityNotifier.updateColor(color);
+                                  setState(() {});
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+                CustomButton(
+                  text:
+                      "\t\t\t\t\t\t\t\tChanger la date\n(${Utils.formatDate(newActivity.date)})",
+                  onPressed: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2021),
+                      lastDate: DateTime(DateTime.now().year + 5),
+                      builder: (BuildContext context, Widget? child) {
+                        return Theme(
+                          data:
+                              Theme.of(context).colorScheme.brightness ==
+                                  Brightness.dark
+                              ? ThemeData.dark().copyWith(
+                                  colorScheme: ColorScheme.dark(
+                                    primary: Theme.of(
+                                      context,
+                                    ).colorScheme.tertiary,
+                                    onPrimary: Colors.black,
+                                    surface: Theme.of(
+                                      context,
+                                    ).colorScheme.surface,
+                                    onSurface: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                  ),
+                                )
+                              : ThemeData.light().copyWith(
+                                  colorScheme: ColorScheme.light(
+                                    primary: Theme.of(
+                                      context,
+                                    ).colorScheme.tertiary,
+                                    onPrimary: Colors.white,
+                                    surface: Theme.of(
+                                      context,
+                                    ).colorScheme.surface,
+                                    onSurface: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                  ),
+                                ),
+                          child: child ?? const SizedBox(),
+                        );
+                      },
+                    );
+                    if (date != null) {
+                      newActivityNotifier.updateDate(date);
+                      setState(() {});
+                    }
+                  },
+                ),
+              },
               RoundedContainer(
                 padding: const EdgeInsets.all(8),
-                borderColor: widget.model.color,
+                borderColor: newActivity.color,
                 child: Column(
                   spacing: 2,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,7 +197,7 @@ class _ActivityTemplateState extends ConsumerState<ActivityTemplate> {
                             widget.model.title,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 20,
+                              fontSize: 18,
                             ),
                           ),
                     !newActivity.isCompleted
@@ -128,8 +214,9 @@ class _ActivityTemplateState extends ConsumerState<ActivityTemplate> {
                           )
                         : Text(
                             widget.model.subTitle,
-                            style: TextStyle(fontSize: 16),
+                            style: TextStyle(fontSize: 14),
                           ),
+                    SizedBox(height: 8),
                     !newActivity.isCompleted
                         ? TextField(
                             controller: TextEditingController(
@@ -184,7 +271,7 @@ class _ActivityTemplateState extends ConsumerState<ActivityTemplate> {
               ),
               RoundedContainer(
                 padding: const EdgeInsets.all(8),
-                borderColor: widget.model.color,
+                borderColor: newActivity.color,
                 width: double.infinity,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -280,7 +367,7 @@ class _ActivityTemplateState extends ConsumerState<ActivityTemplate> {
               ),
               RoundedContainer(
                 padding: const EdgeInsets.all(8),
-                borderColor: widget.model.color,
+                borderColor: newActivity.color,
                 width: double.infinity,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -502,7 +589,7 @@ class _ActivityDetailsTemplateState
                               step.keys.first,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 20,
+                                fontSize: 18,
                               ),
                             ),
                             for (var texts in step.values) ...{

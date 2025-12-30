@@ -3,6 +3,7 @@
 // Created by MoniK.
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:l_alternative/src/core/service/database_services.dart';
@@ -124,9 +125,12 @@ class UserProvider extends StateNotifier<UserModel> {
   }
 
   Future<void> loadUserData() async {
-    var snapshot = await DatabaseServices.get(
+    DataSnapshot snapshot = await DatabaseServices.get(
       "/users/${FirebaseAuth.instance.currentUser?.uid}",
     );
+    if (snapshot.value == null) {
+      throw Exception("User data not found in database");
+    }
     var data = snapshot.value as Map<dynamic, dynamic>?;
     if (data != null) {
       var userId =

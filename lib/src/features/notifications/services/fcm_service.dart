@@ -61,31 +61,74 @@ class FCMService {
       },
     );
 
-    // Request APNS token for iOS (required before getting FCM token)
-    try {
-      await _firebaseMessaging.getAPNSToken();
-    } catch (e) {
-      // Ignore APNS token error - it may not be available yet on iOS
+    // For iOS, check if APNS token is available before attempting to get FCM token
+    // On iOS, the APNS token is obtained asynchronously and calling getToken()
+    // before APNS is ready will cause an error
+    if (Platform.isIOS) {
       await EventStore.getInstance().eventLogger.log(
-        "fcm.apns_token_not_ready",
-        EventLevel.info,
+        "fcm.ios_checking_apns",
+        EventLevel.debug,
         {
           "parameters": {
-            "message":
-                "APNS token not available yet, will get FCM token anyway",
+            "message": "iOS detected - checking APNS token availability",
           },
         },
       );
+
+      try {
+        final apnsToken = await _firebaseMessaging.getAPNSToken();
+        if (apnsToken != null) {
+          await EventStore.getInstance().eventLogger.log(
+            "fcm.apns_token_available",
+            EventLevel.debug,
+            {
+              "parameters": {
+                "message":
+                    "APNS token is available, proceeding to get FCM token",
+              },
+            },
+          );
+        } else {
+          await EventStore.getInstance().eventLogger.log(
+            "fcm.apns_token_null",
+            EventLevel.debug,
+            {
+              "parameters": {
+                "message": "APNS token is null, will wait for it via retries",
+              },
+            },
+          );
+          // Schedule retries to get the token once APNS is ready
+          _scheduleTokenRetry();
+          return; // Don't attempt to get FCM token yet
+        }
+      } catch (e) {
+        // APNS token not ready yet
+        await EventStore.getInstance().eventLogger.log(
+          "fcm.apns_token_not_ready",
+          EventLevel.debug,
+          {
+            "parameters": {
+              "message":
+                  "APNS token not ready yet, will wait for it via retries",
+              "error": e.toString(),
+            },
+          },
+        );
+        // Schedule retries to get the token once APNS is ready
+        _scheduleTokenRetry();
+        return; // Don't attempt to get FCM token yet
+      }
     }
 
-    // Get FCM token with error handling for iOS APNS token issue
+    // Get FCM token (only reached if not iOS or if APNS token is ready)
     try {
       String? token = await _firebaseMessaging.getToken();
       if (token != null) {
         await _saveFCMToken(token);
         await EventStore.getInstance().eventLogger.log(
           "fcm.token_obtained",
-          EventLevel.debug,
+          EventLevel.info,
           {
             "parameters": {"token": token},
           },
@@ -95,27 +138,25 @@ class FCMService {
           "fcm.token_null",
           EventLevel.warning,
           {
-            "parameters": {
-              "message": "FCM token is null, will retry on refresh",
-            },
+            "parameters": {"message": "FCM token is null, will retry"},
           },
         );
+        // Schedule retries to get the token
+        _scheduleTokenRetry();
       }
     } catch (e) {
-      // Handle APNS token not available error on iOS
+      // Unexpected error getting FCM token
       await EventStore.getInstance().eventLogger.log(
         "fcm.token_error",
         EventLevel.warning,
         {
           "parameters": {
             "error": e.toString(),
-            "message":
-                "Failed to get FCM token, will retry when token is available",
+            "message": "Failed to get FCM token, will retry",
           },
         },
       );
-      // Don't throw - allow app to continue, token will be obtained via onTokenRefresh
-      // Schedule a retry after a delay to allow APNS token to be received
+      // Don't throw - allow app to continue, token will be obtained via retries or onTokenRefresh
       _scheduleTokenRetry();
     }
 
@@ -339,6 +380,8 @@ class FCMService {
     Future.delayed(Duration(seconds: 3), () => _retryGetToken(1));
     Future.delayed(Duration(seconds: 10), () => _retryGetToken(2));
     Future.delayed(Duration(seconds: 30), () => _retryGetToken(3));
+    Future.delayed(Duration(minutes: 1), () => _retryGetToken(4));
+    Future.delayed(Duration(minutes: 5), () => _retryGetToken(5));
   }
 
   /// Retry getting FCM token
@@ -346,12 +389,56 @@ class FCMService {
     try {
       await EventStore.getInstance().eventLogger.log(
         "fcm.token_retry_attempt",
-        EventLevel.info,
+        EventLevel.debug,
         {
           "parameters": {"attempt": attemptNumber},
         },
       );
 
+      // On iOS, check if APNS token is available before attempting to get FCM token
+      if (Platform.isIOS) {
+        try {
+          final apnsToken = await _firebaseMessaging.getAPNSToken();
+          if (apnsToken == null) {
+            await EventStore.getInstance().eventLogger.log(
+              "fcm.apns_token_not_ready",
+              EventLevel.debug,
+              {
+                "parameters": {
+                  "attempt": attemptNumber,
+                  "message": "APNS token not ready yet, skipping retry",
+                },
+              },
+            );
+            return; // Skip this retry, let later retries or onTokenRefresh handle it
+          }
+          await EventStore.getInstance().eventLogger.log(
+            "fcm.apns_token_ready",
+            EventLevel.debug,
+            {
+              "parameters": {
+                "attempt": attemptNumber,
+                "message": "APNS token is now available",
+              },
+            },
+          );
+        } catch (e) {
+          // APNS token not ready yet
+          await EventStore.getInstance().eventLogger.log(
+            "fcm.apns_token_error_on_retry",
+            EventLevel.debug,
+            {
+              "parameters": {
+                "attempt": attemptNumber,
+                "message": "APNS token not ready yet: ${e.toString()}",
+              },
+            },
+          );
+          return; // Skip this retry, let later retries or onTokenRefresh handle it
+        }
+      }
+
+      // Now attempt to get FCM token
       String? token = await _firebaseMessaging.getToken();
       if (token != null) {
         await _saveFCMToken(token);
@@ -369,7 +456,7 @@ class FCMService {
           {
             "parameters": {
               "attempt": attemptNumber,
-              "message": "Token still null, will retry later",
+              "message": "Token still null, will rely on onTokenRefresh",
             },
           },
         );

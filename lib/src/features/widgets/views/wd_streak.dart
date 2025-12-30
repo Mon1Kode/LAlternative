@@ -6,9 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
 import 'package:l_alternative/src/features/connections/provider/user_provider.dart';
+import 'package:l_alternative/src/features/widgets/model/custom_widget.dart';
 
-class WdStreak extends ConsumerStatefulWidget {
+class WdStreak extends ConsumerStatefulWidget implements CustomWidget {
   const WdStreak({super.key});
+
+  @override
+  int get widthInGrid => 1;
 
   @override
   ConsumerState<WdStreak> createState() => _WdStreakState();

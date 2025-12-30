@@ -10,6 +10,7 @@ class ActivityModel {
   final String title;
   final String subTitle;
   final String description;
+  final DateTime date;
   final DateTime creationDate;
   final DateTime updatedDate;
   final List<Map> videos;
@@ -23,6 +24,7 @@ class ActivityModel {
     required this.title,
     required this.subTitle,
     required this.description,
+    required this.date,
     required this.creationDate,
     required this.updatedDate,
     required this.videos,
@@ -37,6 +39,7 @@ class ActivityModel {
     String? title,
     String? subTitle,
     String? description,
+    DateTime? date,
     DateTime? creationDate,
     DateTime? updatedDate,
     List<Map>? videos,
@@ -50,6 +53,7 @@ class ActivityModel {
       title: title ?? this.title,
       subTitle: subTitle ?? this.subTitle,
       description: description ?? this.description,
+      date: date ?? this.date,
       creationDate: creationDate ?? this.creationDate,
       updatedDate: updatedDate ?? this.updatedDate,
       videos: videos ?? this.videos,
@@ -66,6 +70,7 @@ class ActivityModel {
       title: "TITLE",
       subTitle: "SUBTITLE",
       description: "DESCRIPTION",
+      date: DateTime.now(),
       creationDate: DateTime.now(),
       updatedDate: DateTime.now(),
       videos: [],
@@ -81,6 +86,7 @@ class ActivityModel {
       'title': title,
       'subTitle': subTitle,
       'description': description,
+      'date': date.toIso8601String(),
       'creationDate': creationDate.toIso8601String(),
       'updatedDate': updatedDate.toIso8601String(),
       'videos': videos,
@@ -97,6 +103,7 @@ class ActivityModel {
       title: map['title'] as String,
       subTitle: map['subTitle'] as String? ?? 'SUBTITLE',
       description: map['description'] as String,
+      date: DateTime.parse(map['date'] as String),
       creationDate: DateTime.parse(map['creationDate'] as String),
       updatedDate: DateTime.parse(map['updatedDate'] as String),
       videos: List<Map>.from(map['videos'] as List? ?? []),

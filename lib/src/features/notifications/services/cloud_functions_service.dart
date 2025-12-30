@@ -4,7 +4,6 @@
 
 import 'dart:convert';
 
-// ignore:
 import 'package:http/http.dart' as http;
 import 'package:monikode_event_store/monikode_event_store.dart';
 

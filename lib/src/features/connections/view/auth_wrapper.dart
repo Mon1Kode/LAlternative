@@ -20,6 +20,16 @@ class AuthWrapper extends ConsumerWidget {
     var userNotifier = ref.watch(userProvider.notifier);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        await DatabaseServices.checkDatabaseStatus();
+      } catch (e) {
+        if (context.mounted) {
+          Navigator.of(
+            context,
+          ).pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
+        }
+        return;
+      }
       if (isLoggedIn) {
         await userNotifier.loadUserData();
         var user = userNotifier.getUser();
@@ -27,8 +37,6 @@ class AuthWrapper extends ConsumerWidget {
           var hasTodayLoggedIn = false;
           if (Utils.isSameDay(DateTime.now(), user.lastLoginDate!)) {
             hasTodayLoggedIn = true;
-          } else {
-            hasTodayLoggedIn = false;
           }
           if (!hasTodayLoggedIn) {
             await EventStore.getInstance().eventLogger.log(
@@ -55,7 +63,9 @@ class AuthWrapper extends ConsumerWidget {
           ).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
         }
       } else {
-        Navigator.of(context).pushReplacementNamed('/login');
+        if (context.mounted) {
+          Navigator.of(context).pushReplacementNamed('/login');
+        }
       }
     });
 

@@ -204,6 +204,12 @@ class NotificationService {
     if (storedNotificationsString != null &&
         storedNotificationsString.isNotEmpty) {
       try {
+        // Validate that the string looks like valid JSON before parsing
+        if (!storedNotificationsString.trim().startsWith('{') &&
+            !storedNotificationsString.trim().startsWith('[')) {
+          throw FormatException('Invalid JSON format');
+        }
+
         final Map<String, dynamic> jsonMap = jsonDecode(
           storedNotificationsString,
         );
@@ -216,9 +222,19 @@ class NotificationService {
           "notif.load_error",
           EventLevel.error,
           {
-            "parameters": {"error": e.toString()},
+            "parameters": {
+              "error": e.toString(),
+              "storedData": storedNotificationsString.substring(
+                0,
+                storedNotificationsString.length > 100
+                    ? 100
+                    : storedNotificationsString.length,
+              ),
+            },
           },
         );
+        // Clear corrupted data
+        await prefs.remove('stored_notifications');
         return [];
       }
     } else {

@@ -6,7 +6,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:l_alternative/src/core/components/popup_modal.dart';
 import 'package:l_alternative/src/core/service/database_services.dart';
+import 'package:l_alternative/src/core/service/error_service.dart';
+import 'package:l_alternative/src/core/utils/app_utils.dart';
 import 'package:l_alternative/src/features/connections/model/user_model.dart';
 import 'package:l_alternative/src/features/connections/service/connection_service.dart';
 import 'package:monikode_event_store/monikode_event_store.dart';
@@ -215,5 +218,85 @@ class UserProvider extends StateNotifier<UserModel> {
     await DatabaseServices.update("/users/${state.id}", {
       'streak_count': state.streakCount,
     });
+  }
+
+  Future<void> changeEmail(String email, BuildContext context) async {
+    var user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception("Aucun utilisateur n'est actuellement connecté.");
+    }
+    try {
+      await user.verifyBeforeUpdateEmail(email);
+      EventStore.getInstance().eventLogger.log(
+        "user.change_email",
+        EventLevel.info,
+        {
+          "parameters": {"email": email},
+        },
+      );
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (_) {
+            return PopupModal(
+              title: "Vérifiez votre boîte mail",
+              content:
+                  "Un email de vérification vous a été envoyé à l’adresse ${Utils.anonymousEmail(email)}",
+              ctaText: "Fermer",
+              onPressed: (newContext) {
+                Navigator.pop(newContext);
+                logout(newContext);
+              },
+            );
+          },
+        );
+      }
+    } catch (e) {
+      EventStore.getInstance().eventLogger.log(
+        "user.change_email_error",
+        EventLevel.error,
+        {
+          "parameters": {"error": e.toString(), "email": email},
+        },
+      );
+      if (context.mounted) {
+        ErrorService.showErrorSnackBar(context, e);
+      }
+    }
+  }
+
+  Future<void> changePassword(String oldPassword, String newPassword) async {
+    var user = FirebaseAuth.instance.currentUser;
+    if (user == null || user.email == null) {
+      throw Exception("No user is currently logged in.");
+    }
+    var cred = EmailAuthProvider.credential(
+      email: user.email!,
+      password: oldPassword,
+    );
+    try {
+      await user.reauthenticateWithCredential(cred);
+      await user.updatePassword(newPassword);
+      await user.sendEmailVerification();
+      EventStore.getInstance().eventLogger.log(
+        "user.change_password",
+        EventLevel.info,
+        {
+          "parameters": {"user_id": state.id},
+        },
+      );
+    } catch (e) {
+      EventStore.getInstance().eventLogger.log(
+        "user.change_password_error",
+        EventLevel.error,
+        {
+          "parameters": {"error": e.toString(), "user_id": state.id},
+        },
+      );
+      if (e is FirebaseAuthException && e.code == 'invalid-credential') {
+        throw Exception("Le mot de passe actuel est incorrect.");
+      }
+      rethrow;
+    }
   }
 }

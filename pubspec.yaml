@@ -2,7 +2,7 @@ name: l_alternative
 description: "A mood tracking and mental wellness app."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.0+1
+version: 0.0.1
 
 environment:
   sdk: ^3.9.2
@@ -23,14 +23,15 @@ dependencies:
   timezone: ^0.10.1
   image_picker: ^1.2.1
 
+  # Firebase packages
   firebase_auth: ^6.1.2
   firebase_core: ^4.2.1
   firebase_database: ^12.1.0
   firebase_messaging: ^16.0.4
-  url_launcher: ^6.3.2
   cloud_firestore: ^6.1.0
+
+  url_launcher: ^6.3.2
   http: ^1.6.0
-  components_toolbox: ^7.0.0+1
 
 dev_dependencies:
   flutter_test:

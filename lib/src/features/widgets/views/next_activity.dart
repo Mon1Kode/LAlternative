@@ -2,9 +2,9 @@
 // Unauthorized copying of this file, via any medium, is strictly prohibited.
 // Created by MoniK.
 
-import 'package:components_toolbox/components/markdown_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:l_alternative/src/core/components/markdown_text.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
 import 'package:l_alternative/src/core/utils/app_utils.dart';
 import 'package:l_alternative/src/features/admin/model/activity_model.dart';
@@ -66,6 +66,7 @@ class _NextActivityState extends ConsumerState<NextActivity> {
                     paragraphs: [
                       "soit dans ${Utils.timeRemaining(nextActivity.date)}",
                     ],
+                    textColor: Colors.black,
                     fontSize: 12,
                   ),
                 ],

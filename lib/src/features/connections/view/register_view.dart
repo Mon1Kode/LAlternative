@@ -8,6 +8,7 @@ import 'package:l_alternative/src/core/components/custom_button.dart';
 import 'package:l_alternative/src/core/components/custom_text_field.dart';
 import 'package:l_alternative/src/core/components/popup_modal.dart';
 import 'package:l_alternative/src/core/service/error_service.dart';
+import 'package:l_alternative/src/core/utils/app_utils.dart';
 import 'package:l_alternative/src/features/connections/provider/user_provider.dart';
 import 'package:l_alternative/src/features/connections/service/connection_service.dart';
 import 'package:monikode_event_store/monikode_event_store.dart';
@@ -211,7 +212,7 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                                                       title:
                                                           "Vérifiez votre boîte mail",
                                                       content:
-                                                          "Un email de vérification vous a été envoyé à l’adresse ${anonymousEmail(emailController.text)}",
+                                                          "Un email de vérification vous a été envoyé à l’adresse ${Utils.anonymousEmail(emailController.text)}",
                                                       ctaText: "Fermer",
                                                       onPressed: (newContext) {
                                                         Navigator.pop(
@@ -265,18 +266,5 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
         ),
       ),
     );
-  }
-
-  anonymousEmail(String text) {
-    var parts = text.split("@");
-    if (parts.length != 2) return text;
-    var name = parts[0];
-    var domain = parts[1];
-    if (name.length <= 2) {
-      name = "${name[0]}*";
-    } else {
-      name = name[0] + "*" * (name.length - 2) + name[name.length - 1];
-    }
-    return "$name@$domain";
   }
 }

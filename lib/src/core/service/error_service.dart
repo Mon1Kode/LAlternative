@@ -68,6 +68,8 @@ class ErrorService {
   static String getErrorMessage(dynamic error) {
     if (error is FirebaseAuthException) {
       return getFirebaseAuthErrorMessage(error);
+    } else if (error is String) {
+      return error;
     } else if (error is FirebaseException) {
       EventStore.getInstance().eventLogger.log(
         'firebase.error',

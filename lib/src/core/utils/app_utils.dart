@@ -56,4 +56,17 @@ class Utils {
       return 'Maintenant';
     }
   }
+
+  static anonymousEmail(String text) {
+    var parts = text.split("@");
+    if (parts.length != 2) return text;
+    var name = parts[0];
+    var domain = parts[1];
+    if (name.length <= 2) {
+      name = "${name[0]}*";
+    } else {
+      name = name[0] + "*" * (name.length - 2) + name[name.length - 1];
+    }
+    return "$name@$domain";
+  }
 }

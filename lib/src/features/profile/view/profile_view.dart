@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:l_alternative/src/core/components/custom_button.dart';
+import 'package:l_alternative/src/core/components/custom_text_field.dart';
 import 'package:l_alternative/src/core/components/image_button.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
 import 'package:l_alternative/src/core/provider/app_providers.dart';
@@ -104,13 +105,66 @@ class _ProfileViewState extends ConsumerState<ProfileView>
                     CustomButton(
                       text: "Modifier l'adresse e-mail\n\t\t${user.email}",
                       onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            var newEmailController = TextEditingController();
+                            return AlertDialog(
+                              title: Text(
+                                "Modifier l'adresse e-mail",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              content: CustomTextField(
+                                textController: newEmailController,
+                                hintText: "Nouvelle adresse e-mail",
+                                obscureText: false,
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text(
+                                    "Fermer",
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.secondary,
+                                    ),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    await ref
+                                        .read(userProvider.notifier)
+                                        .changeEmail(
+                                          newEmailController.text,
+                                          context,
+                                        );
+                                    if (context.mounted) {
+                                      Navigator.of(context).pop();
+                                    }
+                                  },
+                                  child: Text(
+                                    "Modifier",
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.tertiary,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
                         setState(() {});
                       },
                     ),
                     CustomButton(
                       text: "Modifier le mot de passe",
                       onPressed: () {
-                        // Navigator.pushNamed(context, "/change-password");
+                        Navigator.pushNamed(context, "/change-password");
                       },
                     ),
                     // _isEditMode

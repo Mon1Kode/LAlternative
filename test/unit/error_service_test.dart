@@ -128,7 +128,7 @@ void main() {
       test('handles unknown error type', () {
         final error = 'String error';
         final message = ErrorService.getErrorMessage(error);
-        expect(message, 'Une erreur inattendue s\'est produite.');
+        expect(message, 'String error');
       });
     });
 

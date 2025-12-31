@@ -10,6 +10,7 @@ class CustomButton extends StatelessWidget {
   final Color? color;
   final String? routeName;
   final bool predicate;
+  final bool isEnabled;
   const CustomButton({
     super.key,
     this.onPressed,
@@ -17,12 +18,13 @@ class CustomButton extends StatelessWidget {
     this.color,
     this.routeName,
     this.predicate = false,
+    this.isEnabled = true,
   });
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: onPressed != null || routeName != null
+      onPressed: (onPressed != null || routeName != null) && isEnabled
           ? routeName != null
                 ? () {
                     if (predicate) {

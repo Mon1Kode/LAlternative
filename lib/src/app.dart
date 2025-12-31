@@ -13,6 +13,7 @@ import 'package:l_alternative/src/features/history/view/history_view.dart';
 import 'package:l_alternative/src/features/home/view/home_view.dart';
 import 'package:l_alternative/src/features/notifications/view/notifications_view.dart';
 import 'package:l_alternative/src/features/profile/model/evaluation_model.dart';
+import 'package:l_alternative/src/features/profile/view/change_password.dart';
 import 'package:l_alternative/src/features/profile/view/profile_view.dart';
 import 'package:l_alternative/src/features/relaxation/view/activity_template.dart';
 import 'package:monikode_event_store/monikode_event_store.dart';
@@ -143,6 +144,8 @@ class MyApp extends ConsumerWidget {
             );
           case '/faq':
             return MaterialPageRoute(builder: (context) => FaqView());
+          case '/change-password':
+            return MaterialPageRoute(builder: (context) => ChangePassword());
           default:
             EventStore.getInstance().eventLogger.log(
               'app.page_not_found',

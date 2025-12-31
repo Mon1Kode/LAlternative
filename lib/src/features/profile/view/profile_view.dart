@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:l_alternative/src/core/components/custom_button.dart';
 import 'package:l_alternative/src/core/components/custom_text_field.dart';
 import 'package:l_alternative/src/core/components/image_button.dart';
+import 'package:l_alternative/src/core/components/markdown_text.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
 import 'package:l_alternative/src/core/provider/app_providers.dart';
 import 'package:l_alternative/src/core/utils/app_utils.dart';
@@ -102,64 +103,74 @@ class _ProfileViewState extends ConsumerState<ProfileView>
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    CustomButton(
-                      text: "Modifier l'adresse e-mail\n\t\t${user.email}",
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            var newEmailController = TextEditingController();
-                            return AlertDialog(
-                              title: Text(
-                                "Modifier l'adresse e-mail",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              content: CustomTextField(
-                                textController: newEmailController,
-                                hintText: "Nouvelle adresse e-mail",
-                                obscureText: false,
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Text(
-                                    "Fermer",
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(user.email, style: TextStyle(fontSize: 18)),
+                        ImageButton(
+                          imagePath: "edit.png",
+                          size: 32,
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                var newEmailController =
+                                    TextEditingController();
+                                return AlertDialog(
+                                  title: Text(
+                                    "Modifier l'adresse e-mail",
                                     style: TextStyle(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.secondary,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                ),
-                                TextButton(
-                                  onPressed: () async {
-                                    await ref
-                                        .read(userProvider.notifier)
-                                        .changeEmail(
-                                          newEmailController.text,
-                                          context,
-                                        );
-                                    if (context.mounted) {
-                                      Navigator.of(context).pop();
-                                    }
-                                  },
-                                  child: Text(
-                                    "Modifier",
-                                    style: TextStyle(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.tertiary,
-                                    ),
+                                  content: CustomTextField(
+                                    textController: newEmailController,
+                                    hintText: "Nouvelle adresse e-mail",
+                                    obscureText: false,
                                   ),
-                                ),
-                              ],
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text(
+                                        "Fermer",
+                                        style: TextStyle(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.secondary,
+                                        ),
+                                      ),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        await ref
+                                            .read(userProvider.notifier)
+                                            .changeEmail(
+                                              newEmailController.text,
+                                              context,
+                                            );
+                                        if (context.mounted) {
+                                          Navigator.of(context).pop();
+                                        }
+                                      },
+                                      child: Text(
+                                        "Modifier",
+                                        style: TextStyle(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.tertiary,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
                             );
+                            setState(() {});
                           },
-                        );
-                        setState(() {});
-                      },
+                        ),
+                      ],
                     ),
                     CustomButton(
                       text: "Modifier le mot de passe",
@@ -167,52 +178,6 @@ class _ProfileViewState extends ConsumerState<ProfileView>
                         Navigator.pushNamed(context, "/change-password");
                       },
                     ),
-                    // _isEditMode
-                    //     ? SizedBox(
-                    //         width: 200,
-                    //         child: TextField(
-                    //           controller: _nameController,
-                    //           autofocus: true,
-                    //           style: TextStyle(fontSize: 18),
-                    //           cursorColor: Theme.of(
-                    //             context,
-                    //           ).colorScheme.tertiary,
-                    //           decoration: InputDecoration(
-                    //             hintText: "Enter your name",
-                    //             border: OutlineInputBorder(
-                    //               borderRadius: BorderRadius.circular(8.0),
-                    //               borderSide: BorderSide(
-                    //                 color: Theme.of(
-                    //                   context,
-                    //                 ).colorScheme.secondary,
-                    //                 width: 1,
-                    //               ),
-                    //             ),
-                    //             enabledBorder: OutlineInputBorder(
-                    //               borderRadius: BorderRadius.circular(8.0),
-                    //               borderSide: BorderSide(
-                    //                 color: Theme.of(
-                    //                   context,
-                    //                 ).colorScheme.secondary,
-                    //                 width: 1,
-                    //               ),
-                    //             ),
-                    //             focusedBorder: OutlineInputBorder(
-                    //               borderRadius: BorderRadius.circular(8.0),
-                    //               borderSide: BorderSide(
-                    //                 color: Theme.of(
-                    //                   context,
-                    //                 ).colorScheme.secondary,
-                    //                 width: 1,
-                    //               ),
-                    //             ),
-                    //           ),
-                    //         ),
-                    //       )
-                    //     : Text(
-                    //         user.displayName,
-                    //         style: TextStyle(fontSize: 18),
-                    //       ),
                   ],
                 ),
               ),
@@ -320,6 +285,135 @@ class _ProfileViewState extends ConsumerState<ProfileView>
                               size: 32,
                               onPressed: () {
                                 Navigator.pushNamed(context, "/faq");
+                              },
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("GCGU", style: TextStyle(fontSize: 18)),
+                            ImageButton(
+                              imagePath: "file-signature.png",
+                              size: 32,
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  builder: (_) {
+                                    return StatefulBuilder(
+                                      builder:
+                                          (
+                                            BuildContext context,
+                                            StateSetter setModalState,
+                                          ) {
+                                            return SizedBox(
+                                              height:
+                                                  MediaQuery.of(
+                                                    context,
+                                                  ).size.height *
+                                                  0.8,
+                                              child: Container(
+                                                padding: EdgeInsets.all(24),
+                                                width: double.infinity,
+                                                child: Stack(
+                                                  alignment:
+                                                      Alignment.bottomCenter,
+                                                  children: [
+                                                    SingleChildScrollView(
+                                                      child: Column(
+                                                        spacing: 16,
+                                                        children: [
+                                                          Text(
+                                                            "CGVU et politique de confidentalité",
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            style: TextStyle(
+                                                              fontSize: 19,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color:
+                                                                  Theme.of(
+                                                                        context,
+                                                                      )
+                                                                      .colorScheme
+                                                                      .tertiary,
+                                                            ),
+                                                          ),
+                                                          MarkdownText(
+                                                            textColor:
+                                                                Theme.of(
+                                                                      context,
+                                                                    )
+                                                                    .colorScheme
+                                                                    .secondary,
+                                                            paragraphs: [
+                                                              "**Dernière mise à jour :** 31 décembre 2025",
+                                                              "## Introduction",
+                                                              "L'Alternative s'engage à protéger votre vie privée. Cette Politique de Confidentialité explique comment nous collectons, utilisons, divulguons et protégeons vos informations lorsque vous utilisez notre application mobile.",
+                                                              "## Informations que nous collectons",
+                                                              "### Informations personnelles que vous fournissez",
+                                                              "- **Données d'humeur :** Entrées et évaluations d'humeur quotidiennes\n- **Données de fatigue :** Entrées de niveau d'énergie\n- **Informations de compte :** Adresse e-mail (si vous choisissez de créer un compte)",
+                                                              "### Informations collectées automatiquement",
+                                                              "- **Informations sur l'appareil :** Type d'appareil, système d'exploitation, version de l'application\n- **Données d'utilisation :** Fonctionnalités utilisées, durée de session, interactions avec l'application\n- **Jetons de notification push :** Jetons FCM pour l'envoi de notifications\n- **Données analytiques :** Statistiques d'utilisation anonymes via Firebase Analytics",
+                                                              "## Comment nous utilisons vos informations",
+                                                              "Nous utilisons les informations collectées pour :",
+                                                              "- Fournir et maintenir les fonctionnalités de l'application\n- Suivre votre historique d'humeur et générer des aperçus\n- Vous envoyer des notifications push (évaluations des activités, rappels)\n- Améliorer et personnaliser votre expérience\n- Analyser l'utilisation de l'application pour améliorer les fonctionnalités\n- Répondre à vos demandes et fournir un support client",
+                                                              "## Stockage et sécurité des données",
+                                                              "- Toutes les données sont stockées de manière sécurisée en utilisant les services Firebase (Google Cloud Platform)\n- Les données d'humeur sont stockées en local sur votre appareil\n- L'authentification des utilisateurs est gérée par Firebase Authentication\n- Nous mettons en œuvre des mesures de sécurité conformes aux normes de l'industrie pour protéger vos données\n- La transmission des données est cryptée via HTTPS/TLS",
+                                                              "## Services tiers",
+                                                              "Nous utilisons les services tiers suivants qui peuvent collecter des informations :",
+                                                              "- **Firebase (Google) :** Authentification, base de données, analytiques, messagerie\n  - [Politique de confidentialité Firebase](https://firebase.google.com/support/privacy)\n- **Cloud Firestore :** Stockage de données\n- **Firebase Cloud Messaging :** Notifications push",
+                                                              "## Vos droits et choix",
+                                                              "Vous avez le droit de :",
+                                                              "- **Accès :** Demander une copie de vos données\n- **Suppression :** Demander la suppression de votre compte et de toutes les données associées\n- **Modification :** Mettre à jour vos informations de profil à tout moment\n- **Désactivation :** Désactiver les notifications push dans les paramètres de l'application\n- **Export :** Demander l'exportation de vos données d'humeur",
+                                                              "### Comment exercer vos droits",
+                                                              "Pour exercer l'un de ces droits, contactez-nous à : victor.delamonica@icloud.com",
+                                                              "### Suppression de compte",
+                                                              "Vous pouvez supprimer votre compte et toutes les données associées via :\n1. Paramètres de l'application → Profil → Supprimer le compte\n2. Ou en nous contactant à : victor.delamonica@icloud.com",
+                                                              "Après suppression, toutes vos données seront définitivement supprimées dans les 30 jours.",
+                                                              "## Conservation des données",
+                                                              "- **Comptes actifs :** Données conservées pendant que le compte est actif\n- **Comptes supprimés :** Données définitivement supprimées dans les 30 jours\n- **Données analytiques :** Les données anonymisées peuvent être conservées jusqu'à 14 mois",
+                                                              "## Confidentialité des enfants",
+                                                              "L'Alternative n'est pas destinée aux enfants de moins de 13 ans. Nous ne collectons pas sciemment d'informations auprès d'enfants de moins de 13 ans. Si vous pensez que nous avons collecté des informations auprès d'un enfant de moins de 13 ans, veuillez nous contacter immédiatement.",
+                                                              "## Notifications push",
+                                                              "Nous utilisons Firebase Cloud Messaging pour envoyer :\n- Évaluations des activités\n- Mises à jour de fonctionnalités",
+                                                              "Vous pouvez désactiver les notifications à tout moment dans les paramètres de votre appareil ou de l'application.",
+                                                              "## Modifications de cette Politique de Confidentialité",
+                                                              "Nous pouvons mettre à jour cette Politique de Confidentialité de temps en temps. Nous vous informerons de tout changement en :\n- Publiant la nouvelle Politique de Confidentialité dans l'application\n- Mettant à jour la date « Dernière mise à jour »\n- (Pour les changements significatifs) Vous envoyant une notification push",
+                                                              "## Nous contacter",
+                                                              "Si vous avez des questions concernant cette Politique de Confidentialité ou nos pratiques, contactez-nous :",
+                                                              "- **Email :** clarisse.hikoum@gmail.com ou victor.delamonica@icloud.com\n- **Site web :** inclusens.org",
+                                                              "## Conformité légale",
+                                                              "Cette application est conforme à :\n- Règlement Général sur la Protection des Données (RGPD) - UE\n- California Consumer Privacy Act (CCPA) - USA\n- Exigences de sécurité des données du Google Play Store\n- Exigences de confidentialité de l'Apple App Store",
+                                                              "## Base juridique du traitement des données (RGPD)",
+                                                              "Nous traitons vos données sur la base de :\n- **Consentement :** Pour les fonctionnalités optionnelles comme les notifications push\n- **Contrat :** Pour fournir le service de suivi d'humeur\n- **Intérêt légitime :** Pour améliorer l'application et prévenir les abus",
+                                                            ],
+                                                          ),
+
+                                                          const SizedBox(
+                                                            height: 60,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    CustomButton(
+                                                      text: "Fermer",
+                                                      onPressed: () {
+                                                        Navigator.of(
+                                                          context,
+                                                        ).pop();
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                    );
+                                  },
+                                );
                               },
                             ),
                           ],

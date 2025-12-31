@@ -2,6 +2,7 @@
 // Unauthorized copying of this file, via any medium, is strictly prohibited.
 // Created by MoniK.
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:l_alternative/src/core/components/custom_button.dart';
@@ -233,33 +234,34 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   endIndent: 150,
                   thickness: 2,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Pas de compte ?",
-                      style: TextStyle(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onPrimary.withValues(alpha: 0.7),
-                        fontSize: 13,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/register');
-                      },
-                      child: Text(
-                        "Créé maintenant",
+                if (kDebugMode)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Pas de compte ?",
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.tertiary,
-                          decoration: TextDecoration.underline,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onPrimary.withValues(alpha: 0.7),
                           fontSize: 13,
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/register');
+                        },
+                        child: Text(
+                          "Créé maintenant",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.tertiary,
+                            decoration: TextDecoration.underline,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
               ],
             ),
           ),

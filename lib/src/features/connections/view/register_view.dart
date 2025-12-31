@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:l_alternative/src/core/components/custom_button.dart';
 import 'package:l_alternative/src/core/components/custom_text_field.dart';
+import 'package:l_alternative/src/core/components/markdown_text.dart';
 import 'package:l_alternative/src/core/components/popup_modal.dart';
 import 'package:l_alternative/src/core/service/error_service.dart';
 import 'package:l_alternative/src/core/utils/app_utils.dart';
@@ -144,16 +145,50 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                                             ).colorScheme.tertiary,
                                           ),
                                         ),
-                                        Text(
-                                          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam facilisis ex ex, nec pretium ante mollis id. Nullam lorem magna, malesuada sit amet nisi ut, congue lobortis turpis. Nulla pellentesque libero vitae mollis facilisis. Nulla auctor diam posuere aliquam scelerisque. Curabitur id sodales diam. Aliquam ut bibendum mi. Proin id ipsum sed nisl commodo dapibus. Aliquam eleifend mollis ipsum, vel rhoncus mauris. In a neque a urna vulputate elementum non sed quam. Ut in faucibus ante.\n\nPellentesque non dolor consectetur, mollis nunc id, tincidunt orci. Suspendisse accumsan odio nec nunc mattis maximus. Donec id varius orci, ut eleifend metus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Suspendisse potenti. In non sagittis nunc. In lectus ipsum, suscipit vitae iaculis a, sagittis eu mauris. Nam at finibus eros. Sed congue efficitur quam, ultricies rutrum diam accumsan quis. Maecenas finibus ex eu efficitur maximus. Vivamus in erat laoreet, malesuada mi ut, suscipit tortor. Ut euismod iaculis velit, et euismod dolor semper ac. Aliquam bibendum, nulla ac semper volutpat, arcu urna sagittis nulla, non vehicula ante neque eu velit. Duis a pharetra felis. Donec sed luctus metus. Duis feugiat risus eu tortor tempus, id fermentum felis dictum.",
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onPrimary
-                                                .withValues(alpha: 0.7),
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                        MarkdownText(
+                                          paragraphs: [
+                                            "# Politique de Confidentialité de L'Alternative",
+                                            "**Dernière mise à jour :** 31 décembre 2025",
+                                            "## Introduction",
+                                            "L'Alternative s'engage à protéger votre vie privée. Cette Politique de Confidentialité explique comment nous collectons, utilisons, divulguons et protégeons vos informations lorsque vous utilisez notre application mobile.",
+                                            "## Informations que nous collectons",
+                                            "### Informations personnelles que vous fournissez",
+                                            "- **Données d'humeur :** Entrées et évaluations d'humeur quotidiennes\n- **Données de fatigue :** Entrées de niveau d'énergie\n- **Informations de compte :** Adresse e-mail (si vous choisissez de créer un compte)",
+                                            "### Informations collectées automatiquement",
+                                            "- **Informations sur l'appareil :** Type d'appareil, système d'exploitation, version de l'application\n- **Données d'utilisation :** Fonctionnalités utilisées, durée de session, interactions avec l'application\n- **Jetons de notification push :** Jetons FCM pour l'envoi de notifications\n- **Données analytiques :** Statistiques d'utilisation anonymes via Firebase Analytics",
+                                            "## Comment nous utilisons vos informations",
+                                            "Nous utilisons les informations collectées pour :",
+                                            "- Fournir et maintenir les fonctionnalités de l'application\n- Suivre votre historique d'humeur et générer des aperçus\n- Vous envoyer des notifications push (évaluations des activités, rappels)\n- Améliorer et personnaliser votre expérience\n- Analyser l'utilisation de l'application pour améliorer les fonctionnalités\n- Répondre à vos demandes et fournir un support client",
+                                            "## Stockage et sécurité des données",
+                                            "- Toutes les données sont stockées de manière sécurisée en utilisant les services Firebase (Google Cloud Platform)\n- Les données d'humeur sont stockées en local sur votre appareil\n- L'authentification des utilisateurs est gérée par Firebase Authentication\n- Nous mettons en œuvre des mesures de sécurité conformes aux normes de l'industrie pour protéger vos données\n- La transmission des données est cryptée via HTTPS/TLS",
+                                            "## Services tiers",
+                                            "Nous utilisons les services tiers suivants qui peuvent collecter des informations :",
+                                            "- **Firebase (Google) :** Authentification, base de données, analytiques, messagerie\n  - [Politique de confidentialité Firebase](https://firebase.google.com/support/privacy)\n- **Cloud Firestore :** Stockage de données\n- **Firebase Cloud Messaging :** Notifications push",
+                                            "## Vos droits et choix",
+                                            "Vous avez le droit de :",
+                                            "- **Accès :** Demander une copie de vos données\n- **Suppression :** Demander la suppression de votre compte et de toutes les données associées\n- **Modification :** Mettre à jour vos informations de profil à tout moment\n- **Désactivation :** Désactiver les notifications push dans les paramètres de l'application\n- **Export :** Demander l'exportation de vos données d'humeur",
+                                            "### Comment exercer vos droits",
+                                            "Pour exercer l'un de ces droits, contactez-nous à : victor.delamonica@icloud.com",
+                                            "### Suppression de compte",
+                                            "Vous pouvez supprimer votre compte et toutes les données associées via :\n1. Paramètres de l'application → Profil → Supprimer le compte\n2. Ou en nous contactant à : victor.delamonica@icloud.com",
+                                            "Après suppression, toutes vos données seront définitivement supprimées dans les 30 jours.",
+                                            "## Conservation des données",
+                                            "- **Comptes actifs :** Données conservées pendant que le compte est actif\n- **Comptes supprimés :** Données définitivement supprimées dans les 30 jours\n- **Données analytiques :** Les données anonymisées peuvent être conservées jusqu'à 14 mois",
+                                            "## Confidentialité des enfants",
+                                            "L'Alternative n'est pas destinée aux enfants de moins de 13 ans. Nous ne collectons pas sciemment d'informations auprès d'enfants de moins de 13 ans. Si vous pensez que nous avons collecté des informations auprès d'un enfant de moins de 13 ans, veuillez nous contacter immédiatement.",
+                                            "## Notifications push",
+                                            "Nous utilisons Firebase Cloud Messaging pour envoyer :\n- Évaluations des activités\n- Mises à jour de fonctionnalités",
+                                            "Vous pouvez désactiver les notifications à tout moment dans les paramètres de votre appareil ou de l'application.",
+                                            "## Modifications de cette Politique de Confidentialité",
+                                            "Nous pouvons mettre à jour cette Politique de Confidentialité de temps en temps. Nous vous informerons de tout changement en :\n- Publiant la nouvelle Politique de Confidentialité dans l'application\n- Mettant à jour la date « Dernière mise à jour »\n- (Pour les changements significatifs) Vous envoyant une notification push",
+                                            "## Nous contacter",
+                                            "Si vous avez des questions concernant cette Politique de Confidentialité ou nos pratiques, contactez-nous :",
+                                            "- **Email :** clarisse.hikoum@gmail.com ou victor.delamonica@icloud.com\n- **Site web :** inclusens.org",
+                                            "## Conformité légale",
+                                            "Cette application est conforme à :\n- Règlement Général sur la Protection des Données (RGPD) - UE\n- California Consumer Privacy Act (CCPA) - USA\n- Exigences de sécurité des données du Google Play Store\n- Exigences de confidentialité de l'Apple App Store",
+                                            "## Base juridique du traitement des données (RGPD)",
+                                            "Nous traitons vos données sur la base de :\n- **Consentement :** Pour les fonctionnalités optionnelles comme les notifications push\n- **Contrat :** Pour fournir le service de suivi d'humeur\n- **Intérêt légitime :** Pour améliorer l'application et prévenir les abus",
+                                          ],
                                         ),
                                         SizedBox(height: 1),
                                         Row(

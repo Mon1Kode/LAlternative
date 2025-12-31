@@ -5,12 +5,12 @@ import 'package:url_launcher/url_launcher.dart';
 
 class Utils {
   static String formatDate(DateTime date) {
-    DateFormat formatter = DateFormat('EEEE, d MMMM, y');
+    DateFormat formatter = DateFormat('EEEE, d MMMM, y', "fr_FR");
     return formatter.format(date);
   }
 
   static String formatShortDate(DateTime date) {
-    DateFormat formatter = DateFormat('d MMMM, y');
+    DateFormat formatter = DateFormat('d MMMM, y', "fr_FR");
     return formatter.format(date);
   }
 
@@ -30,7 +30,7 @@ class Utils {
   }
 
   static timeRemainingString(String dateString) {
-    DateFormat formatter = DateFormat('d MMMM, y');
+    DateFormat formatter = DateFormat('d MMMM, y', "fr_FR");
     DateTime date = formatter.parse(dateString);
     Duration difference = date.difference(DateTime.now());
     if (difference.inDays > 0) {

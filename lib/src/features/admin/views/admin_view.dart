@@ -208,9 +208,12 @@ class _AdminViewState extends ConsumerState<AdminView> {
                         height: 100,
                         width: 200,
                         child: BlockPicker(
-                          pickerColor: ref.read(newActivityProvider).color,
-                          onColorChanged: (color) {
-                            newActivity.updateColor(color);
+                          items: Colors.primaries
+                              .map((e) => Container(color: e.shade200))
+                              .toList(),
+                          pickerItem: ref.read(newActivityProvider).color,
+                          onChanged: (color) {
+                            newActivity.updateColor(color as Color);
                           },
                         ),
                       ),

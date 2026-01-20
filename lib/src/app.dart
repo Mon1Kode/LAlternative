@@ -16,6 +16,7 @@ import 'package:l_alternative/src/features/profile/model/evaluation_model.dart';
 import 'package:l_alternative/src/features/profile/view/change_password.dart';
 import 'package:l_alternative/src/features/profile/view/profile_view.dart';
 import 'package:l_alternative/src/features/relaxation/view/activity_template.dart';
+import 'package:l_alternative/src/features/relaxation/view/all_activities_view.dart';
 import 'package:monikode_event_store/monikode_event_store.dart';
 
 import 'core/provider/app_providers.dart';
@@ -99,6 +100,17 @@ class MyApp extends ConsumerWidget {
             return MaterialPageRoute(builder: (context) => const ProfileView());
           case '/notifications':
             return MaterialPageRoute(builder: (context) => NotificationsView());
+          case '/activities':
+            final args = settings.arguments;
+            if (args is List<ActivityModel>) {
+              return MaterialPageRoute(
+                builder: (context) => AllActivitiesView(activities: args),
+              );
+            } else {
+              return MaterialPageRoute(
+                builder: (context) => AllActivitiesView(activities: []),
+              );
+            }
           case '/evaluations':
             final args = settings.arguments;
             if (args is EvaluationModel) {

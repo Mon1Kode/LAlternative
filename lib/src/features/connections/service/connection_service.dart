@@ -32,6 +32,12 @@ class ConnectionService {
     if (userCredential.user == null) {
       throw FirebaseAuthException(code: 'user-not-found');
     }
+    DatabaseServices.update("/metadata/${userCredential.user?.uid}", {
+      "email": email,
+      "id": userCredential.user?.uid,
+      "provider": password,
+      "updated_at": DateTime.now().toIso8601String(),
+    });
     EventStore.getInstance().eventLogger.log("user.login", EventLevel.info, {
       "parameters": {"email": email},
     });
@@ -51,6 +57,12 @@ class ConnectionService {
     DatabaseServices.update("/users/${userCredential.user?.uid}", {
       "email": email,
       "id": userCredential.user?.uid,
+    });
+    DatabaseServices.update("/metadata/${userCredential.user?.uid}", {
+      "email": email,
+      "id": userCredential.user?.uid,
+      "provider": password,
+      "updated_at": DateTime.now().toIso8601String(),
     });
     EventStore.getInstance().eventLogger.log("user.signup", EventLevel.info, {
       "parameters": {"email": email},

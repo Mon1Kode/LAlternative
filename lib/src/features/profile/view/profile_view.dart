@@ -7,6 +7,7 @@ import 'package:l_alternative/src/core/components/image_button.dart';
 import 'package:l_alternative/src/core/components/markdown_text.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
 import 'package:l_alternative/src/core/provider/app_providers.dart';
+import 'package:l_alternative/src/core/service/database_services.dart';
 import 'package:l_alternative/src/core/utils/app_utils.dart';
 import 'package:l_alternative/src/features/connections/provider/user_provider.dart';
 import 'package:l_alternative/src/features/notifications/model/notifications_model.dart';
@@ -24,14 +25,23 @@ class ProfileView extends ConsumerStatefulWidget {
 class _ProfileViewState extends ConsumerState<ProfileView>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  late List<String> adminUsersId = [];
 
   final TextEditingController _nameController = TextEditingController();
+
+  Future<void> _getAdminUsersId() async {
+    var admins = await DatabaseServices.getList("/admins");
+    setState(() {
+      adminUsersId = List<String>.from(admins);
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this);
     _nameController.text = ref.read(userProvider).displayName;
+    _getAdminUsersId();
   }
 
   @override
@@ -52,18 +62,19 @@ class _ProfileViewState extends ConsumerState<ProfileView>
       appBar: AppBar(
         centerTitle: false,
         title: Text(
-          "Profile",
+          "Profil",
           style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
         ),
         actions: [
-          ImageButton(
-            imagePath: "settings.png",
-            onPressed: () {
-              Navigator.pushNamed(context, "/admin");
-            },
-            size: 32,
-            borderRadius: 16,
-          ),
+          if (adminUsersId.contains(user.id))
+            ImageButton(
+              imagePath: "settings.png",
+              onPressed: () {
+                Navigator.pushNamed(context, "/admin");
+              },
+              size: 32,
+              borderRadius: 16,
+            ),
           const SizedBox(width: 4),
           ImageButton(
             imagePath: themeMode == ThemeMode.dark
@@ -376,19 +387,19 @@ class _ProfileViewState extends ConsumerState<ProfileView>
                                                               "## Conservation des données",
                                                               "- **Comptes actifs :** Données conservées pendant que le compte est actif\n- **Comptes supprimés :** Données définitivement supprimées dans les 30 jours\n- **Données analytiques :** Les données anonymisées peuvent être conservées jusqu'à 14 mois",
                                                               "## Confidentialité des enfants",
-                                                              "L'Alternative n'est pas destinée aux enfants de moins de 13 ans. Nous ne collectons pas sciemment d'informations auprès d'enfants de moins de 13 ans. Si vous pensez que nous avons collecté des informations auprès d'un enfant de moins de 13 ans, veuillez nous contacter immédiatement.",
+                                                              "L'Alternative est pas destuniquement aux perssones majeurs.",
                                                               "## Notifications push",
                                                               "Nous utilisons Firebase Cloud Messaging pour envoyer :\n- Évaluations des activités\n- Mises à jour de fonctionnalités",
                                                               "Vous pouvez désactiver les notifications à tout moment dans les paramètres de votre appareil ou de l'application.",
                                                               "## Modifications de cette Politique de Confidentialité",
-                                                              "Nous pouvons mettre à jour cette Politique de Confidentialité de temps en temps. Nous vous informerons de tout changement en :\n- Publiant la nouvelle Politique de Confidentialité dans l'application\n- Mettant à jour la date « Dernière mise à jour »\n- (Pour les changements significatifs) Vous envoyant une notification push",
+                                                              "Nous mettrons à jour cette Politique de Confidentialité selons les besoins. Nous vous informerons de tout changement en :\n- Publiant la nouvelle Politique de Confidentialité dans l'application\n- Mettant à jour la date « Dernière mise à jour »\n- (Pour les changements significatifs) Vous envoyant une notification push",
                                                               "## Nous contacter",
                                                               "Si vous avez des questions concernant cette Politique de Confidentialité ou nos pratiques, contactez-nous :",
                                                               "- **Email :** clarisse.hikoum@gmail.com ou victor.delamonica@icloud.com\n- **Site web :** inclusens.org",
                                                               "## Conformité légale",
-                                                              "Cette application est conforme à :\n- Règlement Général sur la Protection des Données (RGPD) - UE\n- California Consumer Privacy Act (CCPA) - USA\n- Exigences de sécurité des données du Google Play Store\n- Exigences de confidentialité de l'Apple App Store",
-                                                              "## Base juridique du traitement des données (RGPD)",
-                                                              "Nous traitons vos données sur la base de :\n- **Consentement :** Pour les fonctionnalités optionnelles comme les notifications push\n- **Contrat :** Pour fournir le service de suivi d'humeur\n- **Intérêt légitime :** Pour améliorer l'application et prévenir les abus",
+                                                              "Cette application est conforme à :\n- Règlement Général sur la Protection des Données (RGPD) - UE\n- Loi CNIL 1978 - FR\n- California Consumer Privacy Act (CCPA) - USA\n- Exigences de sécurité des données du Google Play Store\n- Exigences de confidentialité de l'Apple App Store",
+                                                              "## Base juridique du traitement des données (RGPD - CNIL)",
+                                                              "Nous traitons vos données sur la base de :\n- **Consentement :** Pour les fonctionnalités optionnelles comme les notifications push\n- **Intérêt légitime :** Pour améliorer l'application et prévenir les abus",
                                                             ],
                                                           ),
 

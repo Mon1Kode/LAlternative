@@ -4,33 +4,38 @@
 
 import 'package:flutter/material.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
+import 'package:l_alternative/src/features/admin/model/activity_model.dart';
+import 'package:l_alternative/src/features/relaxation/view/activity_template.dart';
 
 class ActivityCard extends StatelessWidget {
-  final String title;
-  final String description;
-  final String imagePath;
-  final Widget actionView;
-  final Color color;
+  final ActivityModel activity;
   final bool isLast;
   final EdgeInsets padding;
   final bool hasImage;
+  final bool hasShadow;
 
   const ActivityCard({
     super.key,
-    required this.title,
-    required this.description,
-    required this.imagePath,
-    required this.actionView,
-    required this.color,
+    required this.activity,
     this.isLast = false,
     this.padding = const EdgeInsets.all(16),
     this.hasImage = true,
+    this.hasShadow = true,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
+        boxShadow: hasShadow
+            ? [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  blurRadius: 4,
+                  offset: const Offset(0, -4),
+                ),
+              ]
+            : [],
         border: Border(
           top: BorderSide(
             color: Theme.of(context).colorScheme.secondary,
@@ -54,7 +59,7 @@ class ActivityCard extends StatelessWidget {
       child: RoundedContainer(
         width: MediaQuery.of(context).size.width - 32 - 8,
         hasBorder: false,
-        color: color,
+        color: activity.color,
         padding: padding,
         borderRadius: 20,
         child: Row(
@@ -65,7 +70,7 @@ class ActivityCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    title,
+                    activity.title,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -73,7 +78,7 @@ class ActivityCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    description,
+                    activity.subTitle,
                     style: const TextStyle(fontSize: 16, color: Colors.black),
                   ),
                   if (isLast)
@@ -86,7 +91,10 @@ class ActivityCard extends StatelessWidget {
                       ),
                       onPressed: () {
                         Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => actionView),
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ActivityTemplate(model: activity),
+                          ),
                         );
                       },
                       child: Text(
@@ -98,8 +106,8 @@ class ActivityCard extends StatelessWidget {
               ),
             ),
             if (hasImage)
-              Image.asset(
-                imagePath,
+              Image.network(
+                activity.illustration,
                 width: MediaQuery.of(context).size.width * 0.3,
               ),
           ],

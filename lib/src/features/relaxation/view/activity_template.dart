@@ -10,6 +10,7 @@ import 'package:l_alternative/src/core/components/custom_text_field.dart';
 import 'package:l_alternative/src/core/components/image_button.dart';
 import 'package:l_alternative/src/core/components/resource_row.dart';
 import 'package:l_alternative/src/core/components/rounded_container.dart';
+import 'package:l_alternative/src/core/model/app_model.dart';
 import 'package:l_alternative/src/core/provider/app_providers.dart';
 import 'package:l_alternative/src/core/utils/app_utils.dart';
 import 'package:l_alternative/src/features/admin/model/activity_model.dart';
@@ -45,6 +46,7 @@ class _ActivityTemplateState extends ConsumerState<ActivityTemplate> {
     final newActivityNotifier = ref.read(newActivityProvider.notifier);
     final activitiesNotifier = ref.read(activitiesProvider.notifier);
     final themeMode = ref.watch(themeModeProvider);
+    var size = MediaQuery.of(context).size;
 
     return Scaffold(
       appBar: AppBar(
@@ -52,7 +54,9 @@ class _ActivityTemplateState extends ConsumerState<ActivityTemplate> {
         foregroundColor: Colors.black,
         leading: IconButton(
           onPressed: () {
-            ref.read(newActivityProvider.notifier).resetActivity();
+            if (!widget.model.isCompleted) {
+              newActivityNotifier.updateActivity(newActivity);
+            }
             Navigator.of(context).pop();
           },
           icon: Icon(Icons.chevron_left),
@@ -73,6 +77,7 @@ class _ActivityTemplateState extends ConsumerState<ActivityTemplate> {
                 newActivityNotifier.updateUpdatedDate(DateTime.now());
                 final updatedActivity = ref.read(newActivityProvider);
                 activitiesNotifier.addOrUpdateActivity(updatedActivity);
+                newActivityNotifier.resetActivity();
                 if (context.mounted) {
                   Navigator.of(context).pop();
                 }
@@ -88,34 +93,95 @@ class _ActivityTemplateState extends ConsumerState<ActivityTemplate> {
             spacing: 24,
             children: [
               if (!newActivity.isCompleted) ...{
-                CustomButton(
-                  text: "Changer la couleur",
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: Text("Choisir une couleur"),
-                          content: SingleChildScrollView(
-                            child: SizedBox(
-                              height: 100,
-                              width: 200,
-                              child: BlockPicker(
-                                pickerColor: ref
-                                    .read(newActivityProvider)
-                                    .color,
-                                onColorChanged: (color) {
-                                  newActivityNotifier.updateColor(color);
-                                  setState(() {});
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
+                SizedBox(
+                  width: size.width,
+                  child: Row(
+                    spacing: 8,
+                    children: [
+                      Expanded(
+                        child: CustomButton(
+                          text: "Changer la couleur",
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text("Choisir une couleur"),
+                                  content: SingleChildScrollView(
+                                    child: SizedBox(
+                                      height: size.height * 0.5,
+                                      width: size.width * 0.8,
+                                      child: BlockPicker(
+                                        items: Colors.primaries
+                                            .map(
+                                              (e) =>
+                                                  Container(color: e.shade200),
+                                            )
+                                            .toList(),
+                                        pickerItem: ref
+                                            .read(newActivityProvider)
+                                            .color,
+                                        onChanged: (container) {
+                                          var color =
+                                              (container as Container).color!;
+                                          newActivityNotifier.updateColor(
+                                            color,
+                                          );
+                                          setState(() {});
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: CustomButton(
+                          text: "Changer l'illustration",
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text("Choisir une illustration"),
+                                  content: SingleChildScrollView(
+                                    child: SizedBox(
+                                      height: size.height * 0.5,
+                                      width: size.width * 0.8,
+                                      child: BlockPicker(
+                                        items: AppModel.illustrations
+                                            .map((e) => Image.network(e))
+                                            .toList(),
+                                        pickerItem: Image.network(
+                                          ref
+                                              .read(newActivityProvider)
+                                              .illustration,
+                                        ),
+                                        onChanged: (newValue) {
+                                          var image = newValue as Image;
+                                          newActivityNotifier
+                                              .updateIllustration(
+                                                (image.image as NetworkImage)
+                                                    .url,
+                                              );
+                                          setState(() {});
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 CustomButton(
                   text:

@@ -18,6 +18,7 @@ class ImageButton extends ConsumerStatefulWidget {
   final Alignment? alignment;
   final bool isColored;
   final Color? color;
+  final String? semanticLabel;
 
   const ImageButton({
     super.key,
@@ -32,6 +33,7 @@ class ImageButton extends ConsumerStatefulWidget {
     this.alignment,
     this.isColored = true,
     this.color,
+    this.semanticLabel,
   });
 
   @override
@@ -42,13 +44,15 @@ class _ImageButtonState extends ConsumerState<ImageButton> {
   @override
   Widget build(BuildContext context) {
     final themeMode = ref.read(themeModeProvider);
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(widget.borderRadius),
-        onTap: widget.onPressed,
+    return Semantics(
+      button: true,
+      enabled: widget.onPressed != null,
+      label: widget.semanticLabel ?? widget.text ?? 'Image button',
+      child: Material(
+        color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(widget.borderRadius),
+          onTap: widget.onPressed,
           child: Stack(
             children: [
               ClipRRect(
@@ -63,6 +67,7 @@ class _ImageButtonState extends ConsumerState<ImageButton> {
                       : null,
                   width: widget.size ?? widget.width ?? 150,
                   height: widget.size ?? widget.height ?? 150,
+                  excludeFromSemantics: true, // Parent Semantics widget provides the label
                 ),
               ),
               Container(

@@ -2,10 +2,12 @@
 // Unauthorized copying of this file, via any medium, is strictly prohibited.
 // Created by MoniK.
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:l_alternative/src/core/service/database_services.dart';
 import 'package:l_alternative/src/features/admin/model/activity_model.dart';
+import 'package:monikode_event_store/monikode_event_store.dart';
 
 var newActivityProvider =
     StateNotifierProvider<NewActivityProvider, ActivityModel>(
@@ -28,6 +30,16 @@ class NewActivityProvider extends StateNotifier<ActivityModel> {
     var id = state.id.replaceAll(RegExp(r'[.#$[\]/]'), '');
     state = state.copyWith(isCompleted: true, id: id);
     await DatabaseServices.update("/activites", {id: state.toMap()});
+    await EventStore.getInstance().eventLogger.log(
+      "admin.activities.update",
+      EventLevel.info,
+      {
+        "parameters": {
+          "activityId": id,
+          "userId": FirebaseAuth.instance.currentUser?.uid,
+        },
+      },
+    );
   }
 
   void updateCreationDate(DateTime creationDate) {
@@ -183,10 +195,24 @@ class NewActivityProvider extends StateNotifier<ActivityModel> {
       }
       return step;
     }).toList();
+    await EventStore.getInstance().eventLogger.log(
+      "admin.activities.paragraph.delete",
+      EventLevel.info,
+      {
+        "params": {
+          "activityId": state.id,
+          "userId": FirebaseAuth.instance.currentUser?.uid,
+        },
+      },
+    );
     state = state.copyWith(newSteps: updatedSteps);
   }
 
   void updateDate(DateTime date) {
     state = state.copyWith(date: date);
+  }
+
+  void updateIllustration(newValue) {
+    state = state.copyWith(illustration: newValue);
   }
 }

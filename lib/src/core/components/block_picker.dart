@@ -4,13 +4,15 @@
 import 'package:flutter/material.dart';
 
 class BlockPicker extends StatefulWidget {
-  final Color pickerColor;
-  final Function(Color) onColorChanged;
+  final dynamic pickerItem;
+  final void Function(dynamic) onChanged;
+  final List<dynamic> items;
 
   const BlockPicker({
     super.key,
-    required this.pickerColor,
-    required this.onColorChanged,
+    required this.pickerItem,
+    required this.onChanged,
+    required this.items,
   });
 
   @override
@@ -18,23 +20,24 @@ class BlockPicker extends StatefulWidget {
 }
 
 class BlockPickerState extends State<BlockPicker> {
-  Color _selectedColor = Colors.white;
-
-  get selectedColor => _selectedColor;
+  dynamic _selectedItem;
 
   @override
   void initState() {
     super.initState();
-    _selectedColor = widget.pickerColor;
+    if (widget.pickerItem != null) {
+      _selectedItem = widget.pickerItem;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return SizedBox(
-      height: 200,
+      height: size.height * 0.4,
       width: double.infinity,
       child: GridView.builder(
-        itemCount: 18,
+        itemCount: widget.items.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 4,
           mainAxisSpacing: 8,
@@ -44,15 +47,17 @@ class BlockPickerState extends State<BlockPicker> {
           return GestureDetector(
             onTap: () {
               setState(() {
-                _selectedColor = Colors.primaries[index].shade200;
+                _selectedItem = widget.items[index];
               });
-              widget.onColorChanged(Colors.primaries[index].shade200);
+              widget.onChanged(widget.items[index]);
             },
-            child: Container(
-              color: Colors.primaries[index].shade200,
-              child: _selectedColor == Colors.primaries[index].shade200
-                  ? const Icon(Icons.check)
-                  : null,
+            child: Stack(
+              children: [
+                widget.items[index],
+                ?_selectedItem == widget.items[index]
+                    ? Center(child: const Icon(Icons.check))
+                    : null,
+              ],
             ),
           );
         },

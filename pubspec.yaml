@@ -32,6 +32,8 @@ dependencies:
   url_launcher: ^6.3.2
   http: ^1.6.0
   flutter_date_formatter: ^0.0.9
+  flutter_native_splash: ^2.4.7
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -92,3 +94,10 @@ flutter:
           weight: 600
         - asset: assets/fonts/InclusiveSans/InclusiveSans-Bold.ttf
           weight: 700
+
+flutter_native_splash:
+  color: "#EAE3D9"
+  image: assets/images/logo.png
+  android: true
+  ios: true
+  web: false

@@ -240,7 +240,9 @@ class _HistoryViewState extends State<HistoryView> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      Utils.formatDate(sortedEntries[i].key),
+                                      Utils.formatDate(
+                                        sortedEntries[i].key,
+                                      ).toCapitalized(),
                                     ),
                                     Image.asset(
                                       "assets/images/moods/${sortedEntries[i].value}",

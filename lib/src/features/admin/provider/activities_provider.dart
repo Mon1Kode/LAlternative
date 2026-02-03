@@ -2,10 +2,12 @@
 // Unauthorized copying of this file, via any medium, is strictly prohibited.
 // Created by MoniK.
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:l_alternative/src/core/service/database_services.dart';
 import 'package:l_alternative/src/features/admin/model/activity_model.dart';
+import 'package:monikode_event_store/monikode_event_store.dart';
 
 var activitiesProvider =
     StateNotifierProvider<ActivitiesProvider, ActivitiesModel>((ref) {
@@ -63,6 +65,16 @@ class ActivitiesProvider extends StateNotifier<ActivitiesModel> {
         .where((activity) => activity.id != id)
         .toList();
     await DatabaseServices.remove("/activites/$id");
+    await EventStore.getInstance().eventLogger.log(
+      "admin.activities.delete",
+      EventLevel.warning,
+      {
+        "params": {
+          "activityId": id,
+          "userId": FirebaseAuth.instance.currentUser?.uid,
+        },
+      },
+    );
     state = state.copyWith(newActivities: updatedActivities);
   }
 }

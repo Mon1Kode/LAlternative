@@ -17,6 +17,7 @@ class ActivityModel {
   final List<Map> testimonials;
   final List<Map<String, List<Map<String, String>>>> steps;
   final bool isCompleted;
+  final String illustration;
 
   ActivityModel({
     required this.id,
@@ -31,6 +32,8 @@ class ActivityModel {
     required this.testimonials,
     required this.steps,
     this.isCompleted = false,
+    this.illustration =
+        "https://firebasestorage.googleapis.com/v0/b/l-alternative-bf37d.firebasestorage.app/o/illustrations%2Fone.png?alt=media&token=d1e05486-1832-44d3-9a35-3c0d4ca307a8",
   });
 
   ActivityModel copyWith({
@@ -46,6 +49,7 @@ class ActivityModel {
     List<Map>? testimonials,
     List<Map<String, List<Map<String, String>>>>? newSteps,
     bool? isCompleted,
+    String? illustration,
   }) {
     return ActivityModel(
       id: id ?? this.id,
@@ -60,6 +64,7 @@ class ActivityModel {
       testimonials: testimonials ?? this.testimonials,
       steps: newSteps ?? steps,
       isCompleted: isCompleted ?? this.isCompleted,
+      illustration: illustration ?? this.illustration,
     );
   }
 
@@ -93,6 +98,7 @@ class ActivityModel {
       'testimonials': testimonials,
       'steps': steps,
       'isCompleted': isCompleted,
+      'illustration': illustration,
     };
   }
 
@@ -109,26 +115,30 @@ class ActivityModel {
       videos: List<Map>.from(map['videos'] as List? ?? []),
       testimonials: List<Map>.from(map['testimonials'] as List? ?? []),
       steps: List<Map<String, List<Map<String, String>>>>.from(
-        (map['steps'] as List).map((step) {
-          final stepMap = step as Map;
-          return stepMap.map((key, value) {
-            final valueList = value as List;
-            return MapEntry(
-              key.toString(),
-              List<Map<String, String>>.from(
-                valueList.map(
-                  (item) => Map<String, String>.from(
-                    (item as Map).map(
-                      (k, v) => MapEntry(k.toString(), v.toString()),
+        (map['steps'] as List?)?.map((step) {
+              final stepMap = step as Map;
+              return stepMap.map((key, value) {
+                final valueList = value as List;
+                return MapEntry(
+                  key.toString(),
+                  List<Map<String, String>>.from(
+                    valueList.map(
+                      (item) => Map<String, String>.from(
+                        (item as Map).map(
+                          (k, v) => MapEntry(k.toString(), v.toString()),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-            );
-          });
-        }),
+                );
+              });
+            }) ??
+            [],
       ),
       isCompleted: map['isCompleted'] as bool,
+      illustration:
+          map['illustration'] as String? ??
+          "https://firebasestorage.googleapis.com/v0/b/l-alternative-bf37d.firebasestorage.app/o/illustrations%2Fone.png?alt=media&token=d1e05486-1832-44d3-9a35-3c0d4ca307a8",
     );
   }
 

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:intl/intl.dart';
+import 'package:l_alternative/src/core/model/app_model.dart';
 import 'package:l_alternative/src/features/notifications/services/fcm_service.dart';
 import 'package:l_alternative/src/features/notifications/services/notifications_services.dart';
 
@@ -15,11 +15,10 @@ void main() async {
   // Initialize date formatting early so locale data is available to any
   // service or widget that runs during app startup.
   await initializeDateFormatting();
-  Intl.defaultLocale = 'fr_FR';
-
   await Firebase.initializeApp();
   await NotificationService.init();
   await FCMService.initialize();
+  await AppModel.getIllustrations();
 
   // fix portrait mode only
   SystemChrome.setPreferredOrientations([

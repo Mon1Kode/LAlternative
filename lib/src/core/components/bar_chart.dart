@@ -59,71 +59,81 @@ class BarChartSample4State extends State<BarChartSample4> {
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 1.66,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 16),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            const barsSpace = 24.0;
-            const barsWidth = 24.0;
-            return BarChart(
-              BarChartData(
-                maxY: widget.maxY + 1,
-                alignment: BarChartAlignment.center,
-                barTouchData: BarTouchData(enabled: false),
-                titlesData: FlTitlesData(
-                  show: true,
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 19,
-                      getTitlesWidget: bottomTitles,
+    // Create a text description of the data for screen readers
+    String dataDescription = 'Bar chart with ${widget.values.length} data points. ';
+    for (int i = 0; i < widget.values.length; i++) {
+      final percentage = ((widget.values[i] / (widget.maxY == 0.0 ? 1 : widget.maxY)) * 100).toInt();
+      dataDescription += 'Point ${i + 1}: $percentage percent. ';
+    }
+    
+    return Semantics(
+      label: dataDescription,
+      child: AspectRatio(
+        aspectRatio: 1.66,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              const barsSpace = 24.0;
+              const barsWidth = 24.0;
+              return BarChart(
+                BarChartData(
+                  maxY: widget.maxY + 1,
+                  alignment: BarChartAlignment.center,
+                  barTouchData: BarTouchData(enabled: false),
+                  titlesData: FlTitlesData(
+                    show: true,
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 19,
+                        getTitlesWidget: bottomTitles,
+                      ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 40,
+                        interval: max(widget.maxY / 5, 1).toDouble(),
+                        getTitlesWidget: leftTitles,
+                      ),
+                    ),
+                    topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
                     ),
                   ),
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 40,
-                      interval: max(widget.maxY / 5, 1).toDouble(),
-                      getTitlesWidget: leftTitles,
+                  gridData: FlGridData(
+                    show: true,
+                    horizontalInterval: 25,
+                    checkToShowHorizontalLine: (value) => value > 0,
+                    getDrawingHorizontalLine: (value) => FlLine(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      strokeWidth: 1,
+                    ),
+                    drawVerticalLine: false,
+                  ),
+                  borderData: FlBorderData(
+                    show: true,
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Theme.of(context).colorScheme.secondary,
+                        width: 1,
+                      ),
+                      left: BorderSide(
+                        color: Theme.of(context).colorScheme.secondary,
+                        width: 1,
+                      ),
                     ),
                   ),
-                  topTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  rightTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
+                  groupsSpace: barsSpace,
+                  barGroups: getData(barsWidth, barsSpace),
                 ),
-                gridData: FlGridData(
-                  show: true,
-                  horizontalInterval: 25,
-                  checkToShowHorizontalLine: (value) => value > 0,
-                  getDrawingHorizontalLine: (value) => FlLine(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    strokeWidth: 1,
-                  ),
-                  drawVerticalLine: false,
-                ),
-                borderData: FlBorderData(
-                  show: true,
-                  border: Border(
-                    bottom: BorderSide(
-                      color: Theme.of(context).colorScheme.secondary,
-                      width: 1,
-                    ),
-                    left: BorderSide(
-                      color: Theme.of(context).colorScheme.secondary,
-                      width: 1,
-                    ),
-                  ),
-                ),
-                groupsSpace: barsSpace,
-                barGroups: getData(barsWidth, barsSpace),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );

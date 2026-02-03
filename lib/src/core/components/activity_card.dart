@@ -29,80 +29,93 @@ class ActivityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(
-            color: Theme.of(context).colorScheme.secondary,
-            width: 4,
+    return Semantics(
+      label: '$title: $description',
+      button: isLast,
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              color: Theme.of(context).colorScheme.secondary,
+              width: 4,
+            ),
+            left: BorderSide(
+              color: Theme.of(context).colorScheme.secondary,
+              width: 4,
+            ),
+            right: BorderSide(
+              color: Theme.of(context).colorScheme.secondary,
+              width: 4,
+            ),
+            bottom: BorderSide(
+              color: Theme.of(context).colorScheme.secondary,
+              width: 0.5,
+            ),
           ),
-          left: BorderSide(
-            color: Theme.of(context).colorScheme.secondary,
-            width: 4,
-          ),
-          right: BorderSide(
-            color: Theme.of(context).colorScheme.secondary,
-            width: 4,
-          ),
-          bottom: BorderSide(
-            color: Theme.of(context).colorScheme.secondary,
-            width: 0.5,
-          ),
+          borderRadius: BorderRadius.circular(24),
         ),
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: RoundedContainer(
-        width: MediaQuery.of(context).size.width - 32 - 8,
-        hasBorder: false,
-        color: color,
-        padding: padding,
-        borderRadius: 20,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+        child: RoundedContainer(
+          width: MediaQuery.of(context).size.width - 32 - 8,
+          hasBorder: false,
+          color: color,
+          padding: padding,
+          borderRadius: 20,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
-                  ),
-                  Text(
-                    description,
-                    style: const TextStyle(fontSize: 16, color: Colors.black),
-                  ),
-                  if (isLast)
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.tertiary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                    Text(
+                      description,
+                      style: const TextStyle(fontSize: 16, color: Colors.black),
+                    ),
+                    if (isLast)
+                      Semantics(
+                        button: true,
+                        label: "Voir l'activité $title",
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.tertiary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(builder: (context) => actionView),
+                            );
+                          },
+                          child: Text(
+                            "Voir l'activité",
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
                         ),
                       ),
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => actionView),
-                        );
-                      },
-                      child: Text(
-                        "Voir l'activité",
-                        style: TextStyle(fontSize: 16, color: Colors.white),
-                      ),
-                    ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            if (hasImage)
-              Image.asset(
-                imagePath,
-                width: MediaQuery.of(context).size.width * 0.3,
-              ),
-          ],
+              if (hasImage)
+                Semantics(
+                  image: true,
+                  label: 'Activity illustration for $title',
+                  child: Image.asset(
+                    imagePath,
+                    width: MediaQuery.of(context).size.width * 0.3,
+                    excludeFromSemantics: false,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

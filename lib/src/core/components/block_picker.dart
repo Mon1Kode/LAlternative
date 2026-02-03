@@ -22,6 +22,28 @@ class BlockPickerState extends State<BlockPicker> {
 
   get selectedColor => _selectedColor;
 
+  // Color names for accessibility
+  static const List<String> colorNames = [
+    'Red',
+    'Pink',
+    'Purple',
+    'Deep Purple',
+    'Indigo',
+    'Blue',
+    'Light Blue',
+    'Cyan',
+    'Teal',
+    'Green',
+    'Light Green',
+    'Lime',
+    'Yellow',
+    'Amber',
+    'Orange',
+    'Deep Orange',
+    'Brown',
+    'Grey',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -30,32 +52,49 @@ class BlockPickerState extends State<BlockPicker> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 200,
-      width: double.infinity,
-      child: GridView.builder(
-        itemCount: 18,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 8,
+    return Semantics(
+      label: 'Color picker',
+      hint: 'Select a color for your profile',
+      child: SizedBox(
+        height: 200,
+        width: double.infinity,
+        child: GridView.builder(
+          itemCount: 18,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 4,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+          ),
+          itemBuilder: (context, index) {
+            final color = Colors.primaries[index].shade200;
+            final isSelected = _selectedColor == color;
+            final colorName = index < colorNames.length ? colorNames[index] : 'Color ${index + 1}';
+            
+            return Semantics(
+              button: true,
+              selected: isSelected,
+              label: colorName,
+              hint: isSelected ? 'Currently selected' : 'Tap to select',
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _selectedColor = color;
+                  });
+                  widget.onColorChanged(color);
+                },
+                child: Container(
+                  color: color,
+                  child: isSelected
+                      ? const Icon(
+                          Icons.check,
+                          semanticLabel: 'Selected',
+                        )
+                      : null,
+                ),
+              ),
+            );
+          },
         ),
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                _selectedColor = Colors.primaries[index].shade200;
-              });
-              widget.onColorChanged(Colors.primaries[index].shade200);
-            },
-            child: Container(
-              color: Colors.primaries[index].shade200,
-              child: _selectedColor == Colors.primaries[index].shade200
-                  ? const Icon(Icons.check)
-                  : null,
-            ),
-          );
-        },
       ),
     );
   }

@@ -32,64 +32,72 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: widget.height ?? 56,
-      child: Material(
-        elevation: 0,
-        borderRadius: BorderRadius.circular(8),
-        child: TextField(
-          controller: widget.textController,
-          showCursor: true,
-          keyboardType: widget.textInputType,
-          maxLines: widget.maxLines,
-          cursorColor: Theme.of(context).colorScheme.onPrimary,
-          obscureText: widget.obscureText ? _isObscured : false,
-          onChanged: (value) {
-            if (widget.onChanged != null) {
-              widget.onChanged!(value);
-            }
-          },
-          decoration: InputDecoration(
-            fillColor: Theme.of(
-              context,
-            ).colorScheme.surface.withValues(alpha: 0.9),
-            filled: true,
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.onPrimary,
+    return Semantics(
+      textField: true,
+      label: widget.hintText,
+      child: SizedBox(
+        height: widget.height ?? 56,
+        child: Material(
+          elevation: 0,
+          borderRadius: BorderRadius.circular(8),
+          child: TextField(
+            controller: widget.textController,
+            showCursor: true,
+            keyboardType: widget.textInputType,
+            maxLines: widget.maxLines,
+            cursorColor: Theme.of(context).colorScheme.onPrimary,
+            obscureText: widget.obscureText ? _isObscured : false,
+            onChanged: (value) {
+              if (widget.onChanged != null) {
+                widget.onChanged!(value);
+              }
+            },
+            decoration: InputDecoration(
+              fillColor: Theme.of(
+                context,
+              ).colorScheme.surface.withValues(alpha: 0.9),
+              filled: true,
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
               ),
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onPrimary.withValues(alpha: 0.7),
+                ),
+              ),
+              suffixIcon: widget.obscureText
+                  ? Semantics(
+                      button: true,
+                      label: _isObscured ? 'Show password' : 'Hide password',
+                      child: IconButton(
+                        icon: Icon(
+                          _isObscured ? Icons.visibility : Icons.visibility_off,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onPrimary.withValues(alpha: 0.7),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isObscured = !_isObscured;
+                          });
+                        },
+                      ),
+                    )
+                  : null,
+              hintText: widget.hintText,
+              hintStyle: TextStyle(
                 color: Theme.of(
                   context,
                 ).colorScheme.onPrimary.withValues(alpha: 0.7),
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
               ),
-            ),
-            suffixIcon: widget.obscureText
-                ? IconButton(
-                    icon: Icon(
-                      _isObscured ? Icons.visibility : Icons.visibility_off,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onPrimary.withValues(alpha: 0.7),
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _isObscured = !_isObscured;
-                      });
-                    },
-                  )
-                : null,
-            hintText: widget.hintText,
-            hintStyle: TextStyle(
-              color: Theme.of(
-                context,
-              ).colorScheme.onPrimary.withValues(alpha: 0.7),
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
             ),
           ),
         ),

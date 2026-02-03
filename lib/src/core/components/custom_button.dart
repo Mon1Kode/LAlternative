@@ -23,30 +23,37 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: (onPressed != null || routeName != null) && isEnabled
-          ? routeName != null
-                ? () {
-                    if (predicate) {
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        routeName!,
-                        (route) => false,
-                      );
-                    } else {
-                      Navigator.pushNamed(context, routeName!);
+    final bool isButtonEnabled = (onPressed != null || routeName != null) && isEnabled;
+    return Semantics(
+      button: true,
+      enabled: isButtonEnabled,
+      label: text,
+      hint: !isButtonEnabled ? 'Button is disabled' : null,
+      child: ElevatedButton(
+        onPressed: isButtonEnabled
+            ? routeName != null
+                  ? () {
+                      if (predicate) {
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          routeName!,
+                          (route) => false,
+                        );
+                      } else {
+                        Navigator.pushNamed(context, routeName!);
+                      }
                     }
-                  }
-                : onPressed
-          : null,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color ?? Theme.of(context).colorScheme.tertiary,
-        foregroundColor: Theme.of(context).colorScheme.onTertiary,
-        minimumSize: Size(double.infinity, 50),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        maximumSize: Size(double.infinity, 50),
+                  : onPressed
+            : null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color ?? Theme.of(context).colorScheme.tertiary,
+          foregroundColor: Theme.of(context).colorScheme.onTertiary,
+          minimumSize: Size(double.infinity, 50),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          maximumSize: Size(double.infinity, 50),
+        ),
+        child: Center(child: Text(text)),
       ),
-      child: Center(child: Text(text)),
     );
   }
 

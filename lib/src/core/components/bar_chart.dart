@@ -60,10 +60,15 @@ class BarChartSample4State extends State<BarChartSample4> {
   @override
   Widget build(BuildContext context) {
     // Create a text description of the data for screen readers
-    String dataDescription = 'Bar chart with ${widget.values.length} data points. ';
-    for (int i = 0; i < widget.values.length; i++) {
-      final percentage = ((widget.values[i] / (widget.maxY == 0.0 ? 1 : widget.maxY)) * 100).toInt();
-      dataDescription += 'Point ${i + 1}: $percentage percent. ';
+    String dataDescription;
+    if (widget.maxY == 0.0 || widget.values.isEmpty) {
+      dataDescription = 'Bar chart with no data available.';
+    } else {
+      dataDescription = 'Bar chart with ${widget.values.length} data points. ';
+      for (int i = 0; i < widget.values.length; i++) {
+        final percentage = ((widget.values[i] / widget.maxY) * 100).toInt();
+        dataDescription += 'Point ${i + 1}: $percentage percent. ';
+      }
     }
     
     return Semantics(

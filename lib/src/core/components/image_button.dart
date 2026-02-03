@@ -53,50 +53,47 @@ class _ImageButtonState extends ConsumerState<ImageButton> {
         child: InkWell(
           borderRadius: BorderRadius.circular(widget.borderRadius),
           onTap: widget.onPressed,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(widget.borderRadius),
-            child: Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(widget.borderRadius),
-                  child: Image.asset(
-                    "assets/images/${widget.imagePath}",
-                    color: widget.isColored
-                        ? widget.color ??
-                              (themeMode == ThemeMode.dark
-                                  ? Colors.white
-                                  : Colors.black)
-                        : null,
-                    width: widget.size ?? widget.width ?? 150,
-                    height: widget.size ?? widget.height ?? 150,
-                    semanticLabel: '',
-                  ),
-                ),
-                Container(
+          child: Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(widget.borderRadius),
+                child: Image.asset(
+                  "assets/images/${widget.imagePath}",
+                  color: widget.isColored
+                      ? widget.color ??
+                            (themeMode == ThemeMode.dark
+                                ? Colors.white
+                                : Colors.black)
+                      : null,
                   width: widget.size ?? widget.width ?? 150,
                   height: widget.size ?? widget.height ?? 150,
-                  alignment: widget.alignment ?? Alignment.center,
-                  padding: const EdgeInsets.only(bottom: 4.0),
-                  child: widget.text != null
-                      ? Text(
-                          widget.text!,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: widget.fontSize,
-                            fontWeight: FontWeight.bold,
-                            shadows: [
-                              Shadow(
-                                offset: Offset(1.0, 1.0),
-                                blurRadius: 3.0,
-                                color: Colors.white54,
-                              ),
-                            ],
-                          ),
-                        )
-                      : null,
+                  semanticLabel: '',
                 ),
-              ],
-            ),
+              ),
+              Container(
+                width: widget.size ?? widget.width ?? 150,
+                height: widget.size ?? widget.height ?? 150,
+                alignment: widget.alignment ?? Alignment.center,
+                padding: const EdgeInsets.only(bottom: 4.0),
+                child: widget.text != null
+                    ? Text(
+                        widget.text!,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: widget.fontSize,
+                          fontWeight: FontWeight.bold,
+                          shadows: [
+                            Shadow(
+                              offset: Offset(1.0, 1.0),
+                              blurRadius: 3.0,
+                              color: Colors.white54,
+                            ),
+                          ],
+                        ),
+                      )
+                    : null,
+              ),
+            ],
           ),
         ),
       ),

@@ -111,7 +111,6 @@ class ActivityCard extends StatelessWidget {
                   child: Image.asset(
                     imagePath,
                     width: MediaQuery.of(context).size.width * 0.3,
-                    excludeFromSemantics: false,
                   ),
                 ),
             ],

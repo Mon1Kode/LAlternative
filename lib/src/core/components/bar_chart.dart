@@ -48,8 +48,9 @@ class BarChartSample4State extends State<BarChartSample4> {
     }
     const style = TextStyle(fontSize: 10);
 
-    var val = ((value.toInt() / (widget.maxY == 0.0 ? 1 : widget.maxY)) * 100)
-        .toInt();
+    var val = widget.maxY == 0.0 
+        ? 0 
+        : ((value.toInt() / widget.maxY) * 100).toInt();
 
     return SideTitleWidget(
       meta: meta,

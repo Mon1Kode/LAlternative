@@ -41,13 +41,15 @@ class CircleImageButton extends StatelessWidget {
           radius: 999,
           child: Padding(
             padding: const EdgeInsets.all(2.0),
-            child: ImageButton(
-              imagePath: imagePath,
-              onPressed: onPressed,
-              size: size.width * 0.1,
-              isColored: false,
-              semanticLabel: '',
-              // borderRadius: 999,
+            child: ExcludeSemantics(
+              // Parent Semantics widget provides the label
+              child: ImageButton(
+                imagePath: imagePath,
+                onPressed: onPressed,
+                size: size.width * 0.1,
+                isColored: false,
+                // borderRadius: 999,
+              ),
             ),
           ),
         ),

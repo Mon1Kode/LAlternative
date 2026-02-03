@@ -67,7 +67,7 @@ class _ImageButtonState extends ConsumerState<ImageButton> {
                       : null,
                   width: widget.size ?? widget.width ?? 150,
                   height: widget.size ?? widget.height ?? 150,
-                  semanticLabel: '',
+                  excludeFromSemantics: true, // Parent Semantics widget provides the label
                 ),
               ),
               Container(

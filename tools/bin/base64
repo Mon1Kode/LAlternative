@@ -1,0 +1,26 @@
+#!/bin/bash
+# Lightweight wrapper to sanitize base64 input and decode reliably on macOS/Linux without complex subshells.
+set -eu
+
+# Detect decode flag
+decode=0
+for a in "$@"; do
+  case "$a" in
+    --decode|-d|-D)
+      decode=1
+      break
+      ;;
+  esac
+done
+
+if [ "$decode" -eq 1 ]; then
+  # Strip any non-base64 characters and decode. Use awk to avoid sed subshell edge cases.
+  if [ "$(uname)" = "Darwin" ]; then
+    awk '{ gsub(/[^A-Za-z0-9+\/=]/, ""); printf "%s", $0 }' | /usr/bin/base64 -D
+  else
+    awk '{ gsub(/[^A-Za-z0-9+\/=]/, ""); printf "%s", $0 }' | base64 --decode
+  fi
+else
+  # Forward other invocations to the system base64
+  command base64 "$@"
+fi

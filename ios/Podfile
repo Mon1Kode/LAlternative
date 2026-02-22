@@ -42,6 +42,24 @@ target 'Runner' do
   end
 end
 
+pre_install do |installer|
+  installer.pod_targets.each do |pod|
+    pod.specs.each do |s|
+      if s.name == 'BoringSSL-GRPC' || (s.respond_to?(:root_name) && s.root_name == 'BoringSSL-GRPC') || s.name.include?('BoringSSL-GRPC')
+        begin
+          if s.respond_to?(:prepare_command=)
+            s.prepare_command = nil
+          else
+            s.instance_variable_set(:@prepare_command, nil) if s.instance_variable_defined?(:@prepare_command)
+          end
+        rescue => e
+          puts "Warning: failed to disable prepare_command for #{s.name}: #{e}"
+        end
+      end
+    end
+  end
+end
+
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
@@ -50,6 +68,22 @@ post_install do |installer|
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
       config.build_settings['ENABLE_BITCODE'] = 'NO'
+    end
+  end
+
+  require 'fileutils'
+  # Copy repo-provided BoringSSL support files into Pods if needed
+  support_dir = File.expand_path(File.join('..', 'tools', 'boringssl_support'), __FILE__)
+  if File.directory?(support_dir)
+    Dir.glob(File.join(installer.sandbox.root, 'BoringSSL-GRPC', '*')).each do |pod_path|
+      dst_include_dir = File.join(pod_path, 'src', 'include', 'openssl')
+      FileUtils.mkdir_p(dst_include_dir)
+      if File.exist?(File.join(support_dir, 'boringssl_prefix_symbols.h'))
+        FileUtils.cp(File.join(support_dir, 'boringssl_prefix_symbols.h'), File.join(dst_include_dir, 'boringssl_prefix_symbols.h'))
+      end
+      if File.exist?(File.join(support_dir, 'PrivacyInfo.xcprivacy'))
+        FileUtils.cp(File.join(support_dir, 'PrivacyInfo.xcprivacy'), File.join(pod_path, 'src', 'PrivacyInfo.xcprivacy'))
+      end
     end
   end
 end

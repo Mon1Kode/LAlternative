@@ -1,35 +1,26 @@
 #!/bin/bash
-# Wrapper to normalize base64 decode flags and optionally ignore garbage characters.
-# Ensures CocoaPods prepare_command base64 decoding works on macOS and other platforms.
+# Lightweight wrapper to sanitize base64 input and decode reliably on macOS/Linux without complex subshells.
 set -eu
-args=("$@")
+
+# Detect decode flag
 decode=0
-ignore_garbage=0
-for a in "${args[@]}"; do
+for a in "$@"; do
   case "$a" in
     --decode|-d|-D)
       decode=1
-      ;;
-    --ignore-garbage)
-      ignore_garbage=1
+      break
       ;;
   esac
 done
 
 if [ "$decode" -eq 1 ]; then
-  if [ "$ignore_garbage" -eq 1 ]; then
-    # strip non-base64 characters then decode
-    sed 's/[^A-Za-z0-9+/=]//g'
+  # Strip any non-base64 characters and decode. Use awk to avoid sed subshell edge cases.
+  if [ "$(uname)" = "Darwin" ]; then
+    awk '{ gsub(/[^A-Za-z0-9+\/=]/, ""); printf "%s", $0 }' | /usr/bin/base64 -D
   else
-    cat
-  fi | (
-    if [ "$(uname)" = "Darwin" ]; then
-      command base64 -D
-    else
-      command base64 --decode
-    fi
-  )
+    awk '{ gsub(/[^A-Za-z0-9+\/=]/, ""); printf "%s", $0 }' | base64 --decode
+  fi
 else
-  # forward other invocations to system base64
+  # Forward other invocations to the system base64
   command base64 "$@"
 fi
